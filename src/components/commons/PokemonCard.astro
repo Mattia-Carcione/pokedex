@@ -1,0 +1,30 @@
+---
+import { LINKS } from '../../const';
+import type { CardPokemon } from '../../utils/interfaces/types.ts';
+import NameInfo from './NameInfo.astro';
+import Sprite from './Sprite.astro';
+import TypesBagde from './TypesBagde.astro';
+
+interface Props {
+  pokemon: CardPokemon;
+}
+
+const { id, name, imgSrc, types } = Astro.props.pokemon;
+const typeColorMain = types[0].color;
+const typeColorSecondary = types[1]?.color ?? types[0].color;
+const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+const href = LINKS.find(x => x.id == "pokemon")?.href + name;
+---
+
+<article class="shadow-xl p-1 rounded-xl transition delay-150 duration-300 ease-in-out hover:scale-110 block" style={`background: linear-gradient(135deg, ${typeColorMain}, ${typeColorSecondary});`} aria-label="Card Pokémon">
+    <a href={href} aria-label={`Vai alla scheda dettagliata di ${displayName}`} class="block p-5">
+        <!-- HEADER -->
+        <div class="flex justify-between py-2">
+            <NameInfo id={id} name={displayName} />
+
+            <TypesBagde types={types} />
+        </div>
+
+        <Sprite imgSrc={imgSrc} name={displayName} />
+    </a>
+</article>

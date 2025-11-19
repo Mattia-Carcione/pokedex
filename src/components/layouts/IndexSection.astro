@@ -1,0 +1,15 @@
+---
+import type { CardPokemon } from '../../utils/interfaces/types'
+import PokemonCard from '../commons/PokemonCard.astro';
+
+interface Props {
+    pokemon: CardPokemon[];
+}
+const { pokemon } = Astro.props;
+---    
+    
+<section id="main-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 p-5" aria-label="Sezione contente l'indice dei Pokémon">
+    {pokemon.map((p: CardPokemon) => (
+        <PokemonCard pokemon={p} />
+    ))}
+</section>

@@ -1,14 +1,27 @@
+---
+import BaseHead from "../components/utilities/BaseHead.astro";
+import { BASE_PATH, LINKS } from "../const";
+import { fetchGenerations } from "../utils/pokeApi";
+
+interface Props {
+	title: string;
+	description: string;
+}
+
+const { title, description } = Astro.props;
+const gensData = await fetchGenerations();
+const gens = gensData.results;
+---
+
 <!doctype html>
 <html lang="it">
 	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Pokédex</title>
+		<BaseHead title={title} description={description} />
 	</head>
 	
 	<body>
-		<slot />
+		<main>
+			<slot />
+		</main>
 	</body>
 </html>

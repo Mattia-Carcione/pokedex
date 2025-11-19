@@ -1,0 +1,15 @@
+---
+import Skeleton from './Skeleton.astro';
+
+interface Props {
+    imgSrc: string;
+    name: string;
+}
+
+const { imgSrc, name } = Astro.props;
+---
+<!-- SPRITE -->
+<div class="flex justify-center-safe items-center h-[350px]" aria-label="Sprite del Pokémon">
+    <Skeleton />
+    <img class="object-cover h-[250px] opacity-0 transition-opacity duration-300" src={imgSrc} alt={`Sprite ufficiale di ${name}`} loading="lazy" onload="this.previousElementSibling.style.display='none'; this.style.opacity='1';"/>
+</div>

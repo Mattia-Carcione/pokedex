@@ -1,10 +1,16 @@
 ---
+import { SITE_TITLE } from '../const';
+import { fetchGenerationById, fetchAllByGeneration } from '../utils/pokeApi.ts';
+import { Sort } from '../utils/helper.ts';
 import Layout from '../layouts/Layout.astro';
+import type { CardPokemon } from '../utils/interfaces/types.ts';
+import IndexSection from '../components/layouts/IndexSection.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const pokemonData = await fetchGenerationById();
+const pokemonSpecies = Sort(pokemonData.pokemon_species);
+const pokemon: CardPokemon[] = await fetchAllByGeneration(pokemonSpecies);
 ---
 
-<Layout>
-	
+<Layout title={SITE_TITLE} description=''>
+    <IndexSection pokemon={pokemon} />
 </Layout>

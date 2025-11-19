@@ -1,0 +1,33 @@
+---
+import IndexSection from '../../components/layouts/IndexSection.astro';
+import { SITE_TITLE } from '../../const';
+import Layout from '../../layouts/Layout.astro';
+import { Sort } from '../../utils/helper';
+import type { CardPokemon } from '../../utils/interfaces/types';
+import { fetchGenerations, fetchGenerationById, fetchAllByGeneration } from '../../utils/pokeApi.ts';
+
+export async function getStaticPaths() {
+  const gens = await fetchGenerations(); 
+  const paths = gens.results.map((g: any) => {
+    const urlParts = g.url.split("/").filter(Boolean);
+    const id = urlParts[urlParts.length - 1]; // numero della gen
+
+    return {
+      params: { id },
+      props: { id },
+    };
+  });
+
+  return paths;
+};
+
+const { id } = Astro.props;
+const pokemonData = await fetchGenerationById(id);
+const pokemonSpecies = Sort(pokemonData.pokemon_species);
+const pokemon: CardPokemon[] = await fetchAllByGeneration(pokemonSpecies);
+const title = SITE_TITLE + " - Gen " + id;
+---
+
+<Layout title={title} description=''>
+  <IndexSection pokemon={pokemon} />
+</Layout>
