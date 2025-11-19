@@ -1,6 +1,6 @@
 export const BASE_PATH = '/pokedex-astro';
 export const LOCAL_URL: URL = new URL('http://localhost:4321');
-export const SITE_TITLE = 'Pokédex';
+export const SITE_TITLE = 'PoKéDex';
 export const LINKS = [
   { id: 'generation', label: 'Generation', href: `${BASE_PATH}/generation/` },
   { id: 'pokemon', label: 'Pokémon', href: `${BASE_PATH}/pokemon/` },

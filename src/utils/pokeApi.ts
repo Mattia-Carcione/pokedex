@@ -1,7 +1,7 @@
 import { LINKS_API } from "../const.ts";
 import { cachedFetch } from "./caching/cache.ts";
-import { MapCardPokemon, MapGeneration } from "./helper.ts";
-import type { CardPokemon } from "./interfaces/types.ts";
+import { MapGeneration } from "./helper.ts";
+import type { Pokemon } from "./interfaces/types.ts";
 
 async function safeFetch(url: string, retries = 5) {
   let error;
@@ -41,32 +41,32 @@ export async function fetchGenerationById(id: string = "1"): Promise<any> {
   }
 }
 
-export async function fetchPokemonByIdOrName(idOrName: string = ""): Promise<CardPokemon> {
+export async function fetchPokemonByIdOrName(idOrName: string = ""): Promise<Pokemon> {
   try {
     return cachedFetch(`pokemon_${idOrName}`, async () => {
       const res = await safeFetch(`${LINKS_API.find(x => x.id == 'pokemon')?.href}${idOrName}`);
       if (!res.ok) throw new Error(`fetchPokemonByIdOrName Failed to fetch pokemon: ${res.status}`);
-      return MapCardPokemon(res.json());
+      return await res.json() as Pokemon;
     });
   } catch (err) {
     throw new Error(`fetchPokemonByIdOrName failed to fetch generations: ${idOrName}. \n Error: ${err}`);
   }
 }
 
-export async function fetchPokemonByUrl(url: string = ""): Promise<CardPokemon> {
+export async function fetchPokemonByUrl(url: string = ""): Promise<Pokemon> {
   const fetchUrl = url.replace("-species", "");
   try {
     return cachedFetch(`pokemon_url_${fetchUrl}`, async () => {
       const res = await safeFetch(fetchUrl);
       if (!res.ok) throw new Error(`fetchPokemonByUrl Failed to fetch pokemon: ${fetchUrl} (status ${res.status})`);
-      return MapCardPokemon(res.json());
+      return await res.json() as Pokemon;
     });
   } catch (err) {
     throw new Error(`fetchPokemonByUrl failed for URL: ${fetchUrl}.\n Error: ${err}`);
   }
 }
 
-export async function fetchAllByGeneration(pokemonData: []): Promise<CardPokemon[]> {
+export async function fetchAllByGeneration(pokemonData: []): Promise<Pokemon[]> {
   try {
     return Promise.all(pokemonData.map(async (p: any) => {
       try {

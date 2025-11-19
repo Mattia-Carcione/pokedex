@@ -1,0 +1,32 @@
+---
+import { MapCardPokemon, Sort } from '../../utils/helper';
+import type { CardPokemon, Generation, Pokemon } from '../../utils/interfaces/types';
+import { fetchAllByGeneration, fetchGenerationById, fetchGenerations } from '../../utils/pokeApi';
+import Detail from '../../layouts/Detail.astro';
+import PokemonCard from '../../components/commons/PokemonCard.astro';
+
+export async function getStaticPaths() {
+  const gens = await fetchGenerations();
+  const flat = await Promise.all(gens.map(async (g: Generation) => {
+    const pokemonData = await fetchGenerationById(g.id.toString());
+    const pokemonSpecies = Sort(pokemonData.pokemon_species);
+    const pokemons = await fetchAllByGeneration(pokemonSpecies);
+    return pokemons.map((pokemon) => {
+      return {
+        params: { name: pokemon.species.name },
+        props: { name: pokemon.species.name, pokemon: pokemon },
+      }
+    })
+  }));
+  return flat.flat();
+};
+
+const { name, pokemon } = Astro.props;
+const data: Pokemon = pokemon;
+const title = "PoKéMon - " + name.charAt(0).toUpperCase() + name.slice(1);;
+const card: CardPokemon = MapCardPokemon(pokemon);
+---
+
+<Detail title={title} description=''>
+  <PokemonCard pokemon={card} />
+</Detail>

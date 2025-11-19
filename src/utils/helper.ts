@@ -1,5 +1,5 @@
 import { TYPE_ICONS, TYPE_COLORS, LINKS } from "../const";
-import type { CardPokemon, Type, Generation } from "./interfaces/types";
+import type { CardPokemon, Type, Generation, Pokemon } from "./interfaces/types";
 
 export function Sort(data: []): [] {
   try {
@@ -17,21 +17,20 @@ export function Sort(data: []): [] {
   }
 }
 
-export async function MapCardPokemon(pokemonPromise: Promise<any>): Promise<CardPokemon> {
+export function MapCardPokemon(pokemon: Pokemon): CardPokemon {
   try {
-    const pokemon = await pokemonPromise;
-    const name: string = pokemon.species.name.toString();
     if (!pokemon)
       throw new Error("MapCardPokemon received empty pokemon data");
+    const name: string = pokemon.species.name;
   
-    const types: Type[] = SetTypes(pokemon.types);
+    const types: Type[] = SetTypes(pokemon.types as []);
     const id = SetPokedexNumber(pokemon.id);
   
     return {
       id: id,
       name: name,
       types,
-      imgSrc: pokemon.sprites?.other?.home?.front_default ?? pokemon.sprites?.front_default ?? "/images/placeholder.png",
+      imgSrc: pokemon.sprites.other.home.front_default ?? pokemon.sprites.front_default,
     };
   } catch (err) {
     throw new Error(`MapCardPokemon failed. \n Error: ${err}`);

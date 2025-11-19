@@ -2,8 +2,8 @@
 import IndexSection from '../../components/layouts/IndexSection.astro';
 import { SITE_TITLE } from '../../const';
 import Layout from '../../layouts/Layout.astro';
-import { Sort } from '../../utils/helper';
-import type { CardPokemon, Generation } from '../../utils/interfaces/types';
+import { MapCardPokemon, Sort } from '../../utils/helper';
+import type { CardPokemon, Generation, Pokemon } from '../../utils/interfaces/types';
 import { fetchGenerations, fetchGenerationById, fetchAllByGeneration } from '../../utils/pokeApi.ts';
 
 export async function getStaticPaths() {
@@ -12,18 +12,19 @@ export async function getStaticPaths() {
     const id = g.id
     return {
       params: { id },
-      props: { id },
+      props: { id: id, gensData: gens },
     };
   });
 };
 
-const { id } = Astro.props;
+const { id, gensData } = Astro.props;
 const pokemonData = await fetchGenerationById(id);
 const pokemonSpecies = Sort(pokemonData.pokemon_species);
-const pokemon: CardPokemon[] = await fetchAllByGeneration(pokemonSpecies);
+const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonSpecies);
+const pokemon: CardPokemon[] = pokemons.map((p) => (MapCardPokemon(p)));
 const title = SITE_TITLE + " - Gen " + id;
 ---
 
-<Layout title={title} description=''>
+<Layout title={title} description='' gensData={gensData}>
   <IndexSection pokemon={pokemon} />
 </Layout>

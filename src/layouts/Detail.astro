@@ -8,11 +8,10 @@ import { fetchGenerations } from "../utils/pokeApi";
 interface Props {
 	title: string;
 	description: string;
-	isHome?: boolean;
-	gensData?: any;
 }
 
-const { title, description, gensData = await fetchGenerations(), isHome = false } = Astro.props;
+const { title, description } = Astro.props;
+const gensData = await fetchGenerations();
 ---
 
 <!doctype html>
@@ -23,10 +22,10 @@ const { title, description, gensData = await fetchGenerations(), isHome = false 
 	
 	<body>
 		<header id="header" class="mt-5 block">
-			<HeroIndex title="PoKéDeX" />
+			<HeroIndex title="PoKéMoN" />
 		</header>
 		<div class="sticky top-5 z-[999]">
-			<NavGen generations={gensData} isHome={isHome} />
+			<NavGen generations={gensData} />
 		</div>
 		<main id="main" class="mt-5">
 			<slot />

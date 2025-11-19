@@ -1,11 +1,19 @@
 ---
+import { BASE_PATH } from '../../const';
 
+interface Props {
+    title: string;
+}
+const { title } = Astro.props;
+const href = BASE_PATH;
 ---
 
 <div class="text-center">
-    <h1 class="pokemon mb-15">
-        PokéDex
-    </h1>
+    <a href={href} aria-label="Vai alla home">
+        <h1 class="pokemon mb-15">
+            {title}
+        </h1>
+    </a>
     <p id="set-gen" class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
         Select Generation:
     </p>
