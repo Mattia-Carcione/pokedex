@@ -23,7 +23,7 @@ async function safeFetch(url: string, retries = 5) {
 export async function fetchGenerations(): Promise<any> {
   try {
     const res = await safeFetch(`${LINKS_API.find(x => x.id == 'generation')?.href}`);
-    if (!res.ok) throw new Error(`Failed to fetch generations: ${res}`);
+    if (!res || !res.ok) throw new Error(`Failed to fetch generations: ${res}`);
     return MapGeneration(res.json());
   } catch (err) {
     throw new Error(`fetchGenerations Failed to fetch generations: ${err}`);
