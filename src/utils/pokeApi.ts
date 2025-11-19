@@ -3,12 +3,21 @@ import { MapCardPokemon, MapGeneration } from "./helper.ts";
 import type { CardPokemon } from "./interfaces/types.ts";
 
 async function safeFetch(url: string, retries = 5) {
-  for (let i = 0; i < retries; i++) {
-    const res = await fetch(url)
-    if (res.ok) return res
-    await new Promise(r => setTimeout(r, 500))
+  try {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) return res;
+        await new Promise(r => setTimeout(r, 500));
+      } catch (err) {
+        throw new Error(`safeFetch Failed to fetch after ${retries} attempts: ${url}. \n ${err}`);
+      } finally {
+        continue;
+      }
+    }
+  } catch (err) {
+    throw new Error(`${err}`);
   }
-  throw new Error(`safeFetch Failed to fetch after ${retries} attempts: ${url}`);
 }
 
 export async function fetchGenerations(): Promise<any> {
