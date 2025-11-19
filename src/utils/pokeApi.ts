@@ -33,7 +33,7 @@ export async function fetchGenerations(): Promise<any> {
 export async function fetchGenerationById(id: string = "1"): Promise<any> {
   try {
     const res = await safeFetch(`${LINKS_API.find(x => x.id == 'generation')?.href}/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch generation');
+    if (!res || !res.ok) throw new Error('Failed to fetch generation');
     return res.json();
   } catch (err) {
     throw new Error(`fetchGenerationById failed to fetch generations: ${id}. \n Error: ${err}`);
@@ -43,7 +43,7 @@ export async function fetchGenerationById(id: string = "1"): Promise<any> {
 export async function fetchPokemonByIdOrName(idOrName: string = ""): Promise<CardPokemon> {
   try {
     const res = await safeFetch(`${LINKS_API.find(x => x.id == 'pokemon')?.href}${idOrName}`);
-    if (!res.ok) throw new Error('Failed to fetch pokemon ' + res);
+    if (!res || !res.ok) throw new Error('Failed to fetch pokemon ' + res);
     return MapCardPokemon(res.json());
   } catch (err) {
     throw new Error(`fetchPokemonByIdOrName failed to fetch generations: ${idOrName}. \n Error: ${err}`);
@@ -54,7 +54,7 @@ export async function fetchPokemonByUrl(url: string = ""): Promise<CardPokemon> 
   const fetchUrl = url.replace("-species", "");
   try {
     const res = await safeFetch(fetchUrl);
-    if (!res.ok) throw new Error(`Failed to fetch pokemon: ${fetchUrl} (status ${res.status})`);
+    if (!res || !res.ok) throw new Error(`Failed to fetch pokemon: ${fetchUrl} (status ${res})`);
     return MapCardPokemon(res.json());
   } catch (err) {
     throw new Error(`fetchPokemonByUrl failed for URL: ${fetchUrl}.\n Error: ${err}`);
