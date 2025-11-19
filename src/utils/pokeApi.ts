@@ -2,7 +2,7 @@ import { LINKS_API } from "../const.ts";
 import { MapCardPokemon, MapGeneration } from "./helper.ts";
 import type { CardPokemon } from "./interfaces/types.ts";
 
-async function safeFetch(url: string, retries = 3) {
+async function safeFetch(url: string, retries = 5) {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url)
     if (res.ok) return res
