@@ -1,6 +1,7 @@
 ---
 import NavGen from "../components/commons/NavGen.astro";
 import ScrollTop from "../components/commons/ScrollTop.astro";
+import HeroIndex from "../components/layouts/HeroIndex.astro";
 import BaseHead from "../components/utilities/BaseHead.astro";
 import { fetchGenerations } from "../utils/pokeApi";
 
@@ -21,15 +22,8 @@ const gensData = await fetchGenerations();
 	</head>
 	
 	<body>
-		<header id="header">
-			<div class="text-center">
-				<h1 class="pokemon mb-15">
-					PokéDex
-				</h1>
-				<p id="set-gen" class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
-					Select Generation:
-				</p>
-			</div>
+		<header id="header" class="mt-5">
+			<HeroIndex />
 			<NavGen generations={gensData} isHome={isHome} />
 		</header>
 		<main id="main" class="mt-5">
