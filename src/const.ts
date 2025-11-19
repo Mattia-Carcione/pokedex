@@ -1,4 +1,4 @@
-export const BASE_PATH = '/pokedex';
+export const BASE_PATH = '/pokedex-astro';
 export const LOCAL_URL: URL = new URL('http://localhost:4321');
 export const SITE_TITLE = 'Pokédex';
 export const LINKS = [
@@ -34,23 +34,23 @@ export const TYPE_COLORS: Record<string, string> = {
 };
 
 export const TYPE_ICONS: Record<string, string> = {
-  fire: "/pokedex/types/fire.svg",
-  water: "/pokedex/types/water.svg",
-  grass: "/pokedex/types/grass.svg",
-  electric: "/pokedex/types/electric.svg",
-  ground: "/pokedex/types/ground.svg",
-  bug: "/pokedex/types/bug.svg",
-  dark: "/pokedex/types/dark.svg",
-  dragon: "/pokedex/types/dragon.svg",
-  fairy: "/pokedex/types/fairy.svg",
-  fighting: "/pokedex/types/fighting.svg",
-  flying: "/pokedex/types/flying.svg",
-  ghost: "/pokedex/types/ghost.svg",
-  ice: "/pokedex/types/ice.svg",
-  normal: "/pokedex/types/normal.svg",
-  poison: "/pokedex/types/poison.svg",
-  psychic: "/pokedex/types/psychic.svg",
-  rock: "/pokedex/types/rock.svg",
-  steel: "/pokedex/types/steel.svg",
+  fire: `${BASE_PATH}/types/fire.svg`,
+  water: `${BASE_PATH}/types/water.svg`,
+  grass: `${BASE_PATH}/types/grass.svg`,
+  electric: `${BASE_PATH}/types/electric.svg`,
+  ground: `${BASE_PATH}/types/ground.svg`,
+  bug: `${BASE_PATH}/types/bug.svg`,
+  dark: `${BASE_PATH}/types/dark.svg`,
+  dragon: `${BASE_PATH}/types/dragon.svg`,
+  fairy: `${BASE_PATH}/types/fairy.svg`,
+  fighting: `${BASE_PATH}/types/fighting.svg`,
+  flying: `${BASE_PATH}/types/flying.svg`,
+  ghost: `${BASE_PATH}/types/ghost.svg`,
+  ice: `${BASE_PATH}/types/ice.svg`,
+  normal: `${BASE_PATH}/types/normal.svg`,
+  poison: `${BASE_PATH}/types/poison.svg`,
+  psychic: `${BASE_PATH}/types/psychic.svg`,
+  rock: `${BASE_PATH}/types/rock.svg`,
+  steel: `${BASE_PATH}/types/steel.svg`,
   // aggiungi tutte le altre…
 };
