@@ -22,10 +22,12 @@ const gensData = await fetchGenerations();
 	</head>
 	
 	<body>
-		<header id="header" class="mt-5">
+		<header id="header" class="mt-5 block">
 			<HeroIndex />
-			<NavGen generations={gensData} isHome={isHome} />
 		</header>
+		<div class="sticky top-5 z-[999]">
+			<NavGen generations={gensData} isHome={isHome} />
+		</div>
 		<main id="main" class="mt-5">
 			<slot />
 			<ScrollTop />
