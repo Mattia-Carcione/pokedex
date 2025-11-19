@@ -3,22 +3,18 @@ import IndexSection from '../../components/layouts/IndexSection.astro';
 import { SITE_TITLE } from '../../const';
 import Layout from '../../layouts/Layout.astro';
 import { Sort } from '../../utils/helper';
-import type { CardPokemon } from '../../utils/interfaces/types';
+import type { CardPokemon, Generation } from '../../utils/interfaces/types';
 import { fetchGenerations, fetchGenerationById, fetchAllByGeneration } from '../../utils/pokeApi.ts';
 
 export async function getStaticPaths() {
-  const gens = await fetchGenerations(); 
-  const paths = gens.results.map((g: any) => {
-    const urlParts = g.url.split("/").filter(Boolean);
-    const id = urlParts[urlParts.length - 1]; // numero della gen
-
+  const gens = await fetchGenerations();
+  return gens.map((g: Generation) => {
+    const id = g.id
     return {
       params: { id },
       props: { id },
     };
   });
-
-  return paths;
 };
 
 const { id } = Astro.props;

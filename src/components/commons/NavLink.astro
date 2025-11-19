@@ -1,0 +1,18 @@
+---
+import type { Generation } from '../../utils/interfaces/types';
+
+interface Props {
+    isActive?: boolean;
+    gen: Generation;
+}
+const { gen, isActive = false } = Astro.props;
+
+let baseClass = "relative inline-block align-middle text-[var(--color-dark)] text-[1.5rem] md:text-[2rem] p-3 font-bold overflow-hidden transition-all navigation-link";
+baseClass = isActive ? baseClass + " active" : baseClass;
+---
+
+<li>
+    <a class={baseClass} href={gen.href} aria-label={`Vai alla Gen ${gen.name}`}>
+        {gen.name}
+    </a>
+</li>

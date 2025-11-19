@@ -1,16 +1,17 @@
 ---
+import NavGen from "../components/commons/NavGen.astro";
+import ScrollTop from "../components/commons/ScrollTop.astro";
 import BaseHead from "../components/utilities/BaseHead.astro";
-import { BASE_PATH, LINKS } from "../const";
 import { fetchGenerations } from "../utils/pokeApi";
 
 interface Props {
 	title: string;
 	description: string;
+	isHome?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, isHome = false } = Astro.props;
 const gensData = await fetchGenerations();
-const gens = gensData.results;
 ---
 
 <!doctype html>
@@ -20,8 +21,20 @@ const gens = gensData.results;
 	</head>
 	
 	<body>
-		<main>
+		<header id="header">
+			<div class="text-center">
+				<h1 class="pokemon mb-15">
+					PokéDex
+				</h1>
+				<p id="set-gen" class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
+					Select Generation:
+				</p>
+			</div>
+			<NavGen generations={gensData} isHome={isHome} />
+		</header>
+		<main id="main" class="mt-5">
 			<slot />
+			<ScrollTop />
 		</main>
 	</body>
 </html>

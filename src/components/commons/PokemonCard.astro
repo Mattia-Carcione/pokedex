@@ -16,7 +16,7 @@ const displayName = name.charAt(0).toUpperCase() + name.slice(1);
 const href = LINKS.find(x => x.id == "pokemon")?.href + name;
 ---
 
-<article class="shadow-xl p-1 rounded-xl transition delay-150 duration-300 ease-in-out hover:scale-110 block" style={`background: linear-gradient(135deg, ${typeColorMain}, ${typeColorSecondary});`} aria-label="Card Pokémon">
+<article class="pokemon-card relative shadow-xl p-1 rounded-xl transition delay-150 duration-300 ease-in-out hover:scale-110 block" style={`background: linear-gradient(150deg, ${typeColorMain} 50%, ${typeColorSecondary} 50%);`} aria-label="Card Pokémon">
     <a href={href} aria-label={`Vai alla scheda dettagliata di ${displayName}`} class="block p-5">
         <!-- HEADER -->
         <div class="flex justify-between py-2">

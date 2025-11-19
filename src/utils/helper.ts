@@ -1,5 +1,5 @@
-import { TYPE_ICONS, TYPE_COLORS } from "../const";
-import type { CardPokemon, Type } from "./interfaces/types";
+import { TYPE_ICONS, TYPE_COLORS, LINKS } from "../const";
+import type { CardPokemon, Type, Generation } from "./interfaces/types";
 
 export function Sort(data: []): [] {
   return data.sort((a: any, b: any) => {
@@ -11,6 +11,7 @@ export function Sort(data: []): [] {
 
 export async function MapCardPokemon(pokemonPromise: Promise<any>): Promise<CardPokemon> {
   const pokemon = await pokemonPromise;
+  const name: string = pokemon.species.name.toString();
   if (!pokemon)
     throw new Error("MapCardPokemon received empty pokemon data");
 
@@ -19,10 +20,29 @@ export async function MapCardPokemon(pokemonPromise: Promise<any>): Promise<Card
 
   return {
     id: id,
-    name: pokemon.name,
+    name: name,
     types,
     imgSrc: pokemon.sprites?.other?.home?.front_default ?? pokemon.sprites?.front_default ?? "/images/placeholder.png",
   };
+}
+
+export async function MapGeneration(generationPromise: Promise<any>): Promise<Generation[]> {
+  try {
+    const generations = await generationPromise;
+    if (!generations)
+      throw new Error("MapGeneration received empty generation data");
+    return generations.results.map((g: any, x: number) => {
+      const name: string = g.name.split("-")[g.name.split("-").length - 1];
+      const href = LINKS.find(x => x.id == "generation")?.href ?? "";
+      return {
+        id: x + 1,
+        name: name.toUpperCase(),
+        href: href + (x+1)
+      };
+    });
+  } catch {
+    throw Error()
+  }
 }
 
 function SetTypes(types: []): Type[] {

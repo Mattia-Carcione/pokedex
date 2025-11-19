@@ -1,12 +1,12 @@
 import { LINKS_API } from "../const.ts";
-import { MapCardPokemon } from "./helper.ts";
+import { MapCardPokemon, MapGeneration } from "./helper.ts";
 import type { CardPokemon } from "./interfaces/types.ts";
 
 export async function fetchGenerations(): Promise<any> {
   try {
     const res = await fetch(`${LINKS_API.find(x => x.id == 'generation')?.href}`);
     if (!res.ok) throw new Error(`Failed to fetch generations: ${res}`);
-    return res.json();
+    return MapGeneration(res.json());
   } catch {
     throw new Error('Failed to fetch generations');
   }

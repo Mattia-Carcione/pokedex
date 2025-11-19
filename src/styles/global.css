@@ -1,30 +1,106 @@
 @import "tailwindcss";
 
+/* ===============================
+   GLOBAL DESIGN VARIABLES
+   =============================== */
 :root {
-    --normal: "#A8A77A";
-    --fire: "#EE8130";
-    --water: "#6390F0";
-    --electric: "#F7D02C";
-    --grass: "#7AC74C";
-    --ice: "#96D9D6";
-    --fighting: "#C22E28";
-    --poison: "#A33EA1";
-    --ground: "#E2BF65";
-    --flying: "#A98FF3";
-    --psychic: "#F95587";
-    --bug: "#A6B91A";
-    --rock: "#B6A136";
-    --ghost: "#735797";
-    --dragon: "#6F35FC";
-    --dark: "#705746";
-    --steel: "#B7B7CE";
-    --fairy: "#D685AD"
+    --color-primary: #FFCB05;
+    --color-secondary: #2A75BB;
+    --color-bug: #A6B91A;
+    --color-dark: #705746;
+    --color-dragon: #6F35FC;
+    --color-electric: #F7D02C;
+    --color-fairy: #D685AD;
+    --color-fighting: #C22E28;
+    --color-fire: #EE8130;
+    --color-flying: #A98FF3;
+    --color-ghost: #735797;
+    --color-grass: #7AC74C;
+    --color-ground: #E2BF65;
+    --color-ice: #96D9D6;
+    --color-normal: #A8A77A;
+    --color-poison: #A33EA1;
+    --color-psychic: #F95587;
+    --color-rock: #B6A136;
+    --color-steel: #B7B7CE;
+    --color-water: #6390F0;
+
+    /* === TYPOGRAPHY === */
+    --font-heading: 'Pokemon Solid', sans-serif;
+}
+
+/* ============================= */
+/* 🔤 TYPOGRAPHY        */
+/* ============================= */
+@font-face {
+    font-family: 'Pokemon Solid';
+    src: url('/pokedex/fonts/Pokemon.woff2') format('woff2');
+}
+
+.pokemon {
+    font-family: var(--font-heading);
+    color: var(--color-primary);
+    text-shadow: -1px 8px var(--color-secondary), -4px 1px var(--color-secondary), 4px 4px var(--color-secondary), 1px -5px var(--color-secondary);
+    font-size: 90px;
+}
+
+/* ============================= */
+/* 🔤 BASICS        */
+/* ============================= */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
     background-image: url('../assets/bg-pokemon.jpg');
 }
 
-main {
+main,
+header {
     @apply w-full max-w-[1800px] mx-auto;
+}
+
+/* ============================= */
+/* 🔤 CARD       */
+/* ============================= */
+.pokemon-card::after {
+    content: '';
+    background-image: url(https://icon-library.com/images/pokemon-desktop-icon/pokemon-desktop-icon-23.jpg);
+    background-repeat: no-repeat;
+    background-size: 10em;
+    filter: brightness(100%);
+    opacity: .5;
+    position: absolute;
+    height: 7em;
+    width: 7em;
+    right: 0;
+    bottom: .4em;
+  }
+
+  .navigation-link:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    left: 0;
+    bottom: 0;
+    background-color: #6c79db;
+    opacity: 0;
+    border-radius: 100px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: all .3s;
+}
+
+.navigation-link.active,
+.navigation-link:focus,
+.navigation-link:hover {
+    outline: none;
+    background-color: #eee;
+}
+
+.navigation-link.navigation-link.active:after {
+    opacity: 1;
+    transform: scaleX(1);
 }

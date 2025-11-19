@@ -11,3 +11,9 @@ export type Type = {
     imgSrc: string; 
     color: string; 
 }
+
+export type Generation = {
+    id: number;
+    name: string;
+    href: string;
+}

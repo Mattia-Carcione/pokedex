@@ -11,6 +11,6 @@ const pokemonSpecies = Sort(pokemonData.pokemon_species);
 const pokemon: CardPokemon[] = await fetchAllByGeneration(pokemonSpecies);
 ---
 
-<Layout title={SITE_TITLE} description=''>
+<Layout title={SITE_TITLE} description='' isHome={true}>
     <IndexSection pokemon={pokemon} />
 </Layout>
