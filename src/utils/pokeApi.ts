@@ -3,17 +3,16 @@ import { cachedFetch } from "./caching/cache.ts";
 import { MapGenerationToCard, Sort } from "./helper.ts";
 import type { Generation, GenerationCard, GenerationInfo, NameUrl, Pokemon, PokemonSpecies } from "./interfaces/types.ts";
 
-async function safeFetch(url: string, retries: number = 2) {
+async function safeFetch(url: string, retries: number = 20) {
   let error;
   for (let i = 0; i < retries; i++) {
     try {
       const res = await fetch(url);
       if (res.ok) return res;
-      retries++;
     } catch (err) {
       error = err;
     }
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(r => setTimeout(r, 2000));
   }
   throw new Error(`safeFetch Failed after ${retries} attempts: ${url}\n${error}`);
 }
