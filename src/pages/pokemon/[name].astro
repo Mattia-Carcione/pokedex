@@ -1,32 +1,31 @@
 ---
-import { MapCardPokemon, Sort } from '../../utils/helper';
-import type { CardPokemon, Generation, Pokemon } from '../../utils/interfaces/types';
+import type { Pokemon } from '../../utils/interfaces/types';
 import { fetchAllByGeneration, fetchGenerationById, fetchGenerations } from '../../utils/pokeApi';
-import Detail from '../../layouts/Detail.astro';
-import PokemonCard from '../../components/commons/PokemonCard.astro';
+import Layout from '../../layouts/Layout.astro';
+import PokemonDetail from '../../components/layouts/PokemonDetail.astro';
+import { fetchPokemonByUrl } from '../../utils/pokeApi';
 
 export async function getStaticPaths() {
   const gens = await fetchGenerations();
-  const flat = await Promise.all(gens.map(async (g: Generation) => {
-    const pokemonData = await fetchGenerationById(g.id.toString());
-    const pokemonSpecies = Sort(pokemonData.pokemon_species);
-    const pokemons = await fetchAllByGeneration(pokemonSpecies);
+  const flat = await Promise.all(gens.map(async (g) => {
+    const data = await fetchGenerationById(g.id);
+    const pokemons = await fetchAllByGeneration(data.pokemon_species) as Pokemon[];
     return pokemons.map((pokemon) => {
+      const name = pokemon.species.name.charAt(0).toUpperCase() + pokemon.species.name.slice(1);
       return {
         params: { name: pokemon.species.name },
-        props: { name: pokemon.species.name, pokemon: pokemon },
+        props: { name: name, pokemon: pokemon, gen: data, length: gens.length },
       }
     })
   }));
   return flat.flat();
-};
+}
 
-const { name, pokemon } = Astro.props;
+const { name, pokemon, gen, length } = Astro.props;
 const data: Pokemon = pokemon;
-const title = "PoKéMon - " + name.charAt(0).toUpperCase() + name.slice(1);;
-const card: CardPokemon = MapCardPokemon(pokemon);
+const title = "PoKéMon - " + name;
 ---
 
-<Detail title={title} description=''>
-  <PokemonCard pokemon={card} />
-</Detail>
+<Layout title={title} heroTitle='PoKéMon' description=''>
+  <PokemonDetail pokemon={data} gen={gen} length={length} />
+</Layout>

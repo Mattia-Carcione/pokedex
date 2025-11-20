@@ -1,0 +1,94 @@
+---
+import type { Pokemon, CardPokemon, GenerationInfo, PokemonSpecies } from '../../utils/interfaces/types'
+import NameInfo from '../commons/NameInfo.astro';
+import TypesBagde from '../commons/TypesBagde.astro';
+import Sprite from '../commons/Sprite.astro';
+import arrow from '../../assets/arrowDown.svg';
+import { MapCardPokemon, GetPreviousOrNext } from '../../utils/helper';
+import { fetchPokemonByUrl } from '../../utils/pokeApi';
+import female from '../../assets/genders/female.svg'
+import male from '../../assets/genders/male.svg'
+
+interface Props {
+    pokemon: Pokemon;
+    gen: GenerationInfo;
+    length: number;
+}
+const { pokemon, gen, length } = Astro.props;
+const pokemonSpecies = await fetchPokemonByUrl(pokemon.species.url, true) as PokemonSpecies;
+const cardInfo: CardPokemon = MapCardPokemon(pokemon);
+const typeColorMain = cardInfo.types[0].color;
+const typeColorSecondary = cardInfo.types[1]?.color ?? cardInfo.types[0].color;
+const input = {
+    id: gen.id,
+    count: length,
+}
+const next = await GetPreviousOrNext(pokemon.species.name, gen.pokemon_species, input, true);
+const prev = await GetPreviousOrNext(pokemon.species.name, gen.pokemon_species, input);
+const genderRate = pokemonSpecies.gender_rate > 0 ? ((pokemonSpecies.gender_rate / 8) * 100) : 0;
+---
+<section id="details" class="p-5" aria-label="Pokémon details">
+    <div id={cardInfo.name} class="pokemon-card relative shadow-xl p-5 rounded-xl" style={`background: linear-gradient(150deg, ${typeColorMain} 50%, ${typeColorSecondary} 50%);`} aria-label="Pokémon info">
+        <div class="flex justify-between py-2">
+            <div id="previous">
+                {prev &&
+                    <a href={prev.name} aria-label="Vai al Pokémon precedente">
+                        <Sprite imgSrc={prev.imgSrc} name={prev.displayName} />
+                        <span class="underline flex items-center mt-1 rounded-full bg-amber-50/50 p-1">
+                            <img class="origin-center rotate-90 h-5 w-5" src={arrow.src} alt="Arrow up icon"/>
+                            #{prev.id} <span class="hidden lg:block">- {prev.displayName}</span>
+                        </span>
+                    </a>
+                }
+            </div>
+            <div id="next">
+                {next &&
+                    <a href={next.name} class="flex flex-col justify-end items-end"  aria-label="Vai al Pokémon successivo">
+                        <Sprite imgSrc={next.imgSrc} name={next.displayName} />
+                        <p class="underline flex items-center mt-1 rounded-full bg-amber-50/50 p-1">
+                            #{next.id} <span class="hidden lg:block">- {next.displayName}</span>
+                            <img class="origin-center rotate-270 h-5 w-5" src={arrow.src} alt="Arrow up icon"/>
+                        </p>
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="rounded-xl border border-amber-50/50 mt-3">
+            <div class="flex justify-between py-2">
+                <NameInfo id={cardInfo.id} name={cardInfo.displayName} />
+        
+                <TypesBagde types={cardInfo.types} />
+            </div>
+            <div class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 grid-rows-2">
+                <div class="col-span-1 flex items-center justify-center">
+                    <Sprite imgSrc={cardInfo.imgSrc} name={cardInfo.displayName} className='w-[250px] h-[250px] md:w-[250px] md:h-[250px]' />
+                </div>
+                
+                <div class="row-span-2 col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 rounded-xl bg-amber-50/50">
+    
+                </div>
+                <div class="col-span-1 bg-amber-50/50 rounded-xl p-3">
+                    <h2 class="text-2xl font-bold">
+                        Gender rate: {genderRate <= 0 && <span>Unkown</span>}
+                    </h2>
+                    {genderRate > 0 &&
+                        <div class="flex items-center gap-4 mt-3">
+                            <div class="">
+                                <img src={male.src} class="size-16 rounded-full bg-amber-50 p-1" alt="" />
+                                <p>
+                                    {100 - genderRate}%
+                                </p>
+                            </div>
+                            <div class="">
+                                <img src={female.src} class="size-16 rounded-full bg-amber-50 p-1" alt="" />
+                                <p>
+                                    {genderRate}%
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

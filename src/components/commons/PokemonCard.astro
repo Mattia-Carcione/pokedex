@@ -9,10 +9,9 @@ interface Props {
   pokemon: CardPokemon;
 }
 
-const { id, name, imgSrc, types } = Astro.props.pokemon;
+const { id, name, displayName, imgSrc, types } = Astro.props.pokemon;
 const typeColorMain = types[0].color;
 const typeColorSecondary = types[1]?.color ?? types[0].color;
-const displayName = name.charAt(0).toUpperCase() + name.slice(1);
 const href = LINKS.find(x => x.id == "pokemon")?.href + name;
 ---
 
@@ -25,6 +24,6 @@ const href = LINKS.find(x => x.id == "pokemon")?.href + name;
             <TypesBagde types={types} />
         </div>
 
-        <Sprite imgSrc={imgSrc} name={displayName} />
+        <Sprite imgSrc={imgSrc} name={displayName} className='w-[250px] h-[250px] md:w-[250px] md:h-[250px]'/>
     </a>
 </article>

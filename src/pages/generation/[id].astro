@@ -2,13 +2,13 @@
 import IndexSection from '../../components/layouts/IndexSection.astro';
 import { SITE_TITLE } from '../../const';
 import Layout from '../../layouts/Layout.astro';
-import { MapCardPokemon, Sort } from '../../utils/helper';
-import type { CardPokemon, Generation, Pokemon } from '../../utils/interfaces/types';
+import { MapCardPokemon } from '../../utils/helper';
+import type { CardPokemon, Pokemon } from '../../utils/interfaces/types';
 import { fetchGenerations, fetchGenerationById, fetchAllByGeneration } from '../../utils/pokeApi.ts';
 
 export async function getStaticPaths() {
   const gens = await fetchGenerations();
-  return gens.map((g: Generation) => {
+  return gens.map((g) => {
     const id = g.id
     return {
       params: { id },
@@ -19,12 +19,11 @@ export async function getStaticPaths() {
 
 const { id, gensData } = Astro.props;
 const pokemonData = await fetchGenerationById(id);
-const pokemonSpecies = Sort(pokemonData.pokemon_species);
-const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonSpecies);
+const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonData.pokemon_species);
 const pokemon: CardPokemon[] = pokemons.map((p) => (MapCardPokemon(p)));
 const title = SITE_TITLE + " - Gen " + id;
 ---
 
-<Layout title={title} description='' gensData={gensData}>
+<Layout title={title} heroTitle='PoKéDex' description='' gensData={gensData}>
   <IndexSection pokemon={pokemon} />
 </Layout>

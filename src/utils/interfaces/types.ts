@@ -1,25 +1,11 @@
-type Basic = {
-    id: number;
-    name: string;
-}
-
-type NameUrl = {
+export type NameUrl = {
     name: string;
     url: string;
 }
 
-export type CardPokemon = Basic & {
-    types: Type[];
-    imgSrc: string;
-}
-
-export type Type = Basic & {
-    imgSrc: string;
-    color: string;
-}
-
-export type Generation = Basic & {
-    href: string;
+type Basic = {
+    id: number;
+    name: string;
 }
 
 type Gen = {
@@ -103,6 +89,41 @@ type Stat = {
     stat: NameUrl;
 }
 
+type NameLang = {
+    language: NameUrl;
+    name: string;
+}
+
+export type CardPokemon = Basic & {
+    displayName: string;
+    types: Type[];
+    imgSrc: string;
+}
+
+export type Type = Basic & {
+    imgSrc: string;
+    color: string;
+}
+
+export type Generation = {
+    count: number;
+    results: NameUrl[];
+}
+
+export type GenerationCard = Generation & Basic & {
+    href: string;
+}
+
+export type GenerationInfo = Basic & {
+    abilities: NameUrl[];
+    main_region: NameUrl;
+    moves: NameUrl[];
+    names: NameLang[];
+    pokemon_species: NameUrl[];
+    types: NameUrl[];
+    version_group: NameUrl[];
+}
+
 export type Pokemon = Basic & NameUrl & {
     abilities: Ability[];
     base_experience: number;
@@ -122,4 +143,66 @@ export type Pokemon = Basic & NameUrl & {
     stats: Stat[];
     types: CompleteType[];
     weight: number;
+}
+
+type PokedexNumber = {
+    entry_number: number;
+    pokedex: NameUrl;
+}
+
+type PalParkEncounterArea = {
+    area: NameUrl;
+    base_score: number;
+    rate: number;
+}
+
+type FlavorText = {
+    flavore_text: string;
+    language: NameUrl;
+    version: NameUrl;
+}
+
+type Description = {
+    description: string;
+    language: NameUrl;
+}
+
+type Genus = {
+    genus: string;
+    language: NameUrl;
+}
+
+type Variety = {
+    is_default: boolean;
+    pokemon: NameUrl;
+}
+
+export type PokemonSpecies = {
+    id: number;
+    name: string;
+    order: number;
+    gender_rate: number;
+    capture_rate: number;
+    base_happiness: number;
+    is_baby: boolean;
+    is_legendary: boolean;
+    is_mythical: boolean;
+    hatch_counter: number;
+    has_gender_differences: boolean;
+    forms_switchable: boolean;
+    growth_rate: NameUrl;
+    pokedex_numbers: PokedexNumber[];
+    egg_groups: NameUrl[];
+    color: NameUrl;
+    shape: NameUrl;
+    evolves_from_species: NameUrl;
+    evolution_chain: string;
+    habitat?: NameUrl;
+    generation: NameUrl;
+    names: NameLang[];
+    pal_park_encounters: PalParkEncounterArea[];
+    flavor_text_entries: FlavorText[];
+    form_descriptions: Description[];
+    genera: Genus[];
+    varieties: Variety[];
 }

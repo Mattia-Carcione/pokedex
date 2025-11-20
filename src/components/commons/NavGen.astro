@@ -10,8 +10,8 @@ const { generations, isHome = false } = Astro.props;
 const params = Astro.params;
 ---
 
-<nav id="main-nav" class="rounded-[1rem] table mx-auto bg-[#FFF] mt-4 [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)]" aria-label="Navigazione generazioni Pokémon">
-    <ul class="flex flex-wrap sticky top-0 z-[999]">
+<nav id="main-nav" class="table mx-auto rounded-[1rem] bg-[#FFF] mt-4 [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)]" aria-label="Navigazione generazioni Pokémon">
+    <ul class="flex flex-wrap">
         {generations.map((g: Generation, x: number) => (
             <NavLink gen={g} isActive={g.id.toString() === params.id || (isHome && x === 0)} index={x} length={generations.length - 1} />
         ))}

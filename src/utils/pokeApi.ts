@@ -1,7 +1,7 @@
 import { LINKS_API } from "../const.ts";
 import { cachedFetch } from "./caching/cache.ts";
-import { MapGeneration } from "./helper.ts";
-import type { Pokemon } from "./interfaces/types.ts";
+import { MapGenerationToCard, Sort } from "./helper.ts";
+import type { Generation, GenerationCard, GenerationInfo, NameUrl, Pokemon, PokemonSpecies } from "./interfaces/types.ts";
 
 async function safeFetch(url: string, retries = 5) {
   let error;
@@ -17,24 +17,27 @@ async function safeFetch(url: string, retries = 5) {
   throw new Error(`safeFetch Failed after ${retries} attempts: ${url}\n${error}`);
 }
 
-export async function fetchGenerations(): Promise<any> {
+export async function fetchGenerations(): Promise<GenerationCard[]> {
   try {
     return cachedFetch("generations", async () => {
       const res = await safeFetch(`${LINKS_API.find(x => x.id == 'generation')?.href}`);
       if (!res.ok) throw new Error(`Failed to fetch generations: ${res.status}`);
-      return MapGeneration(res.json());
+      const data = await res.json() as Generation;
+      return MapGenerationToCard(data);
     });
   } catch (err) {
     throw new Error(`fetchGenerations Failed to fetch generations: ${err}`);
   }
 }
 
-export async function fetchGenerationById(id: string = "1"): Promise<any> {
+export async function fetchGenerationById(id: number = 1): Promise<GenerationInfo> {
   try {
     return cachedFetch(`generation_${id}`, async () => {
-      const res = await safeFetch(`${LINKS_API.find(x => x.id == 'generation')?.href}/${id}`);
+      const res = await safeFetch(`${LINKS_API.find(x => x.id == 'generation')?.href}${id}`);
       if (!res.ok) throw new Error(`fetchGenerationById Failed to fetch generation: ${res.status}`);
-      return res.json();
+      const data = await res.json() as GenerationInfo;
+      data.pokemon_species = Sort(data.pokemon_species as []);
+      return data;
     });
   } catch (err) {
     throw new Error(`fetchGenerationById failed to fetch generations: ${id}. \n Error: ${err}`);
@@ -53,12 +56,14 @@ export async function fetchPokemonByIdOrName(idOrName: string = ""): Promise<Pok
   }
 }
 
-export async function fetchPokemonByUrl(url: string = ""): Promise<Pokemon> {
-  const fetchUrl = url.replace("-species", "");
+export async function fetchPokemonByUrl(url: string = "", isSpecies: boolean = false): Promise<Pokemon | PokemonSpecies> {
+  const fetchUrl = isSpecies ? url : url.replace("-species", "");
   try {
     return cachedFetch(`pokemon_url_${fetchUrl}`, async () => {
       const res = await safeFetch(fetchUrl);
       if (!res.ok) throw new Error(`fetchPokemonByUrl Failed to fetch pokemon: ${fetchUrl} (status ${res.status})`);
+      if(isSpecies)
+        return await res.json() as PokemonSpecies;
       return await res.json() as Pokemon;
     });
   } catch (err) {
@@ -66,11 +71,11 @@ export async function fetchPokemonByUrl(url: string = ""): Promise<Pokemon> {
   }
 }
 
-export async function fetchAllByGeneration(pokemonData: []): Promise<Pokemon[]> {
+export async function fetchAllByGeneration(pokemonData: NameUrl[]): Promise<Pokemon[]> {
   try {
-    return Promise.all(pokemonData.map(async (p: any) => {
+    return Promise.all(pokemonData.map(async (p) => {
       try {
-        return await fetchPokemonByUrl(p.url);
+        return await fetchPokemonByUrl(p.url, false) as Pokemon;
       } catch (err) {
         throw new Error(`fetchAllByGeneration failed for URL: ${p.url}.\n Error: ${err}`);
       }

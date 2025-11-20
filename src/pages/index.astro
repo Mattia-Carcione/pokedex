@@ -1,17 +1,16 @@
 ---
 import { SITE_TITLE } from '../const';
 import { fetchGenerationById, fetchAllByGeneration } from '../utils/pokeApi.ts';
-import { MapCardPokemon, Sort } from '../utils/helper.ts';
+import { MapCardPokemon } from '../utils/helper.ts';
 import Layout from '../layouts/Layout.astro';
 import type { Pokemon, CardPokemon } from '../utils/interfaces/types.ts';
 import IndexSection from '../components/layouts/IndexSection.astro';
 
 const pokemonData = await fetchGenerationById();
-const pokemonSpecies = Sort(pokemonData.pokemon_species);
-const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonSpecies);
+const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonData.pokemon_species);
 const pokemon: CardPokemon[] = pokemons.map((p) => (MapCardPokemon(p)));
 ---
 
-<Layout title={SITE_TITLE} description='' isHome={true}>
+<Layout title={SITE_TITLE} heroTitle='PoKéDex' description='' isHome={true}>
     <IndexSection pokemon={pokemon} />
 </Layout>
