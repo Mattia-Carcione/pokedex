@@ -1,29 +1,48 @@
 ---
-import IndexSection from '../../components/layouts/IndexSection.astro';
-import { SITE_TITLE } from '../../const';
-import Layout from '../../layouts/Layout.astro';
-import { MapCardPokemon } from '../../utils/helper';
-import type { CardPokemon, Pokemon } from '../../utils/interfaces/types';
-import { fetchGenerations, fetchGenerationById, fetchAllByGeneration } from '../../utils/pokeApi.ts';
+import IndexSection from "../../components/layouts/IndexSection.astro";
+import { LINKS_API, SITE_TITLE } from "../../const";
+import Layout from "../../layouts/Layout.astro";
+import { getPokemonData } from "../../utils/helpers/getDataJson";
+import type {
+  GenerationInfo,
+  NameUrl,
+  PokeApi,
+} from "../../utils/interfaces/types";
 
 export async function getStaticPaths() {
-  const gens = await fetchGenerations();
-  return gens.map((g) => {
-    const id = g.id
-    return {
-      params: { id },
-      props: { id: id, gensData: gens },
-    };
-  });
-};
+  const link = LINKS_API.find((x) => x.id == "generation");
+  const dataApi: NameUrl[] = [
+    {
+      name: link!.label,
+      url: link!.href,
+    },
+  ];
+  const data = (await getPokemonData(dataApi, "generations.json")) as PokeApi[];
+  const response = await Promise.all(
+    data.map(async (gen) => {
+      const generation: GenerationInfo[] = await getPokemonData(
+        gen.results,
+        "generationData.json",
+      );
+      return generation.map((x) => {
 
-const { id, gensData } = Astro.props;
-const pokemonData = await fetchGenerationById(id);
-const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonData.pokemon_species);
-const pokemon: CardPokemon[] = pokemons.map((p) => (MapCardPokemon(p)));
+        const id = x.id.toString();
+        return {
+          params: { id },
+          props: { id, data: x },
+        };
+      });
+    }),
+  );
+  return response.flat();
+}
+
+const { id, data } = Astro.props;
+const path = [`pokemonDataGen${id}.json`, `pokemonSpeciesDataGen${id}.json`];
+
 const title = SITE_TITLE + " - Gen " + id;
 ---
 
-<Layout title={title} heroTitle='PoKéDex' description='' gensData={gensData}>
-  <IndexSection pokemon={pokemon} />
+<Layout title={title} heroTitle="PoKéDex" description="">
+  <IndexSection species={data.pokemon_species} path={path} />
 </Layout>

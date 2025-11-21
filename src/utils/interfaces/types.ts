@@ -23,8 +23,6 @@ type Cries = {
     legacy?: string;
 }
 
-type Form = NameUrl;
-
 type VersionGroupDetail = {
     level_learned_at: number;
     move_learned_method: NameUrl;
@@ -48,8 +46,6 @@ type CompleteType = TypeBasic & {
 }
 
 type PastType = Gen & TypeBasic;
-
-type Specie = NameUrl;
 
 type OtherSprite = {
     dream_world: any;
@@ -94,57 +90,6 @@ type NameLang = {
     name: string;
 }
 
-export type CardPokemon = Basic & {
-    displayName: string;
-    types: Type[];
-    imgSrc: string;
-}
-
-export type Type = Basic & {
-    imgSrc: string;
-    color: string;
-}
-
-export type Generation = {
-    count: number;
-    results: NameUrl[];
-}
-
-export type GenerationCard = Generation & Basic & {
-    href: string;
-}
-
-export type GenerationInfo = Basic & {
-    abilities: NameUrl[];
-    main_region: NameUrl;
-    moves: NameUrl[];
-    names: NameLang[];
-    pokemon_species: NameUrl[];
-    types: NameUrl[];
-    version_group: NameUrl[];
-}
-
-export type Pokemon = Basic & NameUrl & {
-    abilities: Ability[];
-    base_experience: number;
-    cries: Cries;
-    forms: Form[];
-    game_indices: [];
-    height: number;
-    held_items: [];
-    is_default: boolean;
-    location_area_encounters: string;
-    moves: Move[];
-    order: number;
-    past_abilities: PastAbility[];
-    past_types: PastType[];
-    species: Specie;
-    sprites: Sprite;
-    stats: Stat[];
-    types: CompleteType[];
-    weight: number;
-}
-
 type PokedexNumber = {
     entry_number: number;
     pokedex: NameUrl;
@@ -177,6 +122,59 @@ type Variety = {
     pokemon: NameUrl;
 }
 
+export type CardPokemon = Basic & {
+    displayName: string;
+    types: Type[];
+    imgSrc: string;
+}
+
+export type Type = Basic & {
+    imgSrc: string;
+    color: string;
+}
+
+export type PokeApi = {
+    count: number;
+    next?: any;
+    previous?: any;
+    results: NameUrl[];
+}
+
+export type GenerationCard = PokeApi & Basic & {
+    href: string;
+}
+
+export type GenerationInfo = Basic & {
+    abilities: NameUrl[];
+    main_region: NameUrl;
+    moves: NameUrl[];
+    names: NameLang[];
+    pokemon_species: NameUrl[];
+    types: NameUrl[];
+    version_groups: NameUrl[];
+}
+
+export type Pokemon = Basic & NameUrl & {
+    abilities: Ability[];
+    base_experience: number;
+    cries: Cries;
+    forms: NameUrl[];
+    game_indices: [];
+    height: number;
+    held_items: [];
+    is_default: boolean;
+    location_area_encounters: string;
+    moves: Move[];
+    order: number;
+    past_abilities: PastAbility[];
+    past_types: PastType[];
+    species: NameUrl;
+    sprites: Sprite;
+    stats: Stat[];
+    types: CompleteType[];
+    weight: number;
+}
+
 export type PokemonSpecies = {
     id: number;
     name: string;
@@ -205,4 +203,8 @@ export type PokemonSpecies = {
     form_descriptions: Description[];
     genera: Genus[];
     varieties: Variety[];
+}
+
+export type Data = {
+    name: Pokemon;
 }

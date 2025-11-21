@@ -1,15 +1,24 @@
 ---
-import type { CardPokemon } from '../../utils/interfaces/types'
+import type { NameUrl, Pokemon, PokemonSpecies } from '../../utils/interfaces/types'
+import { getPokemonData } from '../../utils/helpers/getDataJson.ts';
 import PokemonCard from '../commons/PokemonCard.astro';
 
 interface Props {
-    pokemon: CardPokemon[];
+    species: NameUrl[] | undefined;
+    path: string[];
 }
-const { pokemon } = Astro.props;
+const { species, path } = Astro.props;
+const pokemon = await getPokemonData(species, path[0]) as Pokemon[];
+const pokemonSpecies = await getPokemonData(species, path[1], true) as PokemonSpecies[];
+// console.log(pokemon)
 ---    
     
 <section id="main-section" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 p-5" aria-label="Sezione contente l'indice dei Pokémon">
-    {pokemon.map((p: CardPokemon) => (
-        <PokemonCard pokemon={p} />
+    {(pokemon.length > 1) && pokemon.map((entry: Pokemon) => (
+        <PokemonCard pokemon={entry} />
     ))}
+    {(pokemon.length <= 0) && 
+    <div class="col-span-1 md:col-span-2 lg:col-span-3 2xl:col-span-4 rounded-xl flex justify-center bg-red-500 h-24 p-5">
+        <h2 class="font-bold">OPS! <br/> Nessun Pokemon trovato...</h2>
+    </div>}
 </section>

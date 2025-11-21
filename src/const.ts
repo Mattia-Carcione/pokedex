@@ -10,6 +10,7 @@ export const BASE_PATH_API = 'https://pokeapi.co/api/v2';
 export const LINKS_API = [
   { id: 'generation', label: 'Generation', href: `${BASE_PATH_API}/generation/` },
   { id: 'pokemon', label: 'Pokémon', href: `${BASE_PATH_API}/pokemon/` },
+  { id: 'species', label: 'Pokémon species', href: `${BASE_PATH_API}/pokemon-species/` },
 ];
 
 export const TYPE_COLORS: Record<string, string> = {

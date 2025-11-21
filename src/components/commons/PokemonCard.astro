@@ -1,15 +1,17 @@
 ---
 import { LINKS } from '../../const';
-import type { CardPokemon } from '../../utils/interfaces/types.ts';
+import type { Pokemon } from '../../utils/interfaces/types.ts';
 import NameInfo from './NameInfo.astro';
 import Sprite from './Sprite.astro';
 import TypesBagde from './TypesBagde.astro';
+import { MapCardPokemon } from '../../utils/helpers/mapper.ts';
 
 interface Props {
-  pokemon: CardPokemon;
+  pokemon: Pokemon;
 }
 
-const { id, name, displayName, imgSrc, types } = Astro.props.pokemon;
+const { pokemon } = Astro.props;
+const { id, displayName, types, imgSrc, name } = MapCardPokemon(pokemon);
 const typeColorMain = types[0].color;
 const typeColorSecondary = types[1]?.color ?? types[0].color;
 const href = LINKS.find(x => x.id == "pokemon")?.href + name;

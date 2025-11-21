@@ -1,16 +1,26 @@
 ---
-import { SITE_TITLE } from '../const';
-import { fetchGenerationById, fetchAllByGeneration } from '../utils/pokeApi.ts';
-import { MapCardPokemon } from '../utils/helper.ts';
-import Layout from '../layouts/Layout.astro';
-import type { Pokemon, CardPokemon } from '../utils/interfaces/types.ts';
-import IndexSection from '../components/layouts/IndexSection.astro';
+import { LINKS_API, SITE_TITLE } from "../const";
+import Layout from "../layouts/Layout.astro";
+import IndexSection from "../components/layouts/IndexSection.astro";
+import type { GenerationInfo, NameUrl, PokeApi } from "../utils/interfaces/types";
+import { getPokemonData } from "../utils/helpers/getDataJson";
 
-const pokemonData = await fetchGenerationById();
-const pokemons: Pokemon[] = await fetchAllByGeneration(pokemonData.pokemon_species);
-const pokemon: CardPokemon[] = pokemons.map((p) => (MapCardPokemon(p)));
+const link = LINKS_API.find((x) => x.id == "generation");
+  const dataApi: NameUrl[] = [
+    {
+      name: link!.label,
+      url: link!.href,
+    },
+  ];
+const data = await getPokemonData(dataApi, "generations.json") as PokeApi[];
+const genData = await Promise.all(data.map(async (gen) => {
+    const response = await getPokemonData(gen.results, "generationData.json");
+    return response.flat() as GenerationInfo[];
+}));
+const species = genData.flat().find(x => x.id == 1)?.pokemon_species;
+const path = ["pokemonDataGen1.json", "pokemonSpeciesDataGen1.json"];
 ---
 
-<Layout title={SITE_TITLE} heroTitle='PoKéDex' description='' isHome={true}>
-    <IndexSection pokemon={pokemon} />
+<Layout title={SITE_TITLE} heroTitle="PoKéDex" description="" isHome={true}>
+    <IndexSection species={species} path={path} />
 </Layout>

@@ -4,8 +4,6 @@ import NameInfo from '../commons/NameInfo.astro';
 import TypesBagde from '../commons/TypesBagde.astro';
 import Sprite from '../commons/Sprite.astro';
 import arrow from '../../assets/arrowDown.svg';
-import { MapCardPokemon, GetPreviousOrNext } from '../../utils/helper';
-import { fetchPokemonByUrl } from '../../utils/pokeApi';
 import female from '../../assets/genders/female.svg'
 import male from '../../assets/genders/male.svg'
 
@@ -15,20 +13,9 @@ interface Props {
     length: number;
 }
 const { pokemon, gen, length } = Astro.props;
-const pokemonSpecies = await fetchPokemonByUrl(pokemon.species.url, true) as PokemonSpecies;
-const cardInfo: CardPokemon = MapCardPokemon(pokemon);
-const typeColorMain = cardInfo.types[0].color;
-const typeColorSecondary = cardInfo.types[1]?.color ?? cardInfo.types[0].color;
-const input = {
-    id: gen.id,
-    count: length,
-}
-const next = await GetPreviousOrNext(pokemon.species.name, gen.pokemon_species, input, true);
-const prev = await GetPreviousOrNext(pokemon.species.name, gen.pokemon_species, input);
-const genderRate = pokemonSpecies.gender_rate > 0 ? ((pokemonSpecies.gender_rate / 8) * 100) : 0;
 ---
 <section id="details" class="p-5" aria-label="Pokémon details">
-    <div id={cardInfo.name} class="pokemon-card relative shadow-xl p-5 rounded-xl" style={`background: linear-gradient(150deg, ${typeColorMain} 50%, ${typeColorSecondary} 50%);`} aria-label="Pokémon info">
+    <!-- <div id={cardInfo.name} class="pokemon-card relative shadow-xl p-5 rounded-xl" style={`background: linear-gradient(150deg, ${typeColorMain} 50%, ${typeColorSecondary} 50%);`} aria-label="Pokémon info">
         <div class="flex justify-between py-2">
             <div id="previous">
                 {prev &&
@@ -90,5 +77,5 @@ const genderRate = pokemonSpecies.gender_rate > 0 ? ((pokemonSpecies.gender_rate
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </section>

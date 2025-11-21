@@ -3,17 +3,26 @@ import NavGen from "../components/commons/NavGen.astro";
 import ScrollTop from "../components/commons/ScrollTop.astro";
 import HeroIndex from "../components/layouts/HeroIndex.astro";
 import BaseHead from "../components/utilities/BaseHead.astro";
-import { fetchGenerations } from "../utils/pokeApi";
+import { LINKS_API } from "../const";
+import { getPokemonData } from "../utils/helpers/getDataJson";
+import type { NameUrl, PokeApi } from "../utils/interfaces/types";
 
 interface Props {
 	title: string;
 	heroTitle: string;
 	description: string;
 	isHome?: boolean;
-	gensData?: any;
 }
 
-const { title, heroTitle, description, gensData = await fetchGenerations(), isHome = false } = Astro.props;
+const { title, heroTitle, description, isHome = false } = Astro.props;
+const link = LINKS_API.find(x => x.id == 'generation');
+const dataApi: NameUrl[] = [
+	{
+		name: link!.label,
+		url: link!.href
+	}
+]
+const data = await getPokemonData(dataApi, 'generations.json') as PokeApi[];
 ---
 
 <!doctype html>
@@ -25,7 +34,7 @@ const { title, heroTitle, description, gensData = await fetchGenerations(), isHo
 	<body id="home">
 		<HeroIndex title={heroTitle} />
 		<header id="header" class="sticky top-5 z-[999]">
-			<NavGen generations={gensData} isHome={isHome} />
+			<NavGen generations={data} isHome={isHome} />
 		</header>
 		<main id="main" class="mt-5">
 			<slot />
