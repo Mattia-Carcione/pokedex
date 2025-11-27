@@ -1,28 +1,35 @@
 {
-  "name": "proper-point",
+  "name": "pokegen",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
-  "version": "0.0.1",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
-    "dev": "node ./src/scripts/ApiScript/pokeApi.js && astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
-    "astro": "astro",
-    "getData": "node ./src/scripts/ApiScript/pokeApi.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "vite build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
-    "astro": "^5.15.9",
+    "@unhead/vue": "^2.0.19",
     "axios": "^1.13.2",
-    "cli-progress": "^3.12.0"
+    "pinia": "^3.0.4",
+    "qs": "^6.14.0",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.22",
+    "@types/qs": "^6.14.0",
+    "@vitejs/plugin-vue": "^6.0.1",
     "gh-pages": "^6.3.0",
-    "postcss": "^8.5.6",
+    "postcss": "^8.5.3",
     "tailwindcss": "^4.1.17",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "~5.9.2",
+    "vite": "^7.1.11",
+    "vite-plugin-vue-devtools": "^8.0.3"
   }
 }

@@ -1,6 +1,6 @@
 export const BASE_PATH = '/pokedex-astro';
 export const LOCAL_URL: URL = new URL('http://localhost:4321');
-export const SITE_TITLE = 'PoKéDex';
+export const SITE_TITLE = 'PoKéGen';
 export const LINKS = [
   { id: 'generation', label: 'Generation', href: `${BASE_PATH}/generation/` },
   { id: 'pokemon', label: 'Pokémon', href: `${BASE_PATH}/pokemon/` },
@@ -53,5 +53,4 @@ export const TYPE_ICONS: Record<string, string> = {
   psychic: `${BASE_PATH}/types/psychic.svg`,
   rock: `${BASE_PATH}/types/rock.svg`,
   steel: `${BASE_PATH}/types/steel.svg`,
-  // aggiungi tutte le altre…
 };

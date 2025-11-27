@@ -34,7 +34,7 @@
 /* ============================= */
 @font-face {
     font-family: 'Pokemon Solid';
-    src: url('/pokedex-astro/fonts/Pokemon.woff2') format('woff2');
+    src: url('/src/assets/fonts/Pokemon.woff2') format('woff2');
 }
 
 .pokemon {
@@ -52,7 +52,7 @@ html {
 }
 
 body {
-    background-image: url('../assets/bg-pokemon.jpg');
+    background-image: url('/src/assets/bg-pokemon.jpg');
 }
 
 main,
