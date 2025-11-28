@@ -2,7 +2,9 @@
 import { GenerationService } from '@/services/generationService';
 import { useGenStore } from '@/store/store';
 import { onMounted, ref } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 
+const route = useRoute();
 const store = useGenStore();
 const srv = new GenerationService();
 const data = ref([]);
@@ -13,7 +15,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <nav id="main-nav" class="table mx-auto rounded-[1rem] bg-[#FFF] mt-4 [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)]"
+    <nav v-if="route.name != 'NotFound'" id="main-nav" class="table mx-auto rounded-[1rem] bg-[#FFF] mt-4 [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)]"
         aria-label="Navigazione generazioni Pokémon">
         <ul class="flex flex-wrap">
             <li v-for="(gen, x) in data">

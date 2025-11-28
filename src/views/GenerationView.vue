@@ -22,8 +22,8 @@ async function LoadCards(id) {
 }
 
 watch(() => props.id, async (newID) => {
-    await LoadCards(newID);
     store.setId(newID);
+    await LoadCards(newID);
 }, { immediate: true });
 </script>
 

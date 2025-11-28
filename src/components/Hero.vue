@@ -19,7 +19,7 @@ watch(() => route.path, (newName) => {
                 {{ title }}
             </h1>
         </RouterLink>
-        <p id="set-gen"
+        <p v-if="route.name != 'NotFound'" id="set-gen"
             class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
             Select Generation:
         </p>

@@ -48,7 +48,7 @@
 /* 🔤 BASICS        */
 /* ============================= */
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
@@ -75,9 +75,9 @@ header {
     width: 7em;
     right: 0;
     bottom: .4em;
-  }
+}
 
-  .navigation-link:after {
+.navigation-link:after {
     content: "";
     display: block;
     position: absolute;
