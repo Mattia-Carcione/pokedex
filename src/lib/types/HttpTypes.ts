@@ -23,6 +23,7 @@ export interface NormalizedHttpError {
 
 export interface ErrorValue {
     method: "get" | "post" | "update" | "delete";
-    value: string;
+    function: string;
+    value?: string;
     class: string;
 }

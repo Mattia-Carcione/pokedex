@@ -1,4 +1,4 @@
-name: Deploy Astro site to GitHub Pages
+name: Deploy Pokegen to GitHub Pages
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Astro site
+      - name: Build Pokegen
         run: npm run build
 
       - name: Deploy to GitHub Pages

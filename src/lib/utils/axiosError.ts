@@ -33,22 +33,22 @@ function PrintAxiosError(err: NormalizedHttpError, errValue: ErrorValue): null {
     switch (err.type) {
         case "http":
             if (err.status === 404) {
-                console.warn(`[${errValue.class}] - ${errValue.method}  ${errValue.value} not found (404)`);
+                console.warn(`[${errValue.class} - ${errValue.function}] - ${errValue.method}  ${errValue.value} not found (404)`);
                 return null;
             }
-            console.warn(`[${errValue.class}] HTTP  - ${errValue.method}  ${err.status} fetching ${errValue.value}`);
+            console.warn(`[${errValue.class} - ${errValue.function}] HTTP  - ${errValue.method}  ${err.status} fetching ${errValue.value}`);
             return null;
 
         case "network":
-            console.warn(`[${errValue.class}]  - ${errValue.method}  Network error fetching ${errValue.value}`);
+            console.warn(`[${errValue.class} - ${errValue.function}] HTTP - ${errValue.method}  Network error fetching ${errValue.value}`);
             return null;
 
         case "timeout":
-            console.warn(`[${errValue.class}]  - ${errValue.method}  Timeout fetching ${errValue.value}`);
+            console.warn(`[${errValue.class} - ${errValue.function}] HTTP - ${errValue.method}  Timeout fetching ${errValue.value}`);
             return null;
 
         default:
-            console.warn(`[${errValue.class}]  - ${errValue.method}  Unknown error fetching ${errValue.value}`);
+            console.warn(`[${errValue.class} - ${errValue.function}] HTTP - ${errValue.method}  Unknown error fetching ${errValue.value}`);
             return null;
     }
 }

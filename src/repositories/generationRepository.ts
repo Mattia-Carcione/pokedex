@@ -4,7 +4,6 @@
 * Esempio di repository che usa apiClient per fare fetch dei dati utente.
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
-
 import { Generation } from "@/types/pokemon/generation";
 import { apiClient } from "../lib/http/apiClient";
 import { ListApi, NamedApi } from "@/types/pokeApi";
@@ -36,7 +35,7 @@ export class GenerationRepository {
             const resp = await this.client.get<Generation>(entry.url, { cacheTTL } as ExtendedRequestConfig);
             return resp.data;
         } catch (err) {
-            return NormalizeAndPrintError(err, { method: "get", value: id.toString(), class: 'GenerationRepository' });
+            return NormalizeAndPrintError(err, { method: "get", value: `Gen ${id}`, class: 'GenerationRepository', function: 'Get' });
         }
     }
 
@@ -59,7 +58,7 @@ export class GenerationRepository {
                 return resp.data;
             }));
         } catch (err) {
-            return NormalizeAndPrintError(err, { method: "get", value: 'GetAllGeneration', class: 'GenerationRepository' });
+            return NormalizeAndPrintError(err, { method: "get", function: 'GetAll', class: 'GenerationRepository' });
         }
     }
 
@@ -75,10 +74,16 @@ export class GenerationRepository {
             } as ExtendedRequestConfig);
             return resp.data;
         } catch (err) {
-            return NormalizeAndPrintError(err, { method: "get", value: 'GetPokeApi', class: 'GenerationRepository' });
+            return NormalizeAndPrintError(err, { method: "get", function: 'GetPokeApi', class: 'GenerationRepository' });
         }
     }
 
+    /**
+     * Funzione che restituisce il valore con l'url desiderato.
+     * @param data NamedApi[]
+     * @param value any, valore da confrontare
+     * @returns 
+     */
     private MatchEntry(data: NamedApi[], value: any) {
         return data.find(r => {
                 const match = r.url.match(/\/generation\/(\d+)\/$/);

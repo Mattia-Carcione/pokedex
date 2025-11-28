@@ -4,31 +4,31 @@ import type { BaseApi, NamedApi } from "../pokeApi";
  * Informazioni sulla specie Pokemon
  *
  * @extends BaseApi
- * @member order - Ordine per l'ordinamento delle specie (integer).
- * @member gender_rate - Probabilità che sia femmina in ottavi, o -1 per senza genere (integer).
- * @member capture_rate - Tasso base di cattura (0-255) (integer).
- * @member base_happiness - Felicità base all'ottenimento (0-255) (integer).
- * @member is_baby - Se è un Pokémon baby (boolean).
- * @member is_legendary - Se è leggendario (boolean).
- * @member is_mythical - Se è mitico (boolean).
- * @member hatch_counter - Contatore di schiusa (integer).
- * @member has_gender_differences - Se ha differenze visive di genere (boolean).
- * @member forms_switchable - Se ha forme intercambiabili (boolean).
- * @member growth_rate - Tasso di crescita (GrowthRate).
- * @member pokedex_numbers - Lista di numeri e Pokédex dove compare (PokemonSpeciesDexEntry[]).
- * @member egg_groups - Gruppi d'uovo di appartenenza (NamedApi[]).
- * @member color - Colore per ricerca Pokédex (NamedApi).
- * @member shape - Forma per ricerca Pokédex (NamedApi).
- * @member evolves_from_species - Specie da cui evolve (NamedApi).
- * @member evolution_chain - Catena evolutiva (string, APIResource).
- * @member habitat - Habitat dove può essere incontrato (NamedApi|undefined).
- * @member generation - Generazione di introduzione (NamedApi).
- * @member names - Nomi in diverse lingue (Name[]).
- * @member pal_park_encounters - Incontri in Pal Park (PalParkEncounterArea[]).
- * @member flavor_text_entries - Testi descrittivi/Flavor text (FlavorText[]).
- * @member form_descriptions - Descrizioni delle forme (Description[]).
- * @member genera - Genere localizzato in più lingue (Genus[]).
- * @member varieties - Varietà esistenti nella specie (PokemonSpeciesVariety[]).
+ * @property order - Ordine per l'ordinamento delle specie (integer).
+ * @property gender_rate - Probabilità che sia femmina in ottavi, o -1 per senza genere (integer).
+ * @property capture_rate - Tasso base di cattura (0-255) (integer).
+ * @property base_happiness - Felicità base all'ottenimento (0-255) (integer).
+ * @property is_baby - Se è un Pokémon baby (boolean).
+ * @property is_legendary - Se è leggendario (boolean).
+ * @property is_mythical - Se è mitico (boolean).
+ * @property hatch_counter - Contatore di schiusa (integer).
+ * @property has_gender_differences - Se ha differenze visive di genere (boolean).
+ * @property forms_switchable - Se ha forme intercambiabili (boolean).
+ * @property growth_rate - Tasso di crescita (GrowthRate).
+ * @property pokedex_numbers - Lista di numeri e Pokédex dove compare (PokemonSpeciesDexEntry[]).
+ * @property egg_groups - Gruppi d'uovo di appartenenza (NamedApi[]).
+ * @property color - Colore per ricerca Pokédex (NamedApi).
+ * @property shape - Forma per ricerca Pokédex (NamedApi).
+ * @property evolves_from_species - Specie da cui evolve (NamedApi).
+ * @property evolution_chain - Catena evolutiva (string, APIResource).
+ * @property habitat - Habitat dove può essere incontrato (NamedApi|undefined).
+ * @property generation - Generazione di introduzione (NamedApi).
+ * @property names - Nomi in diverse lingue (Name[]).
+ * @property pal_park_encounters - Incontri in Pal Park (PalParkEncounterArea[]).
+ * @property flavor_text_entries - Testi descrittivi/Flavor text (FlavorText[]).
+ * @property form_descriptions - Descrizioni delle forme (Description[]).
+ * @property genera - Genere localizzato in più lingue (Genus[]).
+ * @property varieties - Varietà esistenti nella specie (PokemonSpeciesVariety[]).
  */
 export interface PokemonSpecies extends BaseApi {
   order: number;

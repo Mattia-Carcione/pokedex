@@ -1,17 +1,3 @@
-export const BASE_PATH = '/pokedex-astro';
-export const LOCAL_URL: URL = new URL('http://localhost:4321');
-export const SITE_TITLE = 'PoKéGen';
-export const LINKS = [
-  { id: 'generation', label: 'Generation', href: `${BASE_PATH}/generation/` },
-  { id: 'pokemon', label: 'Pokémon', href: `${BASE_PATH}/pokemon/` },
-]
-
-export const BASE_PATH_API = 'https://pokeapi.co/api/v2';
-export const LINKS_API = [
-  { id: 'generation', label: 'Generation', href: `${BASE_PATH_API}/generation/` },
-  { id: 'pokemon', label: 'Pokémon', href: `${BASE_PATH_API}/pokemon/` },
-  { id: 'species', label: 'Pokémon species', href: `${BASE_PATH_API}/pokemon-species/` },
-];
 
 export const TYPE_COLORS: Record<string, string> = {
   normal: "#A8A77A",
@@ -33,24 +19,23 @@ export const TYPE_COLORS: Record<string, string> = {
   steel: "#B7B7CE",
   fairy: "#D685AD"
 };
-
 export const TYPE_ICONS: Record<string, string> = {
-  fire: `${BASE_PATH}/types/fire.svg`,
-  water: `${BASE_PATH}/types/water.svg`,
-  grass: `${BASE_PATH}/types/grass.svg`,
-  electric: `${BASE_PATH}/types/electric.svg`,
-  ground: `${BASE_PATH}/types/ground.svg`,
-  bug: `${BASE_PATH}/types/bug.svg`,
-  dark: `${BASE_PATH}/types/dark.svg`,
-  dragon: `${BASE_PATH}/types/dragon.svg`,
-  fairy: `${BASE_PATH}/types/fairy.svg`,
-  fighting: `${BASE_PATH}/types/fighting.svg`,
-  flying: `${BASE_PATH}/types/flying.svg`,
-  ghost: `${BASE_PATH}/types/ghost.svg`,
-  ice: `${BASE_PATH}/types/ice.svg`,
-  normal: `${BASE_PATH}/types/normal.svg`,
-  poison: `${BASE_PATH}/types/poison.svg`,
-  psychic: `${BASE_PATH}/types/psychic.svg`,
-  rock: `${BASE_PATH}/types/rock.svg`,
-  steel: `${BASE_PATH}/types/steel.svg`,
+  fire: "/src/assets/icons/types/fire.svg",
+  water: "/src/assets/icons/types/water.svg",
+  grass: "/src/assets/icons/types/grass.svg",
+  electric: "/src/assets/icons/types/electric.svg",
+  ground: "/src/assets/icons/types/ground.svg",
+  bug: "/src/assets/icons/types/bug.svg",
+  dark: "/src/assets/icons/types/dark.svg",
+  dragon: "/src/assets/icons/types/dragon.svg",
+  fairy: "/src/assets/icons/types/fairy.svg",
+  fighting: "/src/assets/icons/types/fighting.svg",
+  flying: "/src/assets/icons/types/flying.svg",
+  ghost: "/src/assets/icons/types/ghost.svg",
+  ice: "/src/assets/icons/types/ice.svg",
+  normal: "/src/assets/icons/types/normal.svg",
+  poison: "/src/assets/icons/types/poison.svg",
+  psychic: "/src/assets/icons/types/psychic.svg",
+  rock: "/src/assets/icons/types/rock.svg",
+  steel: "/src/assets/icons/types/steel.svg",
 };

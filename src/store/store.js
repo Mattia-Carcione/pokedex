@@ -2,6 +2,9 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
+/**
+ * Funzione getter e setter della generazione nello store
+ */
 export const useGenStore = defineStore('gen', () => {
   const id = ref(null);
   function setId(newId) {

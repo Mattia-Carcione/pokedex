@@ -1,23 +1,13 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import CustomNav from './components/CustomNav.vue';
-import Hero from './components/Hero.vue';
+import ScrollToTop from './components/ScrollToTop.vue';
 </script>
 
 <template>
-  <Suspense>
-
-    <header>
-      <Hero />
-      <CustomNav />
-    </header>
-
-  </Suspense>
-  <Suspense>
-    <main>
+    <Suspense>
       <RouterView />
-    </main>
-  </Suspense>
+    </Suspense>
+    <ScrollToTop />
 </template>
 
 <style scoped></style>

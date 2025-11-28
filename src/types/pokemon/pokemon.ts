@@ -7,24 +7,24 @@ import type { Type } from "./type";
  * Informazioni del singolo Pokemon
  *
  * @extends BaseApi
- * @member abilities - Lista delle abilità che questo Pokémon può avere (Ability[]).
- * @member base_experience - Esperienza base ottenuta sconfiggendo questo Pokémon (integer).
- * @member cries - Collezione di versi/cry (ultima versione e legacy).
- * @member forms - Lista delle forme che questo Pokémon può assumere (NamedApi[]).
- * @member game_indices - Indici dei giochi rilevanti per questo Pokémon per generazione (VersionGameIndex[]).
- * @member height - Altezza del Pokémon in decimetri (integer).
- * @member held_items - Lista di oggetti tenuti da questo Pokémon quando incontrato (PokemonHeldItem[]).
- * @member is_default - Vero se è il Pokémon di default per la specie (boolean).
- * @member location_area_encounters - Link alle aree di incontro con dettagli per versione (string).
- * @member moves - Lista di mosse con dettagli di apprendimento per gruppi di versione (PokemonMove[]).
- * @member order - Ordine per l'ordinamento (integer).
- * @member past_abilities - Abilità che il Pokémon aveva in generazioni passate (PokemonAbilityPast[]).
- * @member past_types - Tipi che il Pokémon aveva in generazioni passate (PokemonTypePast[]).
- * @member species - Specie a cui appartiene il Pokémon (NamedApi).
- * @member sprites - Set di sprite usati per rappresentare il Pokémon (PokemonSprites).
- * @member stats - Lista dei valori base delle statistiche (PokemonStat[]).
- * @member types - Tipi correnti del Pokémon con il relativo slot (PokemonType[]).
- * @member weight - Peso del Pokémon in ettogrammi (integer).
+ * @property abilities - Lista delle abilità che questo Pokémon può avere (Ability[]).
+ * @property base_experience - Esperienza base ottenuta sconfiggendo questo Pokémon (integer).
+ * @property cries - Collezione di versi/cry (ultima versione e legacy).
+ * @property forms - Lista delle forme che questo Pokémon può assumere (NamedApi[]).
+ * @property game_indices - Indici dei giochi rilevanti per questo Pokémon per generazione (VersionGameIndex[]).
+ * @property height - Altezza del Pokémon in decimetri (integer).
+ * @property held_items - Lista di oggetti tenuti da questo Pokémon quando incontrato (PokemonHeldItem[]).
+ * @property is_default - Vero se è il Pokémon di default per la specie (boolean).
+ * @property location_area_encounters - Link alle aree di incontro con dettagli per versione (string).
+ * @property moves - Lista di mosse con dettagli di apprendimento per gruppi di versione (PokemonMove[]).
+ * @property order - Ordine per l'ordinamento (integer).
+ * @property past_abilities - Abilità che il Pokémon aveva in generazioni passate (PokemonAbilityPast[]).
+ * @property past_types - Tipi che il Pokémon aveva in generazioni passate (PokemonTypePast[]).
+ * @property species - Specie a cui appartiene il Pokémon (NamedApi).
+ * @property sprites - Set di sprite usati per rappresentare il Pokémon (PokemonSprites).
+ * @property stats - Lista dei valori base delle statistiche (PokemonStat[]).
+ * @property types - Tipi correnti del Pokémon con il relativo slot (PokemonType[]).
+ * @property weight - Peso del Pokémon in ettogrammi (integer).
  */
 export interface Pokemon extends BaseApi {
   abilities: Ability[]; // list ìAbility
