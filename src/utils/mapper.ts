@@ -25,7 +25,7 @@ export class Mapper {
             return {
                 id: e.id,
                 name: name,
-                href: `/generation/${e.id}`,
+                href: `{ name: 'generation'. params: {${e.id}} }`,
                 label: `Vai alla Gen ${e.id}`
             }
         })

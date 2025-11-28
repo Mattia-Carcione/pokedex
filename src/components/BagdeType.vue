@@ -3,7 +3,6 @@ import Skeleton from './Skeleton.vue';
 
 const props = defineProps(['types']);
 const types = props.types ?? [];
-const style = props.class ?? 'w-[50px] h-[50px] md:h-[90px] md:w-[90px]';
 </script>
 
 <template>

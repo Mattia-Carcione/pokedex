@@ -34,7 +34,7 @@
 /* ============================= */
 @font-face {
     font-family: 'Pokemon Solid';
-    src: url('/src/assets/fonts/Pokemon.woff2') format('woff2');
+    src: url('/fonts/Pokemon.woff2') format('woff2');
 }
 
 .pokemon {
@@ -52,7 +52,7 @@ html {
 }
 
 body {
-    background-image: url('/src/assets/bg-pokemon.jpg');
+    background-image: url('/bg-pokemon.jpg');
 }
 
 main,
@@ -65,7 +65,7 @@ header {
 /* ============================= */
 .pokemon-card::after {
     content: '';
-    background-image: url(https://icon-library.com/images/pokemon-desktop-icon/pokemon-desktop-icon-23.jpg);
+    background-image: url('/bg-card-after.jpg');
     background-repeat: no-repeat;
     background-size: 10em;
     filter: brightness(100%);

@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/pokedex-astro/',
   plugins: [
     vue(),
     vueDevTools(),
