@@ -1,4 +1,4 @@
-
+export const BASE_URI = '/pokedex-astro/'
 export const TYPE_COLORS: Record<string, string> = {
   normal: "#A8A77A",
   fire: "#EE8130",
@@ -20,22 +20,22 @@ export const TYPE_COLORS: Record<string, string> = {
   fairy: "#D685AD"
 };
 export const TYPE_ICONS: Record<string, string> = {
-  fire: "/icons/types/fire.svg",
-  water: "/icons/types/water.svg",
-  grass: "/icons/types/grass.svg",
-  electric: "/icons/types/electric.svg",
-  ground: "/icons/types/ground.svg",
-  bug: "/icons/types/bug.svg",
-  dark: "/icons/types/dark.svg",
-  dragon: "/icons/types/dragon.svg",
-  fairy: "/icons/types/fairy.svg",
-  fighting: "/icons/types/fighting.svg",
-  flying: "/icons/types/flying.svg",
-  ghost: "/icons/types/ghost.svg",
-  ice: "/icons/types/ice.svg",
-  normal: "/icons/types/normal.svg",
-  poison: "/icons/types/poison.svg",
-  psychic: "/icons/types/psychic.svg",
-  rock: "/icons/types/rock.svg",
-  steel: "/icons/types/steel.svg",
+  fire: `${BASE_URI}icons/types/fire.svg`,
+  water: `${BASE_URI}icons/types/water.svg`,
+  grass: `${BASE_URI}icons/types/grass.svg`,
+  electric: `${BASE_URI}icons/types/electric.svg`,
+  ground: `${BASE_URI}icons/types/ground.svg`,
+  bug: `${BASE_URI}icons/types/bug.svg`,
+  dark: `${BASE_URI}icons/types/dark.svg`,
+  dragon: `${BASE_URI}icons/types/dragon.svg`,
+  fairy: `${BASE_URI}icons/types/fairy.svg`,
+  fighting: `${BASE_URI}icons/types/fighting.svg`,
+  flying: `${BASE_URI}icons/types/flying.svg`,
+  ghost: `${BASE_URI}icons/types/ghost.svg`,
+  ice: `${BASE_URI}icons/types/ice.svg`,
+  normal: `${BASE_URI}icons/types/normal.svg`,
+  poison: `${BASE_URI}icons/types/poison.svg`,
+  psychic: `${BASE_URI}icons/types/psychic.svg`,
+  rock: `${BASE_URI}icons/types/rock.svg`,
+  steel: `${BASE_URI}icons/types/steel.svg`,
 };

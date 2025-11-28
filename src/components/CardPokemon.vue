@@ -3,7 +3,6 @@ import BadgeName from './BadgeName.vue';
 import BagdeType from './BagdeType.vue';
 import Sprite from './Sprite.vue';
 const props = defineProps(['card']);
-console.log(props.card)
 const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
 const firstType = props.card.types[0].color;
 const secondaryType = props.card.types[1]?.color ?? props.card.types[0].color;

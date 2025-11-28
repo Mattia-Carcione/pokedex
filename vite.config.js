@@ -4,11 +4,12 @@ import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
+import { BASE_URI } from '@/const'
 
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/pokedex-astro/',
+  base: BASE_URI,
   plugins: [
     vue(),
     vueDevTools(),
