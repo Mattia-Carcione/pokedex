@@ -14,7 +14,7 @@ watch(() => route.path, (newName) => {
 
 <template>
     <div class="text-center">
-        <RouterLink to="{ name: 'home' }" aria-label="Vai alla home">
+        <RouterLink :to="{ name: 'home' }" aria-label="Vai alla home">
             <h1 class="pokemon mb-15">
                 {{ title }}
             </h1>

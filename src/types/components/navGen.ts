@@ -1,4 +1,5 @@
 import { BaseApi } from "../pokeApi";
+import { Routing } from "../routing";
 
 /**
  * Interfaccia per la barra di navigazione
@@ -8,6 +9,6 @@ import { BaseApi } from "../pokeApi";
  * @property label string - descizione per l'aria-label
  */
 export interface NavGen extends BaseApi {
-    href: string;
+    href: Routing;
     label: string;
 }

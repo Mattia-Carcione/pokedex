@@ -25,7 +25,7 @@ export class Mapper {
             return {
                 id: e.id,
                 name: name,
-                href: `{ name: 'generation'. params: {${e.id}} }`,
+                href: { name: 'generation', params: { id: e.id} },
                 label: `Vai alla Gen ${e.id}`
             }
         })
@@ -40,6 +40,7 @@ export class Mapper {
         return {
             id: this.SetPokedexNumber(Number(id), maxNumber),
             name: name,
+            href: { name: 'pokemon', params: { name }, query: { id: id }},
             displayName: name.charAt(0).toUpperCase() + name.slice(1),
             types: this.SetTypes(types),
             src: sprites.other.home.front_default ?? sprites.front_default,
@@ -73,8 +74,8 @@ export class Mapper {
             return {
                 id: (x + 1),
                 name: type.name,
-                src: TYPE_ICONS[type.name] ?? '',
-                color: TYPE_COLORS[type.name] ?? '',
+                src: TYPE_ICONS[type.name.toLowerCase()] ?? '',
+                color: TYPE_COLORS[type.name.toLowerCase()] ?? '',
             }
         })
     }

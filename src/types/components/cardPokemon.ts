@@ -1,4 +1,5 @@
 import { BaseApi } from "../pokeApi";
+import { Routing } from "../routing";
 import { TypePkm } from "./typePkm";
 
 /**
@@ -10,6 +11,7 @@ import { TypePkm } from "./typePkm";
  * @property type (TypePkm[]) - il tipo del pokémon
  */
 export interface CardPokemon extends BaseApi {
+    href: Routing
     displayName: string;
     types: TypePkm[];
     src: string;
