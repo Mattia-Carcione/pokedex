@@ -2,7 +2,7 @@ import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
 import { AxiosInstance } from "axios";
 
 /**
- * funzione generica che tenta due URL: prima url, poi fallback
+ * funzione generica che tenta una fetch con due URL: prima url, poi fallback
  * @param client istanza di axios
  * @param url url primario
  * @param fallback url di fallback se il primo url fallisce

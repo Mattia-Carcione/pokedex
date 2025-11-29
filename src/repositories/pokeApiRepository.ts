@@ -26,8 +26,8 @@ export class PokeApiRepository {
     async GetAndStoreData(cacheTTL?: number): Promise<void | null> {
         try {
             await this._genRepository.GetAll(cacheTTL);
-            await this._pkmRepository.GetAll(cacheTTL);
-            await this._pkmSpeciesRepository.GetAll(cacheTTL);
+            await this._pkmRepository.GetAllByGen(1, cacheTTL);
+            await this._pkmSpeciesRepository.GetAllByGen(1, cacheTTL);
         } catch (err) {
             console.warn(`Error GetAndStoreData fetching data. \n${err}`);
             return null;

@@ -1,25 +1,56 @@
-name: Deploy pokedex-astro to GitHub Pages
+name: Release & Deploy SPA Semantic Version
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of release (patch, minor, major)'
+        required: true
+        default: patch
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 jobs:
+  # =========================================
+  # 1️⃣ Job: Bump version
+  # =========================================
+  bump_version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Bump version
+        id: bump
+        uses: phips28/gh-action-bump-version@v9
+        with:
+          tag-prefix: "v"
+          release-type: ${{ github.event.inputs.release_type }}  # patch, minor, major
+          commit-message: "chore: bump version to v${{steps.bump.outputs.new_version}}"
+
+      - name: Get version
+        id: get_version
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
+  # =========================================
+  # 2️⃣ Job: Build
+  # =========================================
   build:
+    needs: bump_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 18
           cache: npm
 
       - name: Install dependencies
@@ -29,23 +60,50 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
+          name: dist-artifact
           path: dist
 
-
-  deploy:
-    runs-on: ubuntu-latest
+  # =========================================
+  # 3️⃣ Job: Release
+  # =========================================
+  release:
     needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist
 
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.bump_version.outputs.version }}
+          name: Release v${{ needs.bump_version.outputs.version }}
+          body: Automatic release from main
+          draft: false
+          prerelease: false
+          artifacts: dist
+
+  # =========================================
+  # 4️⃣ Job: Deploy su GitHub Pages
+  # =========================================
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
+      url: ${{ steps.deploy_step.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          name: dist-artifact
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deploy_step
+        uses: actions/deploy-pages@v4

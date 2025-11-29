@@ -4,13 +4,12 @@
 * Esempio di repository che usa apiClient per fare fetch dei dati utente.
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
-import { replaceStringUrl } from "@/utils/stringHelper";
 import { apiClient } from "../lib/http/apiClient";
 import { GenerationRepository } from "./generationRepository";
 import { Pokemon } from "@/types/pokemon/pokemon";
-import { fetchWithFallback } from "@/utils/safeFetch";
 import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
 import { NormalizeAndPrintError } from "@/lib/utils/axiosError";
+import { PromiseAll } from "@/utils/promiseAll";
 
 /**
  * Classe che rappresenta il repository per i Pokémon
@@ -19,7 +18,7 @@ export class PokemonRepository {
     private BASE_URL = 'https://pokeapi.co/api/v2/pokemon/';
     private _generationRepository = new GenerationRepository(this.client);
     constructor(private client = apiClient) { }
-    
+
     /**
     * Recupera una generazione (usa GET -> soggetto a caching nel client)
     * @param id identificativo del Pokémon
@@ -50,11 +49,7 @@ export class PokemonRepository {
                 return null;
             }
             const resp = await Promise.all(pokeApi.map(async (e) => {
-                return await Promise.all(e.pokemon_species.map(async (pkm) => {
-                    const url = pkm.url.replace("-species", "");
-                    const fallbackUrl = replaceStringUrl(url, pkm.name);
-                    return await fetchWithFallback<Pokemon>(this.client, url, fallbackUrl, cacheTTL);
-                }))
+                return await PromiseAll<Pokemon>(e.pokemon_species, cacheTTL);
             }));
             return resp.flat();
         } catch (err) {
@@ -64,6 +59,7 @@ export class PokemonRepository {
 
     /**
      * Recupera i dati di tutti i Pokémon (usa GET -> soggetto a caching nel client)
+     * @param id (number) - Ritorna i dati di tutti i pokemon di una generazione
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
     async GetAllByGen(id: number, cacheTTL?: number): Promise<Pokemon[] | null> {
@@ -78,11 +74,7 @@ export class PokemonRepository {
                 console.warn(`[Get] GetAllByGen ${id} not found.`);
                 return null;
             }
-            const resp = await Promise.all(pkm.pokemon_species.map(async (e) => {
-                const url = e.url.replace("-species", "");
-                const fallbackUrl = replaceStringUrl(url, e.name);
-                return await fetchWithFallback<Pokemon>(this.client, url, fallbackUrl, cacheTTL);
-            }));
+            const resp = await PromiseAll<Pokemon>(pkm.pokemon_species, cacheTTL);
             return resp.flat();
         } catch (err) {
             return NormalizeAndPrintError(err, { method: "get", function: 'GetAllByGen', class: 'PokemonRepository', value: `Pokémon of gen ${id}` });
