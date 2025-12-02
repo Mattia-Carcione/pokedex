@@ -1,4 +1,4 @@
-export const BASE_URI = '/pokedex-astro/'
+export const BASE_URI = '/pokedex/'
 export const TYPE_COLORS: Record<string, string> = {
   normal: "#A8A77A",
   fire: "#EE8130",

@@ -1,9 +1,14 @@
-name: Auto Version & Deploy SPA
+name: Release & Deploy SPA
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch: # opzionale: puoi lanciare manualmente
+    inputs:
+      release_type:
+        description: 'Release type (patch, minor, major). Se vuoto usa semantic-release'
+        required: false
 
 permissions:
   contents: write
@@ -12,41 +17,9 @@ permissions:
 
 jobs:
   # =========================================
-  # 1️⃣ Versioning automatico basato sui commit
+  # 1️⃣ Job: Bump version & create GitHub Release
   # =========================================
-  bump_version:
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.set_version.outputs.new_version }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Setup Git identity
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
-      - name: Bump version (Conventional Commits)
-        id: set_version
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-      - run: |
-          npm install -g standard-version
-          npx standard-version --dry-run --no-verify
-          npx standard-version --release-as $(npx standard-version --dry-run | grep 'bump' | awk '{print $NF}')
-          echo "new_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-          
-      - name: Push version bump & tag
-        run: |
-          git push origin main --follow-tags
-
-  # =========================================
-  # 2️⃣ Build & Prepare Artifact
-  # =========================================
-  build:
-    needs: bump_version
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -59,70 +32,76 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build project
-        run: npm run build
-
-      - name: Clean dist for deployment
-        run: |
-          rm -rf clean-dist
-          mkdir clean-dist
-          cp -rL dist/* clean-dist/
-          find clean-dist -name "*.map" -delete
-          find clean-dist -name "*.log" -delete
-
-      - name: Upload clean build artifact
-        uses: actions/upload-artifact@v4
+      - name: Run semantic-release
+        id: semantic_release
+        uses: cycjimmy/semantic-release-action@v4
         with:
-          name: github-pages
-          path: clean-dist
+          extra_plugins: |
+            @semantic-release/npm
+            @semantic-release/git
+            @semantic-release/github
+          dry_run: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+      - name: Get released version
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   # =========================================
-  # 3️⃣ Create GitHub Release
+  # 2️⃣ Job: Build
   # =========================================
-  release:
-    needs: build
+  build:
+    needs: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          name: github-pages
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifact
           path: dist
 
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.bump_version.outputs.version }}
-          name: Release v${{ needs.bump_version.outputs.version }}
-          body: Automatic release from main
-          draft: false
-          prerelease: false
-          allowUpdates: true
-
   # =========================================
-  # 4️⃣ Deploy su GitHub Pages
+  # 3️⃣ Job: Deploy su GitHub Pages
   # =========================================
   deploy:
     needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+      url: ${{ steps.deploy_step.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Download build artifact
+      - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: github-pages
+          name: dist-artifact
           path: dist
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        id: deploy_step
+        uses: peaceiris/actions-gh-pages@v6
         with:
-          artifact_name: github-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
