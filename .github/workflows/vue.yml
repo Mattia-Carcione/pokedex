@@ -1,12 +1,6 @@
-name: Release & Deploy SPA
+name: Auto Release & Deploy SPA Semantic Version
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: 'Type of release (patch, minor, major)'
-        required: true
-        default: patch
   push:
     branches: [main]
 
@@ -17,7 +11,7 @@ permissions:
 
 jobs:
   # =========================================
-  # 1️⃣ Job: Bump version
+  # 1️⃣ Bump version automatico
   # =========================================
   bump_version:
     runs-on: ubuntu-latest
@@ -32,15 +26,15 @@ jobs:
         uses: phips28/gh-action-bump-version@master
         with:
           tag-prefix: "v"
-          release-type: auto  # patch, minor, major
+          release-type: auto   # versione determinata automaticamente dai commit
           commit-message: "chore: bump version to v${{steps.bump.outputs.new_version}}"
 
       - name: Get version
         id: get_version
-        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
   # =========================================
-  # 2️⃣ Job: Build
+  # 2️⃣ Build
   # =========================================
   build:
     needs: bump_version
@@ -61,24 +55,36 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Remove symlinks from dist
+      # =========================================
+      # 🔹 Nuovo step: pulizia symlink e file non necessari
+      # =========================================
+      - name: Clean dist for deployment
         run: |
-          find dist -type l -delete
+          rm -rf clean-dist
+          mkdir clean-dist
+          # Copia solo i file reali, seguendo link simbolici
+          rsync -av --copy-links dist/ clean-dist/
+          # Rimuove eventuali map/log inutili
+          find clean-dist -name "*.map" -delete
+          find clean-dist -name "*.log" -delete
 
-      - name: Upload build artifacts
+      - name: Upload clean build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist-artifact
-          path: dist
+          name: github-pages       # necessario per deploy-pages
+          path: clean-dist
 
   # =========================================
-  # 3️⃣ Job: Release
+  # 3️⃣ Release automatico
   # =========================================
   release:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Download build artifacts
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: github-pages
@@ -93,30 +99,25 @@ jobs:
           draft: false
           prerelease: false
           artifacts: dist
-          allowUpdates: true  # aggiorna il release se il tag esiste già
+          allowUpdates: true   # aggiorna il release se il tag esiste già
 
   # =========================================
-  # 4️⃣ Job: Deploy su GitHub Pages
+  # 4️⃣ Deploy su GitHub Pages
   # =========================================
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy_step.outputs.page_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Download build artifacts
+      - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: github-pages
           path: dist
 
       - name: Deploy to GitHub Pages
-        id: deploy_step
         uses: actions/deploy-pages@v4
         with:
-          # default target directory for Pages deployment
-          directory: dist
+          artifact_name: github-pages
