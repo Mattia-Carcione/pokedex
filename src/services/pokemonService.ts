@@ -3,8 +3,8 @@
 * Esempio di service di business logic che usa repository.
 * Il service può decidere politiche di invalidazione, fallback su cache scaduta, ecc.
 */
-import { apiClient } from "@/lib/http/apiClient";
-import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 import { PokemonRepository } from "@/repositories/pokemonRepository";
 import { CardPokemon } from "@/types/components/cardPokemon";
 import { ListApi } from "@/types/pokeApi";
@@ -18,7 +18,7 @@ import { Mapper } from "@/utils/mapper";
 export class PokemonService {
     private _repo = new PokemonRepository(this.client);
     private URL = 'https://pokeapi.co/api/v2/pokemon/';
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
 
     /**
      * Funzione per la creazione della card del Pokémon

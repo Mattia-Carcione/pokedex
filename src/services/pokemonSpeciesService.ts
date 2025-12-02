@@ -3,7 +3,7 @@
 * Esempio di service di business logic che usa repository.
 * Il service può decidere politiche di invalidazione, fallback su cache scaduta, ecc.
 */
-import { apiClient } from "@/lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { PokemonSpeciesRepository } from "@/repositories/pokemonSpeciesRepository";
 
 /**
@@ -12,6 +12,6 @@ import { PokemonSpeciesRepository } from "@/repositories/pokemonSpeciesRepositor
 export class PokemonSpeciesService {
     private _repo = new PokemonSpeciesRepository(this.client);
 
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
 
 }

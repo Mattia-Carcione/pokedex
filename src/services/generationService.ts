@@ -3,7 +3,7 @@
 * Esempio di service di business logic che usa repository.
 * Il service può decidere politiche di invalidazione, fallback su cache scaduta, ecc.
 */
-import { apiClient } from "@/lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { GenerationRepository } from "../repositories/generationRepository";
 import { Generation } from "@/types/pokemon/generation";
 import { Mapper } from "@/utils/mapper";
@@ -15,7 +15,7 @@ import { NavGen } from "@/types/components/navGen";
 export class GenerationService {
     private _repo = new GenerationRepository(this.client);
 
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
 
     async Fetch(id: number, cacheTTL?: number): Promise<Generation | null> {
         return await this._repo.Get(id, cacheTTL);
