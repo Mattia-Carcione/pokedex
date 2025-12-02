@@ -1,10 +1,13 @@
 import { TYPE_COLORS, TYPE_ICONS } from "@/const";
 import { CardPokemon } from "@/types/components/cardPokemon";
+import { DetailPkm } from "@/types/components/detailPkm";
 import { NavGen } from "@/types/components/navGen";
 import { TypePkm } from "@/types/components/typePkm";
 import { Generation } from "@/types/pokemon/generation";
 import { Pokemon } from "@/types/pokemon/pokemon";
+import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
 import { Type } from "@/types/pokemon/type";
+import { Routing } from "@/types/routing";
 
 /**
  * Classe static Mapper per mapppare i dati dei Pokémon ricevuti dall'Api
@@ -25,7 +28,7 @@ export class Mapper {
             return {
                 id: e.id,
                 name: name,
-                href: { name: 'generation', params: { id: e.id} },
+                href: { name: 'generation', params: { id: e.id } },
                 label: `Vai alla Gen ${e.id}`
             }
         })
@@ -36,14 +39,59 @@ export class Mapper {
      * @param param0 ({ name, id, types, sprites }) Le info del Pokémon da mappare
      * @param maxNumber (number) Il numero massimo di Pokémon
      */
-    static CardPokemonMapper({ name, id, types, sprites }: Pokemon, maxNumber: number): CardPokemon {
+    static CardPokemonMapper({ species, id, types, sprites }: Pokemon, maxNumber: number): CardPokemon {
+        const name = species.name;
         return {
             id: this.SetPokedexNumber(Number(id), maxNumber),
             name: name,
-            href: { name: 'pokemon', params: { name }, query: { id: id }},
+            href: { name: 'pokemon', params: { name }, query: { id: id } },
             displayName: name.charAt(0).toUpperCase() + name.slice(1),
             types: this.SetTypes(types),
             src: sprites.other.home.front_default ?? sprites.front_default,
+        }
+    }
+
+    /**
+     * Funzione che mappa i dati dei Pokémon per la card
+     * @param param0 ({ name, id, types, sprites }) Le info del Pokémon da mappare
+     * @param maxNumber (number) Il numero massimo di Pokémon
+     */
+    static DetailPokemonMapper(cardPkm: CardPokemon, pkm: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number): DetailPkm {
+        try {
+            let femaleRate;
+            let maleRate;
+            let genderRate = null;
+            if(pkm.gender_rate > 0) {
+                femaleRate = (pkm.gender_rate / 8) * 100;
+                maleRate = 100 - femaleRate;
+                genderRate = { male: maleRate, female: femaleRate }
+            }
+            let nextPkm = null;
+            let prevPkm = null;
+            if (prev) prevPkm = this.MapNextOrPrev(prev, count);
+            if (next) nextPkm = this.MapNextOrPrev(next, count);
+            return {
+                ...cardPkm,
+                genderRate: genderRate,
+                next: nextPkm,
+                prev: prevPkm
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    private static MapNextOrPrev({ species, id, sprites }: Pokemon, maxNumber: number): { id: string | number; name: string; src: string; href: Routing; } {
+        const name = species.name;
+        try {
+            return {
+                id: this.SetPokedexNumber(Number(id), maxNumber),
+                name: name,
+                src: sprites.other.home.front_default ?? sprites.front_default,
+                href: { name: 'pokemon', params: { name }, query: { id: id } }
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
 

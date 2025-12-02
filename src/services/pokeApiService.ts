@@ -17,6 +17,11 @@ export class PokeApiService {
     * Ottieni PokeApi con fallback: se la chiamata verso l'API fallisce, prova a leggere dalla cache direttamente
     */
     async FetchPokeApi(cacheTTL?: number): Promise<void> {
-        return await this._repo.GetAndStoreData(cacheTTL);
+        try {
+            return await this._repo.GetAndStoreData(cacheTTL);
+        } catch (err) {
+            console.warn(`Error FetchPokeApi PokeApiService fetching data. \n${err}`);
+            return null;
+        }
     }
 }

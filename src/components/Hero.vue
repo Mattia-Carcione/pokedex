@@ -15,13 +15,13 @@ watch(() => route.path, (newName) => {
 <template>
     <div class="text-center">
         <RouterLink :to="{ name: 'home' }" aria-label="Vai alla home">
-            <h1 class="pokemon mb-15">
+            <h1 class="pokemon mb-15" translate="no">
                 {{ title }}
             </h1>
         </RouterLink>
         <p v-if="route.name != 'NotFound'" id="set-gen"
             class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
-            Select Generation:
+            Select a Generation:
         </p>
     </div>
 </template>
