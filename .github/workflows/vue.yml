@@ -26,7 +26,7 @@ jobs:
         uses: phips28/gh-action-bump-version@master
         with:
           tag-prefix: "v"
-          release-type: auto   # versione determinata automaticamente dai commit
+          release-type: auto
           commit-message: "chore: bump version to v${{steps.bump.outputs.new_version}}"
 
       - name: Get version
@@ -56,22 +56,21 @@ jobs:
         run: npm run build
 
       # =========================================
-      # 🔹 Nuovo step: pulizia symlink e file non necessari
+      # 🔹 Pulizia symlink e file non necessari
       # =========================================
-      - name: Clean dist for deployment
+      - name: Prepare clean dist for deployment
         run: |
           rm -rf clean-dist
           mkdir clean-dist
-          # Copia solo i file reali, seguendo link simbolici
-          rsync -av --copy-links dist/ clean-dist/
-          # Rimuove eventuali map/log inutili
+          cp -rL dist/* clean-dist/
           find clean-dist -name "*.map" -delete
           find clean-dist -name "*.log" -delete
+          du -sh clean-dist
 
       - name: Upload clean build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: github-pages       # necessario per deploy-pages
+          name: github-pages
           path: clean-dist
 
   # =========================================
@@ -99,7 +98,7 @@ jobs:
           draft: false
           prerelease: false
           artifacts: dist
-          allowUpdates: true   # aggiorna il release se il tag esiste già
+          allowUpdates: true
 
   # =========================================
   # 4️⃣ Deploy su GitHub Pages
