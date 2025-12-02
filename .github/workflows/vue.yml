@@ -89,6 +89,7 @@ jobs:
           draft: false
           prerelease: false
           artifacts: dist
+          allowUpdates: true  # aggiorna il release se il tag esiste già
 
   # =========================================
   # 4️⃣ Job: Deploy su GitHub Pages
