@@ -56,21 +56,19 @@ jobs:
         run: npm run build
 
       # =========================================
-      # 🔹 Pulizia symlink e file non necessari
+      # 🔹 Copia piatta dei file della build
       # =========================================
       - name: Prepare clean dist for deployment
         run: |
           rm -rf clean-dist
           mkdir clean-dist
-          cp -rL dist/* clean-dist/
+          # Copia solo file regolari, evitando qualsiasi symlink o hard link
+          find dist -type f -exec cp {} clean-dist/ \;
+          # Rimuove file inutili
           find clean-dist -name "*.map" -delete
           find clean-dist -name "*.log" -delete
-
-      # =========================================
-      # 🔹 Controllo dimensione build
-      # =========================================
-      - name: Check build size
-        run: |
+          find clean-dist -name ".DS_Store" -delete
+          # Controlla dimensione build
           size=$(du -sb clean-dist | awk '{print $1}')
           max=$((10 * 1024 * 1024 * 1024))  # 10 GB in byte
           echo "Build size: $size bytes"
