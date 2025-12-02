@@ -3,7 +3,7 @@
 * Esempio di service di business logic che usa repository.
 * Il service può decidere politiche di invalidazione, fallback su cache scaduta, ecc.
 */
-import { apiClient } from "@/lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { PokeApiRepository } from "../repositories/pokeApiRepository";
 
 /**
@@ -11,7 +11,7 @@ import { PokeApiRepository } from "../repositories/pokeApiRepository";
  */
 export class PokeApiService {
     private _repo = new PokeApiRepository(this.client);
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
 
     /**
     * Ottieni PokeApi con fallback: se la chiamata verso l'API fallisce, prova a leggere dalla cache direttamente

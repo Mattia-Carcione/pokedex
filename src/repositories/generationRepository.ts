@@ -5,17 +5,18 @@
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
 import { Generation } from "@/types/pokemon/generation";
-import { apiClient } from "../lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { ListApi, NamedApi } from "@/types/pokeApi";
-import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
-import { NormalizeAndPrintError } from "@/lib/utils/axiosError";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
+import { NormalizeAndPrintError } from "@/lib/utils/manageError";
+import { CachedAxiosResponse } from "@/cache/types/cacheTypes";
 
 /**
  * Classe che rappresenta il repository per le generazioni
  */
 export class GenerationRepository {
     private BASE_URL = 'https://pokeapi.co/api/v2/generation/';
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
     /**
      * Recupera i dati di una generazione (usa GET -> soggetto a caching nel client)
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
@@ -86,8 +87,8 @@ export class GenerationRepository {
      */
     private MatchEntry(data: NamedApi[], value: any) {
         return data.find(r => {
-                const match = r.url.match(/\/generation\/(\d+)\/$/);
-                return match && match[1] === value.toString();
-            });
+            const match = r.url.match(/\/generation\/(\d+)\/$/);
+            return match && match[1] === value.toString();
+        });
     }
 }

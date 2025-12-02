@@ -4,11 +4,11 @@
 * Esempio di repository che usa apiClient per fare fetch dei dati utente.
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
-import { apiClient } from "../lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { GenerationRepository } from "./generationRepository";
 import { Pokemon } from "@/types/pokemon/pokemon";
-import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
-import { NormalizeAndPrintError } from "@/lib/utils/axiosError";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
+import { NormalizeAndPrintError } from "@/lib/utils/manageError";
 import { PromiseAll } from "@/utils/promiseAll";
 
 /**
@@ -17,7 +17,7 @@ import { PromiseAll } from "@/utils/promiseAll";
 export class PokemonRepository {
     private BASE_URL = 'https://pokeapi.co/api/v2/pokemon/';
     private _generationRepository = new GenerationRepository(this.client);
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
 
     /**
     * Recupera una generazione (usa GET -> soggetto a caching nel client)
@@ -49,7 +49,7 @@ export class PokemonRepository {
                 return null;
             }
             const resp = await Promise.all(pokeApi.map(async (e) => {
-                return await PromiseAll<Pokemon>(e.pokemon_species, cacheTTL);
+                return await PromiseAll<Pokemon>(this.client, e.pokemon_species, cacheTTL);
             }));
             return resp.flat();
         } catch (err) {
@@ -74,7 +74,7 @@ export class PokemonRepository {
                 console.warn(`[Get] GetAllByGen ${id} not found.`);
                 return null;
             }
-            const resp = await PromiseAll<Pokemon>(pkm.pokemon_species, cacheTTL);
+            const resp = await PromiseAll<Pokemon>(this.client, pkm.pokemon_species, cacheTTL);
             return resp.flat();
         } catch (err) {
             return NormalizeAndPrintError(err, { method: "get", function: 'GetAllByGen', class: 'PokemonRepository', value: `Pokémon of gen ${id}` });

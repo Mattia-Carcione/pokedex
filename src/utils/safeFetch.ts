@@ -1,4 +1,4 @@
-import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 import { AxiosInstance } from "axios";
 
 /**
@@ -16,12 +16,12 @@ export async function fetchWithFallback<T>(
     cacheTTL?: number
 ): Promise<T> {
     try {
-        const resp = await client.get(url, { cacheTTL } as any);
-        return resp.data as T;
+        const resp = await client.get<T>(url, { cacheTTL } as any);
+        return resp.data;
     } catch (err) {
         try {
-            const respFallback = await client.get(fallback, { cacheTTL } as ExtendedRequestConfig);
-            return respFallback.data as T;
+            const respFallback = await client.get<T>(fallback, { cacheTTL } as ExtendedRequestConfig);
+            return respFallback.data;
         } catch (err2) {
             throw err2;
         }

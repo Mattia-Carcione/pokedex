@@ -7,6 +7,8 @@ on:
         description: 'Type of release (patch, minor, major)'
         required: true
         default: patch
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -30,7 +32,7 @@ jobs:
         uses: phips28/gh-action-bump-version@v9
         with:
           tag-prefix: "v"
-          release-type: ${{ github.event.inputs.release_type }}  # patch, minor, major
+          release-type: auto  # patch, minor, major
           commit-message: "chore: bump version to v${{steps.bump.outputs.new_version}}"
 
       - name: Get version

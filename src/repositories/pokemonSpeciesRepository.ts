@@ -5,10 +5,10 @@
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
 import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
-import { apiClient } from "../lib/http/apiClient";
+import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { GenerationRepository } from "./generationRepository";
-import { ExtendedRequestConfig } from "@/lib/types/HttpTypes";
-import { NormalizeAndPrintError } from "@/lib/utils/axiosError";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
+import { NormalizeAndPrintError } from "@/lib/utils/manageError";
 import { PromiseAll } from "@/utils/promiseAll";
 
 /**
@@ -17,7 +17,7 @@ import { PromiseAll } from "@/utils/promiseAll";
 export class PokemonSpeciesRepository {
     private BASE_URL = 'https://pokeapi.co/api/v2/pokemon-species/';
     private _generationRepository = new GenerationRepository(this.client);
-    constructor(private client = apiClient) { }
+    constructor(private client = pokeApiClient) { }
     /**
     * Recupera una generazione (usa GET -> soggetto a caching nel client)
     * @param cacheTTL ms opzionale per salvare TTL nel cache layer
@@ -47,7 +47,7 @@ export class PokemonSpeciesRepository {
                 return null;
             }
             return await Promise.all(pokeApi.map(async (e) => {
-                return await PromiseAll<PokemonSpecies>(e.pokemon_species, cacheTTL, true);
+                return await PromiseAll<PokemonSpecies>(this.client, e.pokemon_species, cacheTTL, true);
             })).then((data) => data.flat());
         } catch (err) {
             return NormalizeAndPrintError(err, { method: "get", class: 'PokemonSpeciesRepository', function: 'GetAll' });
@@ -71,7 +71,7 @@ export class PokemonSpeciesRepository {
                 console.warn(`[Get] GetAllByGen ${id} not found.`);
                 return null;
             }
-            const resp = await PromiseAll<PokemonSpecies>(pkm.pokemon_species, cacheTTL, true);
+            const resp = await PromiseAll<PokemonSpecies>(this.client, pkm.pokemon_species, cacheTTL, true);
             return resp.flat();
         } catch (err) {
             return NormalizeAndPrintError(err, { method: "get", function: 'GetAllByGen', class: 'PokemonSpecies', value: `Pokémon species of gen ${id}` });

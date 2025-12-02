@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { ErrorValue, NormalizedHttpError } from "../types/HttpTypes";
+import { ErrorValue, NormalizedHttpError } from "../types/axiosExtendedTypes";
 
 /**
  * Normalizza qualsiasi errore Axios in una struttura unica, scalabile e facile da gestire.
