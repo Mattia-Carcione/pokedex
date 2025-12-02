@@ -61,6 +61,10 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Remove symlinks from dist
+        run: |
+          find dist -type l -delete
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
