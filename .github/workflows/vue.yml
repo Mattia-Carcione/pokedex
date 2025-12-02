@@ -65,7 +65,19 @@ jobs:
           cp -rL dist/* clean-dist/
           find clean-dist -name "*.map" -delete
           find clean-dist -name "*.log" -delete
-          du -sh clean-dist
+
+      # =========================================
+      # 🔹 Controllo dimensione build
+      # =========================================
+      - name: Check build size
+        run: |
+          size=$(du -sb clean-dist | awk '{print $1}')
+          max=$((10 * 1024 * 1024 * 1024))  # 10 GB in byte
+          echo "Build size: $size bytes"
+          if [ $size -gt $max ]; then
+            echo "ERROR: Build size exceeds 10GB limit for GitHub Pages."
+            exit 1
+          fi
 
       - name: Upload clean build artifact
         uses: actions/upload-artifact@v4
