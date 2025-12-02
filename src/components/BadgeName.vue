@@ -7,7 +7,7 @@ const props = defineProps(['number', 'name']);
         <!-- NAME -->
         <span class="font-bold text-amber-50 text-2xl px-3">#{{props.number}}</span>
         <div class="bg-gray-200 rounded-full py-2 px-3">
-            <h2 class="font-bold tracking-wide text-2xl">
+            <h2 class="font-bold tracking-wide text-2xl" translate="no">
                 {{props.name}}
             </h2>
         </div>

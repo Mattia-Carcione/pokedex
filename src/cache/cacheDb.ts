@@ -80,15 +80,8 @@ export async function getCachedResponse<T>(key: string): Promise<LightweightAxio
 
                 if (cachedItem) {
                     const now = Date.now();
-                    if (now < cachedItem.expiry) {
-                        console.log(`[Cache Hit] Trovato dato valido per chiave: ${key}`);
-                        resolve(cachedItem.response);
-                    } else {
-                        console.log(`[Cache Miss] Cache scaduta (${(now - cachedItem.expiry) / 1000}s) per chiave: ${key}`);
-                        // Dalla logica richiesta: se è scaduto, NON lo rimuoviamo subito
-                        // L'Interceptor lo ignorerà e il Response Interceptor lo riscriverà.
-                        resolve(null);
-                    }
+                    if (now < cachedItem.expiry) resolve(cachedItem.response);
+                    else resolve(null);
                 } else {
                     console.log(`[Cache Miss] Nessun dato trovato per chiave: ${key}`);
                     resolve(null);
@@ -141,10 +134,7 @@ export async function setCachedResponse<T>(key: string, response: AxiosResponse<
         const request: IDBRequest = store.put(itemToStore);
 
         return new Promise((resolve, reject) => {
-            request.onsuccess = () => {
-                console.log(`[Cache Write] Risposta memorizzata/aggiornata per chiave: ${key}`);
-                resolve();
-            };
+            request.onsuccess = () => resolve();
 
             request.onerror = (event: Event) => {
                 console.error("Errore IndexedDB set:", (event.target as IDBRequest).error);

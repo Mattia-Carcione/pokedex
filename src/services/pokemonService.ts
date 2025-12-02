@@ -5,6 +5,7 @@
 */
 import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
+import { NormalizeAndPrintError } from "@/lib/utils/manageError";
 import { PokemonRepository } from "@/repositories/pokemonRepository";
 import { CardPokemon } from "@/types/components/cardPokemon";
 import { ListApi } from "@/types/pokeApi";
@@ -16,9 +17,9 @@ import { Mapper } from "@/utils/mapper";
  * @function CreateAllCardByGen (id: number, cacheTTL?: number): Promise<CardPokemon[] | null> - Restituisce la card dei pokémon di una generazione specifica
  */
 export class PokemonService {
-    private _repo = new PokemonRepository(this.client);
+    protected _repo = new PokemonRepository(this.client);
     private URL = 'https://pokeapi.co/api/v2/pokemon/';
-    constructor(private client = pokeApiClient) { }
+    constructor(protected client = pokeApiClient) { }
 
     /**
      * Funzione per la creazione della card del Pokémon
@@ -26,10 +27,15 @@ export class PokemonService {
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
     async CreateCardPokemon(id: number, cacheTTL?: number): Promise<CardPokemon | null> {
-        const resp = await this._repo.Get(id, cacheTTL);
-        if (!resp) return null;
-        const count = await this.GetCountPokemonList(cacheTTL);
-        return Mapper.CardPokemonMapper(resp, count);
+        try {
+            const resp = await this._repo.Get(id, cacheTTL);
+            if (!resp) return null;
+            const count = await this.GetCountPokemonList(cacheTTL);
+            return Mapper.CardPokemonMapper(resp, count);
+        } catch (err) {
+            console.warn(`Error CreateCardPokemon PokemonRepository fetching data ${id}. \n${err}`);
+            return null;
+        }
     }
 
     /**
@@ -38,22 +44,31 @@ export class PokemonService {
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
     async CreateAllCardByGen(id: number, cacheTTL?: number): Promise<CardPokemon[] | null> {
-        const resp = await this._repo.GetAllByGen(id, cacheTTL);
-        if (!resp) return null;
-        const data = resp.sort((a: any, b: any) => a.id - b.id);
-        const count = await this.GetCountPokemonList(cacheTTL);
-        return data.map((x) => Mapper.CardPokemonMapper(x, count));
+        try {
+            const resp = await this._repo.GetAllByGen(id, cacheTTL);
+            if (!resp) return null;
+            const data = resp.sort((a: any, b: any) => a.id - b.id);
+            const count = await this.GetCountPokemonList(cacheTTL);
+            return data.map((x) => Mapper.CardPokemonMapper(x, count));
+        } catch (err) {
+            console.warn(`Error CreateAllCardByGen PokemonRepository fetching data ${id}. \n${err}`);
+            return null;
+        }
     }
 
     /**
      * Funzione per il recupero del numero totale dei Pokémon attuali
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
-    private async GetCountPokemonList(cacheTTL?: number): Promise<number> {
-        const { data } = await this.client.get<ListApi>(this.URL, {
-            // passiamo opzioni di caching custom che il cache layer leggerà
-            cacheTTL,
-        } as ExtendedRequestConfig);
-        return data.count;
+    protected async GetCountPokemonList(cacheTTL?: number): Promise<number> {
+        try {
+            const { data } = await this.client.get<ListApi>(this.URL, {
+                // passiamo opzioni di caching custom che il cache layer leggerà
+                cacheTTL,
+            } as ExtendedRequestConfig);
+            return data.count;
+        } catch (err) {
+            return NormalizeAndPrintError(err, { method: "get", function: 'GetCountPokemonList', class: 'PokemonRepository' });
+        }
     }
 }
