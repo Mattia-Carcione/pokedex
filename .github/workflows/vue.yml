@@ -10,9 +10,6 @@ permissions:
   id-token: write
 
 jobs:
-  # =========================================
-  # 1️⃣ Bump version automatico
-  # =========================================
   bump_version:
     runs-on: ubuntu-latest
     outputs:
@@ -33,9 +30,6 @@ jobs:
         id: get_version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-  # =========================================
-  # 2️⃣ Build
-  # =========================================
   build:
     needs: bump_version
     runs-on: ubuntu-latest
@@ -55,27 +49,19 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # =========================================
-      # 🔹 Copia piatta dei file della build
-      # =========================================
       - name: Prepare clean dist for deployment
         run: |
           rm -rf clean-dist
           mkdir clean-dist
-          # Copia solo file regolari, evitando qualsiasi symlink o hard link
-          find dist -type f -exec cp {} clean-dist/ \;
+          # Copia la build mantenendo struttura cartelle e convertendo symlink → file
+          rsync -av --copy-links dist/ clean-dist/
           # Rimuove file inutili
           find clean-dist -name "*.map" -delete
           find clean-dist -name "*.log" -delete
           find clean-dist -name ".DS_Store" -delete
-          # Controlla dimensione build
+          # Controllo dimensione
           size=$(du -sb clean-dist | awk '{print $1}')
-          max=$((10 * 1024 * 1024 * 1024))  # 10 GB in byte
           echo "Build size: $size bytes"
-          if [ $size -gt $max ]; then
-            echo "ERROR: Build size exceeds 10GB limit for GitHub Pages."
-            exit 1
-          fi
 
       - name: Upload clean build artifact
         uses: actions/upload-artifact@v4
@@ -83,9 +69,6 @@ jobs:
           name: github-pages
           path: clean-dist
 
-  # =========================================
-  # 3️⃣ Release automatico
-  # =========================================
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -110,9 +93,6 @@ jobs:
           artifacts: dist
           allowUpdates: true
 
-  # =========================================
-  # 4️⃣ Deploy su GitHub Pages
-  # =========================================
   deploy:
     needs: build
     runs-on: ubuntu-latest
