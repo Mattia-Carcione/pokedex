@@ -1,4 +1,4 @@
-name: Release & Deploy SPA Semantic Version
+name: Release & Deploy SPA
 
 on:
   workflow_dispatch:
@@ -100,6 +100,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy_step.outputs.page_url }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -109,3 +112,6 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deploy_step
         uses: actions/deploy-pages@v4
+        with:
+          # default target directory for Pages deployment
+          directory: dist
