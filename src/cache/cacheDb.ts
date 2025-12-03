@@ -82,10 +82,7 @@ export async function getCachedResponse<T>(key: string): Promise<LightweightAxio
                     const now = Date.now();
                     if (now < cachedItem.expiry) resolve(cachedItem.response);
                     else resolve(null);
-                } else {
-                    console.log(`[Cache Miss] Nessun dato trovato per chiave: ${key}`);
-                    resolve(null);
-                }
+                } else  resolve(null); 
             };
 
             request.onerror = (event: Event) => {

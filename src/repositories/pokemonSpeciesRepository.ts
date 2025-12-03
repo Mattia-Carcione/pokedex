@@ -24,7 +24,7 @@ export class PokemonSpeciesRepository {
     */
     async Get(id: number, cacheTTL?: number): Promise<PokemonSpecies> {
         try {
-            const url = this.BASE_URL + id;
+            const url = this.BASE_URL + id + '/';
             const resp = await this.client.get<PokemonSpecies>(url, {
                 // passiamo opzioni di caching custom che il cache layer leggerà
                 cacheTTL,

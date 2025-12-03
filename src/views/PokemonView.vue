@@ -2,11 +2,14 @@
 import Detail from '@/components/DetailPkm.vue';
 import Loader from '@/components/Loader.vue';
 import { PokemonSpeciesService } from '@/services/pokemonSpeciesService';
+import { useGenStore } from '@/store/store';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const { name } = defineProps({ name: String });
 const route = useRoute();
+const store = useGenStore();
+store.setId(route.query.id);
 
 const srv = new PokemonSpeciesService();
 const pkm = ref(null);
@@ -21,8 +24,9 @@ async function LoadCards(id) {
 }
 
 watch(() => route.params, async () => {
-    console.log(route)
-    await LoadCards(route.query.id);
+    const id = route.query.id ?? store.id;
+    store.setId(id);
+    await LoadCards(id);
 }, { immediate: true })
 </script>
 
