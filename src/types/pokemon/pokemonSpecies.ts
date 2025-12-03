@@ -52,7 +52,7 @@ export interface PokemonSpecies extends BaseApi {
   generation: NamedApi; // NamedAPIResource (Generation)
   names: { language: NamedApi; name: string; }[]; // list Name
   pal_park_encounters: { area: NamedApi; base_score: number; rate: number; }[]; // list PalParkEncounterArea
-  flavor_text_entries:  { flavore_text: string; language: NamedApi; version: NamedApi; }[]; // list FlavorText
+  flavor_text_entries:  { flavor_text: string; language: NamedApi; version: NamedApi; }[]; // list FlavorText
   form_descriptions: { description: string; language: NamedApi; }[]; // list Description
   genera: { genus: string; language: NamedApi; }[]; // list Genus
   varieties: { is_default: boolean; pokemon: NamedApi; }[]; // list PokemonSpeciesVariety

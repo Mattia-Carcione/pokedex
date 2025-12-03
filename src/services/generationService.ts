@@ -7,7 +7,7 @@ import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { GenerationRepository } from "../repositories/generationRepository";
 import { Generation } from "@/types/pokemon/generation";
 import { Mapper } from "@/utils/mapper";
-import { NavGen } from "@/types/components/navGen";
+import { NavGenDetail } from "@/types/components/navGen";
 
 /**
  * Servizio per il recupero dei dati dalle generazioni
@@ -26,7 +26,7 @@ export class GenerationService {
      * @param cacheTTL 
      * @returns 
      */
-    async FetchAll(cacheTTL?: number): Promise<NavGen[] | null> {
+    async FetchAll(cacheTTL?: number): Promise<NavGenDetail[] | null> {
         try {
             const data = await this._repo.GetAll(cacheTTL);
             return Mapper.NavbarMapper(data);

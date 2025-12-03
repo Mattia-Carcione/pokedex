@@ -4,16 +4,11 @@
 * Il service può decidere politiche di invalidazione, fallback su cache scaduta, ecc.
 */
 import { pokeApiClient } from "@/lib/Http/HttpClient";
-import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 import { PokemonSpeciesRepository } from "@/repositories/pokemonSpeciesRepository";
 import { CardPokemon } from "@/types/components/cardPokemon";
 import { DetailPkm } from "@/types/components/detailPkm";
-import { ListApi } from "@/types/pokeApi";
 import { Mapper } from "@/utils/mapper";
 import { PokemonService } from "./pokemonService";
-import { GenerationRepository } from "@/repositories/generationRepository";
-import { Pokemon } from "@/types/pokemon/pokemon";
-import { Generation } from "@/types/pokemon/generation";
 
 /**
  * Servizio per il recupero dei dati dalle generazioni

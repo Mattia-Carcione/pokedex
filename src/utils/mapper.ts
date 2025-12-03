@@ -1,7 +1,7 @@
 import { TYPE_COLORS, TYPE_ICONS } from "@/const";
 import { CardPokemon } from "@/types/components/cardPokemon";
 import { DetailPkm } from "@/types/components/detailPkm";
-import { NavGen } from "@/types/components/navGen";
+import { NavGen, NavGenDetail } from "@/types/components/navGen";
 import { TypePkm } from "@/types/components/typePkm";
 import { NamedApi } from "@/types/pokeApi";
 import { Generation } from "@/types/pokemon/generation";
@@ -9,6 +9,7 @@ import { Pokemon } from "@/types/pokemon/pokemon";
 import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
 import { Type } from "@/types/pokemon/type";
 import { Routing } from "@/types/routing";
+import { RomanToArabic } from "./romanToArabicNumber";
 
 /**
  * Classe static Mapper per mapppare i dati dei Pokémon ricevuti dall'Api
@@ -23,16 +24,32 @@ export class Mapper {
      * Funzione che mappa una lista di generazioni per la navbar
      * @param data (Generation[]) Lista delle generazioni
      */
-    static NavbarMapper(data: Generation[]): NavGen[] {
+    static NavbarMapper(data: Generation[]): NavGenDetail[] {
         return data.map((e) => {
             const name = this.SetGenerationName(e.name);
             return {
                 id: e.id,
                 name: name,
                 href: { name: 'generation', params: { id: e.id } },
-                label: `Vai alla Gen ${e.id}`
+                label: `Vai alla Gen ${e.id}`,
+                version_groups: this.MapGenerationToVersionsTS(e)
             }
         })
+    }
+
+    /**
+     * Estrae le versioni di gioco da un oggetto "generation" della PokeAPI.
+     * @param gen (Generation) Oggetto generazione ricevuto dalla PokeAPI
+     */
+    private static MapGenerationToVersionsTS(gen: Generation): { generation: string | number; versions: string[]; } {
+        const versions = gen.version_groups.flatMap(vg =>
+            vg.name.includes("-") ? vg.name.split("-") : [vg.name]
+        );
+
+        return {
+            generation: gen.id,
+            versions
+        };
     }
 
     /**
@@ -42,10 +59,11 @@ export class Mapper {
      */
     static CardPokemonMapper({ species, id, types, sprites }: Pokemon, maxNumber: number): CardPokemon {
         const name = species.name;
+        const idGen = this.SetPokedexNumber(Number(id), maxNumber);
         return {
-            id: this.SetPokedexNumber(Number(id), maxNumber),
+            id: idGen,
             name: name,
-            href: { name: 'pokemon', params: { name }, query: { id: id } },
+            href: { name: 'pokemon', params: { name, id: Number(idGen) } },
             displayName: name.charAt(0).toUpperCase() + name.slice(1),
             types: this.SetTypes(types),
             src: sprites.other.home.front_default ?? sprites.front_default,
@@ -73,15 +91,18 @@ export class Mapper {
             const height = Number((pkm.height / 10).toFixed(2));
             const weight = Number((pkm.weight / 10).toFixed(2));
             const captureRate = Number(((pkmSpecies.capture_rate / 255) * 100).toFixed(2));
+            const genName = this.SetGenerationName(pkmSpecies.generation.name);
+            const idGen = RomanToArabic(genName);
 
             return {
                 ...cardPkm,
                 genderRate: genderRate,
                 next: nextPkm,
                 prev: prevPkm,
-                generation: this.SetGenerationName(pkmSpecies.generation.name),
+                generation: { id: idGen, name: genName, href: { name: 'generation', params: { id: idGen } }, label: `Vai alla Gen ${idGen}` },
                 genera,
-                size: { height: height, weight: weight, captureRate: captureRate }
+                size: { height: height, weight: weight, captureRate: captureRate },
+                flavorText: this.MapAllFlavorTextsByLanguage(pkmSpecies, 'en')
             }
         } catch (err) {
             console.log(err);
@@ -96,16 +117,29 @@ export class Mapper {
      */
     private static MapDetailPokemonNav({ species, id, sprites }: Pokemon, maxNumber: number): { id: string | number; name: string; src: string; href: Routing; } {
         const name = species.name;
+        const idPkm = this.SetPokedexNumber(Number(id), maxNumber);
         try {
             return {
-                id: this.SetPokedexNumber(Number(id), maxNumber),
+                id: idPkm,
                 name: name.charAt(0).toUpperCase() + name.slice(1),
                 src: sprites.other.home.front_default ?? sprites.front_default,
-                href: { name: 'pokemon', params: { name }, query: { id: id } }
+                href: { name: 'pokemon', params: { name, id: Number(idPkm) } }
             }
         } catch (err) {
             console.log(err);
         }
+    }
+
+    /**
+     * Funzione per mappare le voci pokedex
+     * @param param0 ({ flavor_text_entries }: PokemonSpecies) Lista delle voci pokedex
+     * @param lang La lingua desiderata
+     * @returns ritorna la lista delle voci pokedex per quella lingua
+     */
+    private static MapAllFlavorTextsByLanguage({ flavor_text_entries }: PokemonSpecies, lang: string): { version: string; text: string; lang: string; }[] {
+        return flavor_text_entries
+            .filter(e => e.language.name === lang)
+            .map(e => ({ version: e.version.name, text: e.flavor_text, lang: e.language.name }));
     }
 
     /**
@@ -122,14 +156,14 @@ export class Mapper {
      * @param genderRate (number) il numero di tasso di genere espresso in ottavi
      */
     private static MapGenderRate(genderRate: number): { male: number; female: number; } | null {
-            let rate = null;
-            if(genderRate === 0) return rate = { male: 100, female: 0 }
-            if(genderRate > 0) {
-                const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
-                const maleRate = Number(100 - femaleRate).toFixed(2);
-                rate = { male: maleRate, female: femaleRate }
-            }
-            return rate;
+        let rate = null;
+        if (genderRate === 0) return rate = { male: 100, female: 0 }
+        if (genderRate > 0) {
+            const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
+            const maleRate = Number(100 - femaleRate).toFixed(2);
+            rate = { male: maleRate, female: femaleRate }
+        }
+        return rate;
     }
 
     /**
@@ -165,4 +199,3 @@ export class Mapper {
         })
     }
 }
-

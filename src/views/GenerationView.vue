@@ -4,7 +4,7 @@ import CustomSection from '@/components/CustomSection.vue';
 import Loader from '@/components/Loader.vue';
 import { PokemonSpeciesRepository } from '@/repositories/pokemonSpeciesRepository';
 import { PokemonService } from '@/services/pokemonService';
-import { useGenStore } from '@/store/store';
+import { useGenStore } from '@/store/store.ts';
 import { ref, watch } from 'vue';
 
 const props = defineProps({ id: String });

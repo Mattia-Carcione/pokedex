@@ -8,7 +8,7 @@ const routes = [
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/404View.vue') },
     { path: '/', name: 'home', component: HomeView, },
     { path: '/generation/:id([1-9]\\d*)', name: 'generation', props: true, component: GenerationView, },
-    { path: '/pokemon/:name', name: 'pokemon', props: route => ({ query: route.query.id }), component: PokemonView, },
+    { path: '/pokemon/:name/:id([1-9]\\d*)', name: 'pokemon', props: true, component: PokemonView, },
 ];
 
 const router = createRouter({
