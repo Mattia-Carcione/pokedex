@@ -20,8 +20,6 @@ import { Generation } from "@/types/pokemon/generation";
  */
 export class PokemonSpeciesService extends PokemonService {
     private _repoSps = new PokemonSpeciesRepository(this.client);
-    private _genRepo = new GenerationRepository(this.client);
-    private URL_SPECIES = 'https://pokeapi.co/api/v2/pokemon-species';
     constructor() { super(pokeApiClient) }
 
     /**
@@ -32,50 +30,21 @@ export class PokemonSpeciesService extends PokemonService {
     async CreateCardDetailPokemon(id: number, cacheTTL?: number): Promise<DetailPkm | null> {
         try {
             id = Number(id);
-            const cardPkm = await this.CreateCardPokemon(id, cacheTTL);
-            if (!cardPkm) return null;
+            const pkm = await this._repo.Get(id, cacheTTL);
+            if (!pkm) return null;
             
-            const resp = await this._repoSps.Get(id, cacheTTL);
-            if (!resp) return null;
+            const pkmSpecies = await this._repoSps.Get(id, cacheTTL);
+            if (!pkmSpecies) return null;
             
-            const { next, prev } = await this.GetNextAndPrev(id, cacheTTL);
-            
+            let prev = null;
+            if(id - 1 > 0) prev = await this._repo.Get((id - 1), cacheTTL);
+            const next = await this._repo.Get((id + 1), cacheTTL);
+
             const count = await this.GetCountPokemonList(cacheTTL);
 
-            return Mapper.DetailPokemonMapper(cardPkm, resp, prev, next, count);
+            return Mapper.DetailPokemonMapper(pkm, pkmSpecies, prev, next, count);
         } catch (err) {
             console.warn(`Error CreateCardDetailPokemon PokemonSpeciesService fetching data ${id}. \n${err}`);
-            return null;
-        }
-    }
-
-    private async GetNextAndPrev(id: number, cacheTTL?: number): Promise<{ next: Pokemon | null, prev: Pokemon | null }> {
-        try {
-            let prev = null;
-            let next = null;
-            id = Number(id);
-            const gen = await this._genRepo.GetAll(cacheTTL);
-            const idPrev = id - 1;
-            if (idPrev > 0) prev = await this.GetPrevOrNext(idPrev, gen);
-            const idNext = id + 1;
-            const pkmNext = await this.GetPrevOrNext(idNext, gen);
-            if(pkmNext) next = pkmNext;
-            return { next, prev }
-        } catch (err) {
-            console.warn(`Error GetNextAndPrev PokemonSpeciesService fetching data ${id}. \n${err}`);
-            return null;
-        }
-    }
-
-    async GetPrevOrNext(id: any, gen: Generation[]): Promise<Pokemon | void> {
-        try {
-            const spcs = gen.find(x => x.pokemon_species.find(pkm => pkm.url === `${this.URL_SPECIES}/${id}/`))?.pokemon_species.find(p => p.url === `${this.URL_SPECIES}/${id}/`);
-            if (!spcs) return null;
-            const url = spcs.url.replace('-species', '');
-            const resp = await this.client.get<Pokemon>(url);
-            return resp.data;
-        } catch (err) {
-            console.warn(`Error GetPrevOrNext PokemonSpeciesService fetching data ${id}. \n${err}`);
             return null;
         }
     }

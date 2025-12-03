@@ -2,6 +2,8 @@
 import BadgeName from './BadgeName.vue';
 import BagdeType from './BagdeType.vue';
 import DetailPkmNav from './DetailPkmNav.vue';
+import GenderRate from './GenderRate.vue';
+import PkmSize from './PkmSize.vue';
 import Sprite from './Sprite.vue';
 
 const { card, name } = defineProps(['card', 'name']);
@@ -9,7 +11,7 @@ const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
 </script>
 
 <template>
-    <section id="details" class="p-5" aria-label="Pokémon details">
+    <section id="details" class="p-5 mt-3" aria-label="Pokémon details">
         <div :id="`info-pkm-${name}`" class="pokemon-card relative shadow-xl p-5 rounded-xl"
             :style="{ background: `linear-gradient(150deg, ${card.types[0].color} 50%, ${card.types[1]?.color ?? card.types[0].color} 50%)` }"
             aria-label="Pokémon info">
@@ -51,28 +53,15 @@ const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
                     </div>
 
                     <!-- Gender -->
-                    <div id="gender"
-                        class="bg-amber-50/50 rounded-xl p-3 flex flex-col items-center text-center order-2 md:order-3 md:col-span-1">
-                        <div>
-                            <h2 class="text-2xl font-bold">Gender rate: </h2>
-                            <span class="font-bold text-lg" v-if="!card.genderRate">Unknown</span>
-                            <div class="flex items-center gap-4 mt-3" v-else>
-                                <div v-if="card.genderRate.male > 0">
-                                    <img src="/icons/genders/male.svg" class="size-16 rounded-full bg-amber-50 p-1"
-                                        alt="" />
-                                    <p>%{{card.genderRate.male}}</p>
-                                </div>
-                                <div v-if="card.genderRate.female > 0">
-                                    <img src="/icons/genders/female.svg" class="size-16 rounded-full bg-amber-50 p-1"
-                                        alt="" />
-                                    <p>%{{card.genderRate.female}}</p>
-                                </div>
-                            </div>
+                    <div class="bg-amber-50/50 rounded-xl p-3 flex flex-col items-center text-center order-2 md:order-3 md:col-span-1">
+                        <p class="mt-3 font-semibold" translate="no">{{card.genera}}</p>
+                        <div id="pkm-generation" class="my-3">
+                            <h3 class="text-2xl font-bold">
+                                Generation: <span class="font-bold text-lg">{{ card.generation }}</span>
+                            </h3>
                         </div>
-                        <div class="mt-3">
-                            <h2 class="text-2xl font-bold">Generation: <span class="font-bold text-lg">{{ card.generation }}</span></h2>
-                            
-                        </div>
+                        <GenderRate :genderRate="card.genderRate" />
+                        <PkmSize :size="card.size" />
                     </div>
 
                 </div>
