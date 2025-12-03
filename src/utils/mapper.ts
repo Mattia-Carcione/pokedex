@@ -3,6 +3,7 @@ import { CardPokemon } from "@/types/components/cardPokemon";
 import { DetailPkm } from "@/types/components/detailPkm";
 import { NavGen } from "@/types/components/navGen";
 import { TypePkm } from "@/types/components/typePkm";
+import { NamedApi } from "@/types/pokeApi";
 import { Generation } from "@/types/pokemon/generation";
 import { Pokemon } from "@/types/pokemon/pokemon";
 import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
@@ -53,47 +54,82 @@ export class Mapper {
 
     /**
      * Funzione che mappa i dati dei Pokémon per la card
-     * @param param0 ({ name, id, types, sprites }) Le info del Pokémon da mappare
-     * @param maxNumber (number) Il numero massimo di Pokémon
+     * @param cardPkm (CardPokemon) Oggetto pokemon mappato per la card
+     * @param pkm (PokemonSpecies) Le info della specie Pokémon da mappare
+     * @param prev (Pokemon | null) Le info del Pokémon precedente da mappare se esiste
+     * @param next (Pokemon | null) Le info del Pokémon successivo da mappare se esiste
+     * @param count (number) Il numero massimo di Pokémon
      */
-    static DetailPokemonMapper(cardPkm: CardPokemon, pkm: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number): DetailPkm {
+    static DetailPokemonMapper(pkm: Pokemon, pkmSpecies: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number): DetailPkm {
         try {
-            let femaleRate;
-            let maleRate;
-            let genderRate = null;
-            if(pkm.gender_rate > 0) {
-                femaleRate = (pkm.gender_rate / 8) * 100;
-                maleRate = 100 - femaleRate;
-                genderRate = { male: maleRate, female: femaleRate }
-            }
+            const cardPkm = this.CardPokemonMapper(pkm, count);
+            const genderRate = this.MapGenderRate(pkmSpecies.gender_rate);
             let nextPkm = null;
             let prevPkm = null;
-            if (prev) prevPkm = this.MapNextOrPrev(prev, count);
-            if (next) nextPkm = this.MapNextOrPrev(next, count);
+            if (prev) prevPkm = this.MapDetailPokemonNav(prev, count);
+            if (next) nextPkm = this.MapDetailPokemonNav(next, count);
+
+            const genera = this.MapPkmCategory(pkmSpecies.genera);
+            const height = Number((pkm.height / 10).toFixed(2));
+            const weight = Number((pkm.weight / 10).toFixed(2));
+            const captureRate = Number(((pkmSpecies.capture_rate / 255) * 100).toFixed(2));
+
             return {
                 ...cardPkm,
                 genderRate: genderRate,
                 next: nextPkm,
                 prev: prevPkm,
-                generation: this.SetGenerationName(pkm.generation.name)
+                generation: this.SetGenerationName(pkmSpecies.generation.name),
+                genera,
+                size: { height: height, weight: weight, captureRate: captureRate }
             }
         } catch (err) {
             console.log(err);
         }
     }
 
-    private static MapNextOrPrev({ species, id, sprites }: Pokemon, maxNumber: number): { id: string | number; name: string; src: string; href: Routing; } {
+    /**
+     * Funzione per mappare la navbar della card dettaglio
+     * @param param0 ({ species, id, sprites }: Pokemon) Info del pokemon da mappare
+     * @param maxNumber (number) Il numero massimo di Pokémon attuali
+     * @returns { id: string | number; name: string; src: string; href: Routing; } le info del pokemon successivo o precedente a quello visualizzato
+     */
+    private static MapDetailPokemonNav({ species, id, sprites }: Pokemon, maxNumber: number): { id: string | number; name: string; src: string; href: Routing; } {
         const name = species.name;
         try {
             return {
                 id: this.SetPokedexNumber(Number(id), maxNumber),
-                name: name,
+                name: name.charAt(0).toUpperCase() + name.slice(1),
                 src: sprites.other.home.front_default ?? sprites.front_default,
                 href: { name: 'pokemon', params: { name }, query: { id: id } }
             }
         } catch (err) {
             console.log(err);
         }
+    }
+
+    /**
+     * Funzione per mappare la categoria del Pokémon
+     * @param genera ({ genus: string; language: NamedApi; }[]) le categorie del Pokémon nelle varie lingue
+     * @returns (string) Il nome della categoria del Pokémon
+     */
+    private static MapPkmCategory(genera: { genus: string; language: NamedApi; }[]): string {
+        return genera.find(x => x.language.name.toLowerCase() === 'en')?.genus;
+    }
+
+    /**
+     * Funzione per mappare il tasso di genere del Pokémon
+     * @param genderRate (number) il numero di tasso di genere espresso in ottavi
+     */
+    private static MapGenderRate(genderRate: number): { male: number; female: number; } | null {
+            let rate = null;
+            if(genderRate === 0) return rate = { male: 100, female: 0 }
+            if(genderRate > 0) {
+                const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
+                const maleRate = Number(100 - femaleRate).toFixed(2);
+                rate = { male: maleRate, female: femaleRate }
+            }
+            return rate;
     }
 
     /**
