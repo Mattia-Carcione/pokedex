@@ -53,19 +53,25 @@ const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
                     <!-- Gender -->
                     <div id="gender"
                         class="bg-amber-50/50 rounded-xl p-3 flex flex-col items-center text-center order-2 md:order-3 md:col-span-1">
-                        <h2 class="text-2xl font-bold">Gender rate: </h2>
-                        <span class="font-bold text-lg" v-if="!card.genderRate">Unknown</span>
-                        <div class="flex items-center gap-4 mt-3" v-else>
-                            <div v-if="card.genderRate.male > 0">
-                                <img src="/icons/genders/male.svg" class="size-16 rounded-full bg-amber-50 p-1"
-                                    alt="" />
-                                <p>%{{card.genderRate.male}}</p>
+                        <div>
+                            <h2 class="text-2xl font-bold">Gender rate: </h2>
+                            <span class="font-bold text-lg" v-if="!card.genderRate">Unknown</span>
+                            <div class="flex items-center gap-4 mt-3" v-else>
+                                <div v-if="card.genderRate.male > 0">
+                                    <img src="/icons/genders/male.svg" class="size-16 rounded-full bg-amber-50 p-1"
+                                        alt="" />
+                                    <p>%{{card.genderRate.male}}</p>
+                                </div>
+                                <div v-if="card.genderRate.female > 0">
+                                    <img src="/icons/genders/female.svg" class="size-16 rounded-full bg-amber-50 p-1"
+                                        alt="" />
+                                    <p>%{{card.genderRate.female}}</p>
+                                </div>
                             </div>
-                            <div v-if="card.genderRate.female > 0">
-                                <img src="/icons/genders/female.svg" class="size-16 rounded-full bg-amber-50 p-1"
-                                    alt="" />
-                                <p>%{{card.genderRate.female}}</p>
-                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h2 class="text-2xl font-bold">Generation: <span class="font-bold text-lg">{{ card.generation }}</span></h2>
+                            
                         </div>
                     </div>
 

@@ -2,6 +2,7 @@
 import CardPokemon from '@/components/CardPokemon.vue';
 import CustomSection from '@/components/CustomSection.vue';
 import Loader from '@/components/Loader.vue';
+import { PokemonSpeciesRepository } from '@/repositories/pokemonSpeciesRepository';
 import { PokemonService } from '@/services/pokemonService';
 import { useGenStore } from '@/store/store';
 import { ref, watch } from 'vue';
@@ -10,6 +11,7 @@ const props = defineProps({ id: String });
 const store = useGenStore();
 store.setId(props.id);
 const srv = new PokemonService();
+const srvSpcs = new PokemonSpeciesRepository();
 const cards = ref(null);
 
 /**
@@ -18,6 +20,7 @@ const cards = ref(null);
  */
 async function LoadCards(id) {
     const result = await srv.CreateAllCardByGen(id);
+    await srvSpcs.GetAllByGen(id);
     cards.value = result ?? [];
 }
 

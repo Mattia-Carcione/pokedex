@@ -74,7 +74,8 @@ export class Mapper {
                 ...cardPkm,
                 genderRate: genderRate,
                 next: nextPkm,
-                prev: prevPkm
+                prev: prevPkm,
+                generation: this.SetGenerationName(pkm.generation.name)
             }
         } catch (err) {
             console.log(err);
