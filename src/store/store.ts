@@ -13,14 +13,3 @@ export const useGenStore = defineStore('gen', () => {
 
   return { id, setId };
 });
-
-export const useVersionStore = defineStore("version", {
-    state: () => ({
-        generations: [] as Array<{ generation: number; versions: string[] }>
-    }),
-    actions: {
-        setGenerations(list: Array<{ generation: number; versions: string[] }>) {
-            this.generations = list;
-        }
-    }
-});

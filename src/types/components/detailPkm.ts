@@ -14,3 +14,12 @@ export interface DetailPkm extends CardPokemon {
     size: { height: number; weight: number; captureRate: number; };
     flavorText: { version: string; text: string; lang: string; }[];
 }
+
+/**
+ * Interfaccia delle versioni dei giochi e generazioni
+ */
+export interface VersionDetail {
+    generation: string | number; 
+    versions: string[]; 
+    pokedexes: string[];
+}

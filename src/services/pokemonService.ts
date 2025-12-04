@@ -8,7 +8,7 @@ import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 import { NormalizeAndPrintError } from "@/lib/utils/manageError";
 import { PokemonRepository } from "@/repositories/pokemonRepository";
 import { CardPokemon } from "@/types/components/cardPokemon";
-import { ListApi } from "@/types/pokeApi";
+import { PokeApi } from "@/types/pokeApi";
 import { Mapper } from "@/utils/mapper";
 
 /**
@@ -62,7 +62,7 @@ export class PokemonService {
      */
     protected async GetCountPokemonList(cacheTTL?: number): Promise<number> {
         try {
-            const { data } = await this.client.get<ListApi>(this.URL, {
+            const { data } = await this.client.get<PokeApi>(this.URL, {
                 // passiamo opzioni di caching custom che il cache layer leggerà
                 cacheTTL,
             } as ExtendedRequestConfig);

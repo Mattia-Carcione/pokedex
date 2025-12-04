@@ -1,19 +1,16 @@
 <script setup>
 import { GenerationService } from '@/services/generationService';
-import { useGenStore, useVersionStore } from '@/store/store';
+import { useGenStore } from '@/store/store';
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
 const route = useRoute();
 const storeGen = useGenStore();
-const storeGames = useVersionStore();
 const srv = new GenerationService();
 const data = ref([]);
 
 onMounted(async () => {
   data.value = await srv.FetchAll();
-  const games = data.value.map(x => x.version_groups);
-  storeGames.setGenerations(games);
 });
 </script>
 

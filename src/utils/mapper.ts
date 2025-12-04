@@ -1,7 +1,7 @@
 import { TYPE_COLORS, TYPE_ICONS } from "@/const";
 import { CardPokemon } from "@/types/components/cardPokemon";
-import { DetailPkm } from "@/types/components/detailPkm";
-import { NavGen, NavGenDetail } from "@/types/components/navGen";
+import { DetailPkm, VersionDetail } from "@/types/components/detailPkm";
+import { NavGen } from "@/types/components/navGen";
 import { TypePkm } from "@/types/components/typePkm";
 import { NamedApi } from "@/types/pokeApi";
 import { Generation } from "@/types/pokemon/generation";
@@ -10,12 +10,14 @@ import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
 import { Type } from "@/types/pokemon/type";
 import { Routing } from "@/types/routing";
 import { RomanToArabic } from "./romanToArabicNumber";
+import { VersionGroup } from "@/types/pokemon/versionGroup";
 
 /**
  * Classe static Mapper per mapppare i dati dei Pokémon ricevuti dall'Api
  * @constructor private constructor()
  * @function NavbarMapper (data: Generation[]) - Funzione che mappa una lista di generazioni per la navbar
- * @function CardPokemonMapper ({ name, id, types, sprites }: Pokemon, maxNumber: number) - Funzione che mappa i dati dei Pokémon per la card
+ * @function CardPokemonMapper ({ name, id, types, sprites }: Pokemon, maxNumber: number) - Funzione che mappa le informazioni principali dei Pokémon per la card
+ * @function DetailPokemonMapper (pkm: Pokemon, pkmSpecies: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number): DetailPkm - Funzione che mappa tutti i dati dei Pokémon per il dettaglio della card
  */
 export class Mapper {
     private constructor() { }
@@ -24,32 +26,56 @@ export class Mapper {
      * Funzione che mappa una lista di generazioni per la navbar
      * @param data (Generation[]) Lista delle generazioni
      */
-    static NavbarMapper(data: Generation[]): NavGenDetail[] {
+    static NavbarMapper(data: Generation[]): NavGen[] {
         return data.map((e) => {
             const name = this.SetGenerationName(e.name);
             return {
                 id: e.id,
                 name: name,
                 href: { name: 'generation', params: { id: e.id } },
-                label: `Vai alla Gen ${e.id}`,
-                version_groups: this.MapGenerationToVersionsTS(e)
+                label: `Vai alla Gen ${e.id}`
             }
         })
     }
 
-    /**
-     * Estrae le versioni di gioco da un oggetto "generation" della PokeAPI.
-     * @param gen (Generation) Oggetto generazione ricevuto dalla PokeAPI
-     */
-    private static MapGenerationToVersionsTS(gen: Generation): { generation: string | number; versions: string[]; } {
-        const versions = gen.version_groups.flatMap(vg =>
-            vg.name.includes("-") ? vg.name.split("-") : [vg.name]
-        );
 
-        return {
-            generation: gen.id,
-            versions
-        };
+    /**
+     * Mappa un VersionGroup in un oggetto semplificato.
+     * 
+     * - Estrae i nomi di tutte le versions
+     * - Estrae i nomi dei pokedexes
+     * - Imposta la generation fornita dal chiamante
+     *
+     * La funzione è robusta: ogni parte della trasformazione è protetta da try/catch.
+     * In caso di errore, viene usato NormalizeAndPrintError e viene restituito null.
+     *
+     * @param vg VersionGroup - l'oggetto originale della PokeAPI
+     */
+    static MapVersionGroup(vg: VersionGroup): VersionDetail | null {
+        try {
+            if (!vg) return null;
+
+            // Versions: estraggo versions[x].name in modo sicuro
+            const versions = Array.isArray(vg.versions)
+                ? vg.versions
+                    .map(v => v?.name)
+                    .filter((name): name is string => Boolean(name))
+                : [];
+
+            // Pokedexes: estraggo pokedexes[x].name in modo sicuro
+            const pokedexes = Array.isArray(vg.pokedexes)
+                ? vg.pokedexes
+                    .map(p => p?.name)
+                    .filter((name): name is string => Boolean(name))
+                : [];
+
+            const generation = RomanToArabic(this.SetGenerationName(vg.generation.name));
+            return {
+                versions, generation, pokedexes
+            };
+        } catch (err) {
+            console.log(`Error during MapVersionGroup. \n${err}`);
+        }
     }
 
     /**
@@ -64,7 +90,7 @@ export class Mapper {
             id: idGen,
             name: name,
             href: { name: 'pokemon', params: { name, id: Number(idGen) } },
-            displayName: name.charAt(0).toUpperCase() + name.slice(1),
+            displayName: name,
             types: this.SetTypes(types),
             src: sprites.other.home.front_default ?? sprites.front_default,
         }
@@ -87,7 +113,7 @@ export class Mapper {
             if (prev) prevPkm = this.MapDetailPokemonNav(prev, count);
             if (next) nextPkm = this.MapDetailPokemonNav(next, count);
 
-            const genera = this.MapPkmCategory(pkmSpecies.genera);
+            const genera = this.MapPkmCategory(pkmSpecies.genera, 'en');
             const height = Number((pkm.height / 10).toFixed(2));
             const weight = Number((pkm.weight / 10).toFixed(2));
             const captureRate = Number(((pkmSpecies.capture_rate / 255) * 100).toFixed(2));
@@ -121,7 +147,7 @@ export class Mapper {
         try {
             return {
                 id: idPkm,
-                name: name.charAt(0).toUpperCase() + name.slice(1),
+                name: name,
                 src: sprites.other.home.front_default ?? sprites.front_default,
                 href: { name: 'pokemon', params: { name, id: Number(idPkm) } }
             }
@@ -147,8 +173,8 @@ export class Mapper {
      * @param genera ({ genus: string; language: NamedApi; }[]) le categorie del Pokémon nelle varie lingue
      * @returns (string) Il nome della categoria del Pokémon
      */
-    private static MapPkmCategory(genera: { genus: string; language: NamedApi; }[]): string {
-        return genera.find(x => x.language.name.toLowerCase() === 'en')?.genus;
+    private static MapPkmCategory(genera: { genus: string; language: NamedApi; }[], lang: string): string {
+        return genera.find(x => x.language.name.toLowerCase() === lang)?.genus;
     }
 
     /**
@@ -160,7 +186,7 @@ export class Mapper {
         if (genderRate === 0) return rate = { male: 100, female: 0 }
         if (genderRate > 0) {
             const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
-            const maleRate = Number(100 - femaleRate).toFixed(2);
+            const maleRate = Number(100 - femaleRate);
             rate = { male: maleRate, female: femaleRate }
         }
         return rate;

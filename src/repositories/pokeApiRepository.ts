@@ -5,32 +5,71 @@
 * Il repository non sa nulla di IndexedDB: la cache è trasparente a livello di http client.
 */
 import { pokeApiClient } from "@/lib/Http/HttpClient";
-import { GenerationRepository } from "./generationRepository";
-import { PokemonRepository } from "./pokemonRepository";
-import { PokemonSpeciesRepository } from "./pokemonSpeciesRepository";
+import { NormalizeAndPrintError } from "@/lib/utils/manageError";
+import { PokeApi } from "../types/pokeApi";
+import { VersionGroup } from "../types/pokemon/versionGroup";
+import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 
 /**
- * Classe che rappresenta il repository per la pokeApi
- */
+* Repository per la PokeAPI.
+* Recupera:
+*  1. La lista dei version-group
+*  2. Tutti i dettagli in parallelo tramite Promise.all
+*/
 export class PokeApiRepository {
-    private _pkmRepository = new PokemonRepository(this.client);
-    private _pkmSpeciesRepository = new PokemonSpeciesRepository(this.client);
-    private _genRepository = new GenerationRepository(this.client);
+    private BASE_URL = "https://pokeapi.co/api/v2/version-group/?limit=100000";
+
+    /**
+     * Costruttore del repository
+     * @param client (AxiosInstance) axios instance
+     */
     constructor(private client = pokeApiClient) { }
 
     /**
-     * Metodo che recupera tutti i dati e li salva in cache.
-     * Se i dati sono già presenti in cache, recupera quelli.
-     * @param cacheTTL ms opzionale per salvare TTL nel cache layer 
+     * Recupera tutti i version-group con caching TTL opzionale.
+     * Implementazione scalabile, robusta e parallela con Promise.all.
+     *
+     * @param cacheTTL number - tempo di caching custom
      */
-    async GetAndStoreData(cacheTTL?: number): Promise<void | null> {
+    async getVersionGroups(cacheTTL: number): Promise<VersionGroup[] | null> {
         try {
-            await this._genRepository.GetAll(cacheTTL);
-            await this._pkmRepository.GetAllByGen(1, cacheTTL);
-            await this._pkmSpeciesRepository.GetAllByGen(1, cacheTTL);
+            const pokeApi = await this.client.get<PokeApi>(
+                this.BASE_URL,
+                { cacheTTL } as ExtendedRequestConfig
+            );
+            const data = pokeApi?.data ?? null;
+            if (!data) return [];
+
+            const promises: Promise<VersionGroup | null>[] = data.results.map(async (entry) => {
+                try {
+                    const vg = await this.client.get<VersionGroup>(
+                        entry.url,
+                        { cacheTTL } as ExtendedRequestConfig
+                    );
+                    return vg.data;
+                } catch (err) {
+                    NormalizeAndPrintError(err, {
+                        method: "get",
+                        function: "GetPokeApi",
+                        class: "PokeApiRepository",
+                        value: entry.url
+                    });
+                    return null;
+                }
+            });
+
+            const fetched = await Promise.all(promises);
+
+            return fetched.filter((v): v is VersionGroup => v !== null);
+
         } catch (err) {
-            console.warn(`Error GetAndStoreData fetching data. \n${err}`);
-            return null;
+            return NormalizeAndPrintError(err, {
+                method: "get",
+                function: "GetPokeApi",
+                class: "PokeApiRepository",
+                value: this.BASE_URL
+            });
         }
     }
+
 }

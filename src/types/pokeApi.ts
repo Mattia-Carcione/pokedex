@@ -28,7 +28,7 @@ export interface NamedApi {
  * @property previous: L'URL della pagina precedente nell'elenco (string | null).
  * @property results: Un elenco di risorse API denominate (NamedApi[]).
  */
-export interface ListApi {
+export interface PokeApi {
     count: number;
     next: string | null;
     previous: string | null;

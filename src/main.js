@@ -24,4 +24,4 @@ nav.use(router);
 nav.mount('#nav');
 
 const api = new PokeApiService();
-await api.FetchPokeApi();
+await api.GetAndStoreData();

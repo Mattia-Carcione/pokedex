@@ -13,9 +13,9 @@ const { size } = defineProps(['size']);
         </thead>
         <tbody>
             <tr>
-                <td class="p-1">{{ size.height }}m</td>
-                <td class="p-1">{{ size.weight }}Kg</td>
-                <td class="p-1">{{ size.captureRate }}%</td>
+                <td class="p-1 font-semibold">{{ size.height }}m</td>
+                <td class="p-1 font-semibold">{{ size.weight }}Kg</td>
+                <td class="p-1 font-semibold">{{ size.captureRate }}%</td>
             </tr>
         </tbody>
     </table>

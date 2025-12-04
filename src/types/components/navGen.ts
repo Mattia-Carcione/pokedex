@@ -12,7 +12,3 @@ export interface NavGen extends BaseApi {
     href: Routing;
     label: string;
 }
-
-export interface NavGenDetail extends NavGen {
-    version_groups: { generation: string | number; versions: string[]; };
-}

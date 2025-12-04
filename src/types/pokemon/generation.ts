@@ -19,5 +19,4 @@ export interface Generation extends BaseApi {
     names: { language: NamedApi; name: string; }[];
     pokemon_species: NamedApi[];
     types: NamedApi[];
-    version_groups: NamedApi[];
 }

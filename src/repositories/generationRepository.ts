@@ -6,7 +6,7 @@
 */
 import { Generation } from "@/types/pokemon/generation";
 import { pokeApiClient } from "@/lib/Http/HttpClient";
-import { ListApi, NamedApi } from "@/types/pokeApi";
+import { PokeApi, NamedApi } from "@/types/pokeApi";
 import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
 import { NormalizeAndPrintError } from "@/lib/utils/manageError";
 import { CachedAxiosResponse } from "@/cache/types/cacheTypes";
@@ -67,9 +67,9 @@ export class GenerationRepository {
      * Recupera la lista delle generazioni (usa GET -> soggetto a caching nel client)
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
-    private async GetPokeApi(cacheTTL?: number): Promise<ListApi | null> {
+    private async GetPokeApi(cacheTTL?: number): Promise<PokeApi | null> {
         try {
-            const resp = await this.client.get<ListApi>(this.BASE_URL, {
+            const resp = await this.client.get<PokeApi>(this.BASE_URL, {
                 // passiamo opzioni di caching custom che il cache layer leggerà
                 cacheTTL,
             } as ExtendedRequestConfig);

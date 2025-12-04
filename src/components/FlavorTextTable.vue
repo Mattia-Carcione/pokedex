@@ -1,46 +1,43 @@
 <script setup>
-import { mapVersionsWithText } from '@/utils/mapVersionToText';
+import { PokeApiService } from '@/services/pokeApiService';
+import { mapGenerationFlavorTextList } from '@/utils/mapVersionToText';
 
-const { generations, flavorTexts } = defineProps(['generations', 'flavorTexts']);
-generations.map((x) => {
-    const te = mapVersionsWithText(x, flavorTexts)
-})
-console.log(generations)
+const { flavorTexts } = defineProps(['flavorTexts']);
+const srv = new PokeApiService();
+const generations = await srv.GetVersionDetail();
+const b = mapGenerationFlavorTextList(generations, flavorTexts)
+console.log(b)
 </script>
 
 <template>
-    <div class="space-y-8">
-
+    <div class="flex flex-col space-y-2 w-full mx-auto">
+        <h2 class="font-bold text-xl p-3">
+            Flavor Text Entry
+        </h2>
         <!-- CICLO GENERAZIONI -->
-        <div v-for="gen in generations" :key="gen.generation">
+        <template v-for="item in mapGenerationFlavorTextList(generations, flavorTexts)" :key="item.version">
+            <template v-if="item.flavorText.length > 0">
+                <!-- TABELLA -->
+                <div class="bg-amber-50/75 rounded-xl md:p-2">
+                    <h3 class="text-center font-bold text-lg pb-3">
+                        Generation {{ item.generation }}
+                    </h3>
+                    <table class="w-full">
 
-            <!-- TITOLO GENERAZIONE -->
-            <h2 class="text-xl font-bold mb-3">
-                Generation {{ gen.generation }}
-            </h2>
-
-            <!-- TABELLA -->
-            <table class=" bg-white border border-gray-200">
-                <thead class="bg-gray-100 border-b">
-                    <tr>
-                        <th class="px-4 py-2 text-left">Version</th>
-                        <th class="px-4 py-2 text-left">Text</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <!-- CICLO VERSIONI INTERNE -->
-                    <tr v-for="item in mapVersionsWithText(gen, flavorTexts)" :key="item.version" class="border-b">
-                        <td class="px-4 py-2 font-semibold capitalize" v-if="item.version">
-                            {{ item.version }}
-                        </td>
-                        <td class="px-4 py-2 whitespace-pre-line" v-if="item.version">
-                            {{ item.text ?? "No text available" }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-        </div>
+                        <tbody class="space-y-[1px]">
+                            <!-- CICLO VERSIONI INTERNE -->
+                            <tr class="flex flex-col md:block border rounded-xl bg-amber-50" v-for="(value, index) in item.flavorText">
+                                <td class="p-1 md:p-5 font-bold capitalize text-center" v-if="value.version">
+                                    {{ value.version }}
+                                </td>
+                                <td class="p-1 md:p-2 rounded-xl" v-if="value.version">
+                                    {{ value.text ?? "No text available" }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+        </template>
     </div>
 </template>
