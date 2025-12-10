@@ -1,4 +1,4 @@
-import type { BaseApi, NamedApi } from "../pokeApi";
+import type { BaseApi, NamedApi, Names } from "../pokeApi";
 
 /**
  * Raggruppamento di giochi Pokémon che li separa in base ai Pokémon che includono.
@@ -16,7 +16,7 @@ export interface Generation extends BaseApi {
     abilities: NamedApi[];
     main_region: NamedApi;
     moves: NamedApi[];
-    names: { language: NamedApi; name: string; }[];
+    names: Names[];
     pokemon_species: NamedApi[];
     types: NamedApi[];
 }

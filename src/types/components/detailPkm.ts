@@ -1,3 +1,4 @@
+import { Names } from "../pokeApi";
 import { Routing } from "../routing";
 import { CardPokemon } from "./cardPokemon";
 import { NavGen } from "./navGen";
@@ -20,6 +21,6 @@ export interface DetailPkm extends CardPokemon {
  */
 export interface VersionDetail {
     generation: string | number; 
-    versions: string[]; 
+    versions: {}[]; 
     pokedexes: string[];
 }

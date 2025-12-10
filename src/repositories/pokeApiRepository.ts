@@ -6,9 +6,10 @@
 */
 import { pokeApiClient } from "@/lib/Http/HttpClient";
 import { NormalizeAndPrintError } from "@/lib/utils/manageError";
-import { PokeApi } from "../types/pokeApi";
-import { VersionGroup } from "../types/pokemon/versionGroup";
+import { Names, PokeApi } from "../types/pokeApi";
+import { Version, VersionGroup } from "../types/pokemon/versionGroup";
 import { ExtendedRequestConfig } from "@/lib/types/axiosExtendedTypes";
+import { PromiseAllAsync } from "@/utils/promiseAll";
 
 /**
 * Repository per la PokeAPI.
@@ -25,42 +26,42 @@ export class PokeApiRepository {
      */
     constructor(private client = pokeApiClient) { }
 
-    /**
-     * Recupera tutti i version-group con caching TTL opzionale.
-     * Implementazione scalabile, robusta e parallela con Promise.all.
-     *
-     * @param cacheTTL number - tempo di caching custom
-     */
-    async getVersionGroups(cacheTTL: number): Promise<VersionGroup[] | null> {
+    private async GetVersionList(cacheTTL: number): Promise<PokeApi | null> {
         try {
             const pokeApi = await this.client.get<PokeApi>(
                 this.BASE_URL,
                 { cacheTTL } as ExtendedRequestConfig
             );
             const data = pokeApi?.data ?? null;
+            return data;
+        } catch (err) {
+            NormalizeAndPrintError(err, {
+                method: "get",
+                function: "GetVersionList",
+                class: "PokeApiRepository",
+                value: this.BASE_URL
+            });
+        }
+    }
+
+    /**
+     * Recupera tutti i version-group con caching TTL opzionale.
+     * Implementazione scalabile, robusta e parallela con Promise.all.
+     *
+     * @param cacheTTL number - tempo di caching custom
+     */
+    async getVersionGroups(cacheTTL: number): Promise<{vg: VersionGroup[], names: Version[] } | []> {
+        try {
+            const data = await this.GetVersionList(cacheTTL);
             if (!data) return [];
 
-            const promises: Promise<VersionGroup | null>[] = data.results.map(async (entry) => {
-                try {
-                    const vg = await this.client.get<VersionGroup>(
-                        entry.url,
-                        { cacheTTL } as ExtendedRequestConfig
-                    );
-                    return vg.data;
-                } catch (err) {
-                    NormalizeAndPrintError(err, {
-                        method: "get",
-                        function: "GetPokeApi",
-                        class: "PokeApiRepository",
-                        value: entry.url
-                    });
-                    return null;
-                }
-            });
-
-            const fetched = await Promise.all(promises);
-
-            return fetched.filter((v): v is VersionGroup => v !== null);
+            const vg = await PromiseAllAsync<VersionGroup>(this.client, data.results, cacheTTL);
+            const vgMap = vg.map(x => x.versions.map(e => e));
+            const vDetail = await PromiseAllAsync<Version>(this.client, vgMap.flat(), cacheTTL);
+            return {
+                vg: vg.filter((v): v is VersionGroup => v !== null),
+                names: vDetail
+            };
 
         } catch (err) {
             return NormalizeAndPrintError(err, {

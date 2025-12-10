@@ -1,4 +1,4 @@
-import type { BaseApi, NamedApi } from "../pokeApi";
+import type { BaseApi, NamedApi, Names } from "../pokeApi";
 
 /**
  * Informazioni sulla specie Pokemon
@@ -50,7 +50,7 @@ export interface PokemonSpecies extends BaseApi {
   evolution_chain: string; // APIResource (EvolutionChain)
   habitat?: NamedApi; // NamedAPIResource (PokemonHabitat)
   generation: NamedApi; // NamedAPIResource (Generation)
-  names: { language: NamedApi; name: string; }[]; // list Name
+  names: Names[]; // list Name
   pal_park_encounters: { area: NamedApi; base_score: number; rate: number; }[]; // list PalParkEncounterArea
   flavor_text_entries:  { flavor_text: string; language: NamedApi; version: NamedApi; }[]; // list FlavorText
   form_descriptions: { description: string; language: NamedApi; }[]; // list Description

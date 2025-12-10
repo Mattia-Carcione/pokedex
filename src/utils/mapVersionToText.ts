@@ -26,15 +26,18 @@ export function mapGenerationFlavorTextList(versionDetails: VersionDetail[], { f
         const grouped = new Map<number, { text: string; version: string }[]>();
         for (const vg of versionDetails) {
             try {
-                const gen = Number(vg.generation);
+                const gen = Number(vg?.generation);
                 if (!grouped.has(gen)) grouped.set(gen, []);
                 const matched = flavorText.filter(
-                    ft => ft && vg.versions.includes(ft.version)
+                    ft => ft && vg?.versions.map((x) => x[ft.version])
                 );
                 for (const ft of matched) {
+                    const italianVersion = vg.versions
+                        .map(v => v[ft.version])
+                        .find(v => Boolean(v));
                     grouped.get(gen)?.push({
                         text: ft.text,
-                        version: ft.version
+                        version: italianVersion
                     });
                 }
             } catch (err) {

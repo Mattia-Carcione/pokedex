@@ -12,8 +12,8 @@ const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
 </script>
 
 <template>
-    <section id="details" class="p-5 mt-3" aria-label="Pokémon details">
-        <div :id="`info-pkm-${name}`" class="pokemon-card relative shadow-xl p-5 rounded-xl" :style="{ background: `linear-gradient(150deg, ${card.types[0].color} 50%, ${card.types[1]?.color ?? card.types[0].color} 50%)` }" aria-label="Pokémon info">
+    <section id="details" class="p-2 md:p-5 mt-3" aria-label="Pokémon details">
+        <div :id="`info-pkm-${name}`" class="pokemon-card relative shadow-xl p-1 md:p-5 rounded-xl" :style="{ background: `linear-gradient(to right, ${card.types[0].color} 0%, ${card.types[1]?.color ?? card.types[0].color} 100%)` }" aria-label="Pokémon info">
             <div id="detail-nav" class="flex justify-between py-2">
                 <div id="previous">
                     <template v-if="card.prev">

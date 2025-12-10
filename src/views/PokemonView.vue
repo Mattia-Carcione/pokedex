@@ -13,7 +13,7 @@ const pkm = ref(null);
  * @param id identificativo della generazione
  */
 async function LoadCards(id) {
-    const result = await srv.CreateCardDetailPokemon(Number(id));
+    const result = await srv.CreateCardDetailPokemon(Number(id), 'it');
     pkm.value = result ?? null;
 }
 

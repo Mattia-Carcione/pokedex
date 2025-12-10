@@ -20,6 +20,11 @@ export interface NamedApi {
     url: string;
 }
 
+export interface Names {
+    language: NamedApi; 
+    name: string;
+}
+
 /**
  * Elenco paginato delle risorse disponibili per quell'API
  * 

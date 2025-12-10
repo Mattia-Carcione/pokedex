@@ -3,14 +3,14 @@ import { CardPokemon } from "@/types/components/cardPokemon";
 import { DetailPkm, VersionDetail } from "@/types/components/detailPkm";
 import { NavGen } from "@/types/components/navGen";
 import { TypePkm } from "@/types/components/typePkm";
-import { NamedApi } from "@/types/pokeApi";
+import { NamedApi, Names } from "@/types/pokeApi";
 import { Generation } from "@/types/pokemon/generation";
 import { Pokemon } from "@/types/pokemon/pokemon";
 import { PokemonSpecies } from "@/types/pokemon/pokemonSpecies";
 import { Type } from "@/types/pokemon/type";
 import { Routing } from "@/types/routing";
 import { RomanToArabic } from "./romanToArabicNumber";
-import { VersionGroup } from "@/types/pokemon/versionGroup";
+import { Version, VersionGroup } from "@/types/pokemon/versionGroup";
 
 /**
  * Classe static Mapper per mapppare i dati dei Pokémon ricevuti dall'Api
@@ -51,25 +51,18 @@ export class Mapper {
      *
      * @param vg VersionGroup - l'oggetto originale della PokeAPI
      */
-    static MapVersionGroup(vg: VersionGroup): VersionDetail | null {
+    static MapVersionGroup(vg: VersionGroup, version: Version[], lang: 'en' | 'it'): VersionDetail | null {
         try {
-            if (!vg) return null;
-
-            // Versions: estraggo versions[x].name in modo sicuro
-            const versions = Array.isArray(vg.versions)
-                ? vg.versions
-                    .map(v => v?.name)
-                    .filter((name): name is string => Boolean(name))
-                : [];
-
-            // Pokedexes: estraggo pokedexes[x].name in modo sicuro
+            if (!vg || version.length <= 0) return null;
+            const versions = version.map((x) => {
+                return { [x?.name]: x?.names.find(x => x?.language.name == lang) }
+            }) ?? [];
             const pokedexes = Array.isArray(vg.pokedexes)
-                ? vg.pokedexes
-                    .map(p => p?.name)
-                    .filter((name): name is string => Boolean(name))
-                : [];
-
-            const generation = RomanToArabic(this.SetGenerationName(vg.generation.name));
+            ? vg.pokedexes
+            .map(p => p?.name)
+            .filter((name): name is string => Boolean(name))
+            : [];
+            const generation = RomanToArabic(this.SetGenerationName(vg?.generation?.name));
             return {
                 versions, generation, pokedexes
             };
@@ -104,7 +97,7 @@ export class Mapper {
      * @param next (Pokemon | null) Le info del Pokémon successivo da mappare se esiste
      * @param count (number) Il numero massimo di Pokémon
      */
-    static DetailPokemonMapper(pkm: Pokemon, pkmSpecies: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number): DetailPkm {
+    static DetailPokemonMapper(pkm: Pokemon, pkmSpecies: PokemonSpecies, prev: Pokemon | null, next: Pokemon | null, count: number, lang: 'en' | 'it'): DetailPkm {
         try {
             const cardPkm = this.CardPokemonMapper(pkm, count);
             const genderRate = this.MapGenderRate(pkmSpecies.gender_rate);
@@ -113,7 +106,7 @@ export class Mapper {
             if (prev) prevPkm = this.MapDetailPokemonNav(prev, count);
             if (next) nextPkm = this.MapDetailPokemonNav(next, count);
 
-            const genera = this.MapPkmCategory(pkmSpecies.genera, 'en');
+            const genera = this.MapPkmCategory(pkmSpecies.genera, lang);
             const height = Number((pkm.height / 10).toFixed(2));
             const weight = Number((pkm.weight / 10).toFixed(2));
             const captureRate = Number(((pkmSpecies.capture_rate / 255) * 100).toFixed(2));
@@ -128,7 +121,7 @@ export class Mapper {
                 generation: { id: idGen, name: genName, href: { name: 'generation', params: { id: idGen } }, label: `Vai alla Gen ${idGen}` },
                 genera,
                 size: { height: height, weight: weight, captureRate: captureRate },
-                flavorText: this.MapAllFlavorTextsByLanguage(pkmSpecies, 'en')
+                flavorText: this.MapAllFlavorTextsByLanguage(pkmSpecies, lang)
             }
         } catch (err) {
             console.log(err);

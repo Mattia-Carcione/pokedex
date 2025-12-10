@@ -10,6 +10,7 @@ import { PokemonRepository } from "../repositories/pokemonRepository";
 import { PokemonSpeciesRepository } from "../repositories/pokemonSpeciesRepository";
 import { PokeApiRepository } from "@/repositories/pokeApiRepository";
 import { Mapper } from "@/utils/mapper";
+import { Version, VersionGroup } from "@/types/pokemon/versionGroup";
 
 /**
  * Classe che rappresenta il repository per la pokeApi
@@ -38,8 +39,12 @@ export class PokeApiService {
         }
     }
 
-    async GetVersionDetail(cacheTTL?: number): Promise<any> {
-        const vg = await this._pokeApiRepository.getVersionGroups(cacheTTL);
-        return vg.map(x => Mapper.MapVersionGroup(x));
+    async GetVersionDetail(lang: 'en' | 'it', cacheTTL?: number): Promise<any> {
+        const data = await this._pokeApiRepository.getVersionGroups(cacheTTL) as { vg: VersionGroup[]; names: Version[]; };
+        if (!data) return [];
+        return data.vg.map(vgItem => {
+            const relatedNames = vgItem.versions.map(v => data.names.find(x => x.name == v.name));
+            return Mapper.MapVersionGroup(vgItem, relatedNames, lang);
+        });
     }
 }

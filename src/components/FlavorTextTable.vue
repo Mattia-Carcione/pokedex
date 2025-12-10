@@ -4,9 +4,7 @@ import { mapGenerationFlavorTextList } from '@/utils/mapVersionToText';
 
 const { flavorTexts } = defineProps(['flavorTexts']);
 const srv = new PokeApiService();
-const generations = await srv.GetVersionDetail();
-const b = mapGenerationFlavorTextList(generations, flavorTexts)
-console.log(b)
+const generations = await srv.GetVersionDetail('it');
 </script>
 
 <template>
@@ -15,8 +13,8 @@ console.log(b)
             Flavor Text Entry
         </h2>
         <!-- CICLO GENERAZIONI -->
-        <template v-for="item in mapGenerationFlavorTextList(generations, flavorTexts)" :key="item.version">
-            <template v-if="item.flavorText.length > 0">
+        <template v-for="(item, x) in mapGenerationFlavorTextList(generations, flavorTexts)" :key="item.version">
+            <template v-if="item.flavorText.length > 0 && item.flavorText.filter(x => Boolean(x.version)).length > 0">
                 <!-- TABELLA -->
                 <div class="bg-amber-50/75 rounded-xl md:p-2">
                     <h3 class="text-center font-bold text-lg pb-3">
@@ -26,14 +24,16 @@ console.log(b)
 
                         <tbody class="space-y-[1px]">
                             <!-- CICLO VERSIONI INTERNE -->
-                            <tr class="flex flex-col md:block border rounded-xl bg-amber-50" v-for="(value, index) in item.flavorText">
-                                <td class="p-1 md:p-5 font-bold capitalize text-center" v-if="value.version">
-                                    {{ value.version }}
-                                </td>
-                                <td class="p-1 md:p-2 rounded-xl" v-if="value.version">
-                                    {{ value.text ?? "No text available" }}
-                                </td>
-                            </tr>
+                            <template v-for="value in item.flavorText">
+                                <tr class="flex flex-col lg:block border rounded-xl bg-amber-50" v-if="value.version">
+                                    <td class="p-1 md:p-3 font-bold capitalize text-center w-full lg:w-32">
+                                        {{ value.version.name }}
+                                    </td>
+                                    <td class="p-1 md:px-3 rounded-xl">
+                                        {{ value.text ?? "No text available" }}
+                                    </td>
+                                </tr>
+                            </template>
                         </tbody>
                     </table>
                 </div>

@@ -22,7 +22,7 @@ export class PokemonSpeciesService extends PokemonService {
      * @param id (number) - identificativo del Pokémon
      * @param cacheTTL ms opzionale per salvare TTL nel cache layer
      */
-    async CreateCardDetailPokemon(id: number, cacheTTL?: number): Promise<DetailPkm | null> {
+    async CreateCardDetailPokemon(id: number, lang: 'en' | 'it', cacheTTL?: number): Promise<DetailPkm | null> {
         try {
             id = Number(id);
             const pkm = await this._repo.Get(id, cacheTTL);
@@ -37,7 +37,7 @@ export class PokemonSpeciesService extends PokemonService {
 
             const count = await this.GetCountPokemonList(cacheTTL);
 
-            return Mapper.DetailPokemonMapper(pkm, pkmSpecies, prev, next, count);
+            return Mapper.DetailPokemonMapper(pkm, pkmSpecies, prev, next, count, lang);
         } catch (err) {
             console.warn(`Error CreateCardDetailPokemon PokemonSpeciesService fetching data ${id}. \n${err}`);
             return null;

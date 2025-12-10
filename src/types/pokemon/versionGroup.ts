@@ -1,4 +1,4 @@
-import { BaseApi, NamedApi } from "../pokeApi";
+import { BaseApi, NamedApi, Names } from "../pokeApi";
 
 export interface VersionGroup extends BaseApi {
     generation: NamedApi;
@@ -7,4 +7,8 @@ export interface VersionGroup extends BaseApi {
     pokedexes: NamedApi[];
     regions: NamedApi[];
     versions: NamedApi[];
+}
+
+export interface Version extends BaseApi {
+    names: Names[];
 }
