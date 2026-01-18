@@ -1,0 +1,38 @@
+/* ===============================
+   GLOBAL DESIGN VARIABLES
+   =============================== */
+:root {
+    --color-primary: #FFCB05;
+    --color-secondary: #2A75BB;
+    --color-bug: #A6B91A;
+    --color-dark: #705746;
+    --color-dragon: #6F35FC;
+    --color-electric: #F7D02C;
+    --color-fairy: #D685AD;
+    --color-fighting: #C22E28;
+    --color-fire: #EE8130;
+    --color-flying: #A98FF3;
+    --color-ghost: #735797;
+    --color-grass: #7AC74C;
+    --color-ground: #E2BF65;
+    --color-ice: #96D9D6;
+    --color-normal: #A8A77A;
+    --color-poison: #A33EA1;
+    --color-psychic: #F95587;
+    --color-rock: #B6A136;
+    --color-steel: #B7B7CE;
+    --color-water: #6390F0;
+
+    --color-contrast-light: #FFFFFF;
+
+    /* === TYPOGRAPHY === */
+    --font-heading: 'Pokemon Solid', sans-serif;
+}
+
+/* ============================= */
+/* 🔤 TYPOGRAPHY        */
+/* ============================= */
+@font-face {
+    font-family: 'Pokemon Solid';
+    src: url('/fonts/Pokemon.woff2') format('woff2');
+}

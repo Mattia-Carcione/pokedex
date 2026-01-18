@@ -1,8 +1,15 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["vite/client", "vitest/globals"]
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*", "test/**/*", "env.d.ts", "vitest.config.ts"]
 }
