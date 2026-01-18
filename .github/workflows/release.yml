@@ -1,107 +1,61 @@
-name: Release & Deploy SPA
+name: Release
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch: # opzionale: puoi lanciare manualmente
-    inputs:
-      release_type:
-        description: 'Release type (patch, minor, major). Se vuoto usa semantic-release'
-        required: false
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
+
+env:
+  NODE_VERSION: '20.19.0'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # =========================================
-  # 1️⃣ Job: Bump version & create GitHub Release
-  # =========================================
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run semantic-release
-        id: semantic_release
-        uses: cycjimmy/semantic-release-action@v4
-        with:
-          extra_plugins: |
-            @semantic-release/npm
-            @semantic-release/git
-            @semantic-release/github
-          dry_run: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-      - name: Get released version
-        id: get_version
-        run: |
-          VERSION=$(jq -r '.version' package.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-  # =========================================
-  # 2️⃣ Job: Build
-  # =========================================
   build:
-    needs: release
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
+      - name: Run unit tests
+        run: npm run test:run
+
+      - name: Build
         run: npm run build
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: dist-artifact
           path: dist
 
-  # =========================================
-  # 3️⃣ Job: Deploy su GitHub Pages
-  # =========================================
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
     environment:
       name: github-pages
-      url: ${{ steps.deploy_step.outputs.page_url }}
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifact
-          path: dist
-
       - name: Deploy to GitHub Pages
-        id: deploy_step
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+        id: deploy
+        uses: actions/deploy-pages@v4
