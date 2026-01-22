@@ -1,4 +1,4 @@
-import { Base, NamedResource } from "@/shared/core/types/CommonTypes";
+import { Base, NamedResource } from "@/core/types/CommonTypes";
 
 /**
  * Rappresenta il Data Transfer Object (DTO) di un Pokémon come definito dalla PokeAPI.
@@ -132,7 +132,7 @@ interface Sprites {
   };
   versions?: {
     [generation: string]: {
-      [version: string]: { [key: string]: string | null };
+      [version: string]: { [key: string]: any };
     };
   };
 }

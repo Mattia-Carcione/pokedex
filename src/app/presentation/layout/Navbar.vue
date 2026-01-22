@@ -3,11 +3,11 @@
     import { watch } from 'vue';
     import { RouterLink, useRoute } from 'vue-router';
 
-    import { getControllers } from '@/app/di/Controllers';
-    import { AppRouteName } from '@/shared/core/enums/AppRouteName';
+    import { AppRouteName } from '@/app/routing/AppRouteName';
+    import { appContainer } from '@/app/di/AppContainer';
 
     const route = useRoute();
-    const { genController } = getControllers();
+    const genController = appContainer.generationController();
 
     onMounted(async () => {
         await genController.loadData();
@@ -22,7 +22,7 @@
             <li v-for="(gen, x) in genController.data.value.generation" :key="gen.version">
                 <RouterLink :to="gen.href" :aria-label="gen.label" translate="no"
                     class="relative inline-block align-middle text-[var(--color-dark)] text-[1rem] md:text-[2rem] p-3 font-bold overflow-hidden transition-all navigation-link"
-                    :class="{ active: ($route.name === AppRouteName.Generation && gen.version == route.params.id), 'rounded-l-[1rem]': x === 0, 'rounded-r-[1rem]': x === genController.data.length - 1 }">
+                    :class="{ active: ($route.name === AppRouteName.Generation && gen.version == route.params.id), 'rounded-l-[1rem]': x === 0, 'rounded-r-[1rem]': x === genController.data.value.generation.length - 1 }">
                     {{ gen.displayVersion }}
                 </RouterLink>
             </li>

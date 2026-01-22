@@ -1,6 +1,6 @@
 import { useGenerationStore } from "../UseGenerationStore";
 import { usePokegenStore } from "../UsePokegenStore";
-import { usePokemonDetailStore } from "../UsePokemonDetailStore";
+import { usePokemonStore } from "../UsePokemonStore";
 
 /**
  * Tipo che rappresenta lo store di generazione dei Pokémon.
@@ -15,4 +15,4 @@ export type GenerationStore = ReturnType<typeof useGenerationStore>;
 /**
  * Tipo che rappresenta lo store del dettaglio del Pokémon.
  */
-export type PokemonDetailStore = ReturnType<typeof usePokemonDetailStore>;
+export type PokemonStore = ReturnType<typeof usePokemonStore>;

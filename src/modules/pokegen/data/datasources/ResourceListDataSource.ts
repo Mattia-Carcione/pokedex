@@ -1,35 +1,38 @@
-import { IDataSource } from "@/shared/core/interfaces/data/IDataSource";
-import { NamedResource } from "@/shared/core/types/CommonTypes";
-import { PokeApiResponse } from "@/shared/core/types/ApiTypes";
-import { IHttpClient } from "@/shared/core/interfaces/infrastructure/http/IHttpClient";
-import { ExternalServiceUnavailableError } from "@/shared/core/errors/ExternalServiceUnavailableError";
-import { NormalizedHttpError } from "@/shared/infrastructure/http/errors/NormalizedHttpError";
-import { mapHttpError } from "@/shared/infrastructure/http/errors/MapHttpError";
+import { EndpointApi } from "@/modules/pokegen/data/enums/EndpointApi";
+import { HttpError } from "@/infrastructure/http/errors/HttpError";
+import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
+import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
+import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
+import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
  * Data source per ottenere la lista delle risorse delle generazioni di Pokémon.
  */
-export class ResourceListDataSource implements IDataSource<PokeApiResponse<NamedResource>> {
-        private readonly BASE_URL = 'https://pokeapi.co/api/v2/generation/';
+export class ResourceListDataSource implements IDataSource<PokeApiResponseDto> {
+        private readonly BASE_URL = EndpointApi.Generation;
     
         constructor(
-            protected readonly httpClient: IHttpClient
+            protected readonly httpClient: IHttpClient,
+            protected readonly httpErrorMapper: IHttpErrorMapper,
+            protected readonly logger: ILogger,
         ) {}
     
         /**
          * Recupera i dati dell'entry point delle generazioni Pokémon.
-         * @returns Una promessa che risolve i dati tipizzati come PokeApiResponse<NamedResource>
+         * @returns Una promessa che risolve i dati tipizzati come PokeApiResponseDto
          * 
          * @throws DataSourceError se il recupero dei dati fallisce
          */
-        async fetchData(): Promise<PokeApiResponse<NamedResource>> {
+        async fetchData(): Promise<PokeApiResponseDto> {
             try {
-                const response = await this.httpClient.get<PokeApiResponse<NamedResource>>(this.BASE_URL);
+                const response = await this.httpClient.get<PokeApiResponseDto>(this.BASE_URL);
                 return response;
             } catch (error) {
-                if(error instanceof NormalizedHttpError)
-                    mapHttpError(error);
-                throw new ExternalServiceUnavailableError("Errore durante il recupero delle risorse iniziali delle generazioni." + " \n Dettagli: " + (error as Error).message);
+                if(error instanceof HttpError)
+                    this.httpErrorMapper.map(error);
+                throw new ExternalServiceUnavailableError("Error fetching resource list data. \n Details: External service unavailable." + (error as Error).message);
             }
         }
 }

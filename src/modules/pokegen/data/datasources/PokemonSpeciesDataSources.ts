@@ -1,16 +1,21 @@
-import { IDataSource } from "@/shared/core/interfaces/data/IDataSource";
-import { PokemonSpeciesDTO } from "../models/dtos/PokemonSpeciesDto";
-import { IHttpClient } from "@/shared/core/interfaces/infrastructure/http/IHttpClient";
-import { ExternalServiceUnavailableError } from "@/shared/core/errors/ExternalServiceUnavailableError";
-import { mapHttpError } from "@/shared/infrastructure/http/errors/MapHttpError";
-import { NormalizedHttpError } from "@/shared/infrastructure/http/errors/NormalizedHttpError";
+import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { EndpointApi } from "@/modules/pokegen/data/enums/EndpointApi";
+import { HttpError } from "@/infrastructure/http/errors/HttpError";
+import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
+import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
+import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
+import { PokemonSpeciesDTO } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
+import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
  * Data source per ottenere i dati dei Pokémon.
  */
 export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDTO> {
+    protected readonly BASE_URI = EndpointApi.PokemonSpecies;
     constructor(
-        private readonly httpClient: IHttpClient
+        private readonly httpClient: IHttpClient,
+        private readonly httpErrorMapper: IHttpErrorMapper,
+        private readonly logger: ILogger
     ) {}
     
     /**
@@ -21,14 +26,17 @@ export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDTO> 
      * @throws DataSourceError se il recupero dei dati fallisce
      */
     async fetchData(endpoint: string): Promise<PokemonSpeciesDTO> {
-        try {
+        try {            
+            endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
             const response = await this.httpClient.get<PokemonSpeciesDTO>(endpoint);
+            this.logger.debug("Dati del Pokémon recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {
-            if(error instanceof NormalizedHttpError)
-                mapHttpError(error);
+            this.logger.error("[PokemonSpeciesDataSource] - Errore nel recupero dei dati del Pokémon: " + (error as Error).message);
+            if(error instanceof HttpError)
+                this.httpErrorMapper.map(error);
 
-            throw new ExternalServiceUnavailableError("Errore nel recupero dei dati del Pokémon." + " \n Dettagli: " + (error as Error).message);
+            throw new ExternalServiceUnavailableError("Error fetching Pokémon Species data. \n Details: External service unavailable." + (error as Error).message);
         }
     }
 }

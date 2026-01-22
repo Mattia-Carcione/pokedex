@@ -1,13 +1,9 @@
+import { IRepository } from "@/core/contracts/data/IRepository";
 import { Pokemon } from "../entities/Pokemon";
 
 /**
  * Interfaccia per il repository dei Pokémon.
  */
-export interface IPokemonRepository {
-    /**
-     * Recupera i dati di un Pokémon specifico.
-     * @param endpoint - L'endpoint da cui recuperare i dati del Pokémon
-     * @returns Una promessa che risolve i dati del Pokémon tipizzati come T
-    */
-    get(endpoint: string): Promise<Pokemon>;
-}
+export interface IPokemonRepository extends IRepository<Pokemon> {
+    getDetailAsync(name: string): Promise<Pokemon>;
+ }

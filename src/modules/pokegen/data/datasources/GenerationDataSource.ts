@@ -1,16 +1,22 @@
-import { IDataSource } from "@/shared/core/interfaces/data/IDataSource";
-import { IHttpClient } from "@/shared/core/interfaces/infrastructure/http/IHttpClient";
-import { NormalizedHttpError } from "@/shared/infrastructure/http/errors/NormalizedHttpError";
-import { mapHttpError } from "@/shared/infrastructure/http/errors/MapHttpError";
-import { ExternalServiceUnavailableError } from "@/shared/core/errors/ExternalServiceUnavailableError";
-import { GenerationDTO } from "../models/dtos/GenerationDto";
+import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { GenerationDTO } from "@/modules/pokegen/data/models/dtos/GenerationDto";
+import { EndpointApi } from "@/modules/pokegen/data/enums/EndpointApi";
+import { HttpError } from "@/infrastructure/http/errors/HttpError";
+import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
+import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
+import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
+import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
  * Data source per ottenere i dati delle generazioni Pokémon.
  */
 export class GenerationDataSource implements IDataSource<GenerationDTO> {
+    protected readonly BASE_URI = EndpointApi.Generation;
+    private readonly message = "[GenerationDataSource] - Errore nel recupero dei dati della generazione. ";
     constructor(
-        protected readonly httpClient: IHttpClient
+        protected readonly httpClient: IHttpClient,
+        protected readonly httpErrorMapper: IHttpErrorMapper,
+        protected readonly logger: ILogger,
     ) {}
     
     /**
@@ -21,13 +27,16 @@ export class GenerationDataSource implements IDataSource<GenerationDTO> {
      */
     async fetchData(endpoint: string): Promise<GenerationDTO> {
         try {
+            endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
             const response = await this.httpClient.get<GenerationDTO>(endpoint);
+            this.logger.debug("[GenerationDataSource] - Dati della generazione recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {
-            if(error instanceof NormalizedHttpError)
-                mapHttpError(error);
+            this.logger.error(this.message + (error as Error).message);
+            if(error instanceof HttpError)
+                this.httpErrorMapper.map(error);
 
-            throw new ExternalServiceUnavailableError("Errore nel recupero dei dati della generazione. \n Dettagli: " + (error as Error).message);
+            throw new ExternalServiceUnavailableError("Error fetching generation data. \n Details: External service unavailable." + (error as Error).message);
         }
     }
 }

@@ -1,12 +1,12 @@
 <script setup>
 import Skeleton from './Skeleton.vue';
 
-const props = defineProps(['types']);
+const {types} = defineProps(['types']);
 </script>
 
 <template>
-    <div class="flex gap-1 items-center" aria-label="Badge dei tipi Pokémon">
-        <div v-for="type in props.types" :key="type.id"
+    <div class="flex gap-1" aria-label="Badge dei tipi Pokémon">
+        <div v-for="type in types" :key="type.id"
             class="flex flex-col justify-center-safe items-center w-14 h-14 bg-amber-50 rounded-full p-1"
             :aria-label="type.name">
             <Skeleton />

@@ -1,4 +1,4 @@
-import { Generation } from "@/modules/pokegen/domain/entities/Generation";
+import { GenerationVM } from "@/shared/viewmodels/GenerationVM";
 
 /**
  * ViewModel per la barra di navigazione dell'applicazione.
@@ -8,7 +8,6 @@ import { Generation } from "@/modules/pokegen/domain/entities/Generation";
  */
 export class NavbarViewModel {
     constructor(
-        public readonly generation: Generation[]
+        public readonly generation: GenerationVM[]
     ) {}
-
 }

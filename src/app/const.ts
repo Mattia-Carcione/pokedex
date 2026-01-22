@@ -6,7 +6,7 @@ export const TITLE = 'PokeGén';
 /**
  * Base URI per le risorse statiche (icone, immagini, ecc.)
  */
-export const BASE_URI = '/pokedex/';
+export const BASE_URI = '/pokegen/';
 
 /**
  * Base URI per le risorse statiche (icone, immagini, ecc.)

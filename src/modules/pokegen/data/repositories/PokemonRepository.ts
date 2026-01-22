@@ -1,8 +1,12 @@
-import { IDataSource } from "@/shared/core/interfaces/data/IDataSource";
 import { IPokemonRepository } from "../../domain/repositories/IPokemonRepository";
 import { PokemonDTO } from "../models/dtos/PokemonDto";
 import { Pokemon } from "../../domain/entities/Pokemon";
-import { IMapper } from "@/shared/core/interfaces/application/mappers/IMapper";
+import { IMapper } from "@/core/contracts/mappers/IMapper";
+import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { NotImplementedError } from "@/core/errors/NotImplementedError";
+import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
+import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
+import { PokemonSpeciesDTO } from "../models/dtos/PokemonSpeciesDto";
 
 /**
  * Repository per gestire i dati dei Pokémon.
@@ -11,7 +15,9 @@ export class PokemonRepository implements IPokemonRepository {
     protected readonly className = "PokemonRepository";
     constructor(
         private readonly dataSource: IDataSource<PokemonDTO>,
-        private readonly mapper: IMapper<PokemonDTO, Pokemon>
+        private readonly speciesDataSource: IDataSource<PokemonSpeciesDTO>,
+        private readonly mapper: IMapper<PokemonAggregateData, Pokemon>,
+        private readonly logger: ILogger
     ) { }
 
     /**
@@ -22,12 +28,33 @@ export class PokemonRepository implements IPokemonRepository {
      * 
      * @throws Error se il recupero o la mappatura dei dati fallisce
      */
-    async get(endpoint: string): Promise<Pokemon> {
+    async getAsync(endpoint: string): Promise<Pokemon> {
         try {
             const data = await this.dataSource.fetchData(endpoint);
-            return this.mapper.toDomain(data);
+            this.logger.debug(`[${this.className}] - Dati del Pokémon recuperati con successo da: ${endpoint}`, data);
+            return this.mapper.map({ pokemon: data });
         } catch (error) {
+            this.logger.error(`[${this.className}] - Errore nel recupero dei dati del Pokémon da: ${endpoint}`, (error as Error).message);
             throw error;
         }
+    }
+
+    async getDetailAsync(name: string): Promise<Pokemon> {
+        try {
+            const pokemon = await this.dataSource.fetchData(name);
+            const species = await this.speciesDataSource.fetchData(name);
+            return this.mapper.map({ pokemon, species});
+        } catch (error) {
+            this.logger.error(`[${this.className}] - Errore nel recupero dei dettagli del Pokémon: ${name}`, (error as Error).message);
+            throw error;
+        }
+    }
+
+    /**
+     * Metodo non implementato per recuperare tutti i Pokémon.
+     * @throws NotImplementedError sempre
+     */
+    getAllAsync(): Promise<Pokemon[]> {
+        throw new NotImplementedError(`[${this.className}] - Method getAllAsync not implemented.`);
     }
 }

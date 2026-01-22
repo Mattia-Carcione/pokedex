@@ -5,8 +5,8 @@ import Sprite from './Sprite.vue';
 
 const { card } = defineProps(['card']);
 const style = 'w-[250px] h-[250px] md:w-[250px] md:h-[250px]';
-const firstType = card.typesInfo[0].color;
-const secondaryType = card.isDoubleType ? card.typesInfo[1].color : firstType;
+const colors = card.displayTypes.map(t => t.color);
+const [firstType, secondaryType = firstType] = colors;
 </script>
 
 <template>
@@ -16,10 +16,10 @@ const secondaryType = card.isDoubleType ? card.typesInfo[1].color : firstType;
         :style="{ background: `linear-gradient(150deg, ${firstType} 50%, ${secondaryType} 50%)` }">
         <RouterLink :to="card.href" :aria-label="`Vai alla scheda dettagliata di ${card.displayName}`"
             class="block p-5">
-            <div class="flex justify-between py-2">
+            <div class="flex justify-between py-2 items-center">
                 <BadgeName :number="card.pokedexNumber" :name="card.displayName" />
 
-                <BadgeType :types="card.typesInfo" />
+                <BadgeType :types="card.displayTypes" />
             </div>
 
             <Sprite :pkm="card" :class="style" />

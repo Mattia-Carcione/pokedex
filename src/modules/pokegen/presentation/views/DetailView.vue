@@ -1,22 +1,22 @@
 <script setup>
 import { onMounted, watch } from 'vue';
-import { getControllers } from '@/app/di/Controllers';
-import Loader from '@/app/presentation/components/Loader.vue';
-import ErrorView from '@/app/presentation/views/404View.vue';
 
-const props = defineProps({
-    name: String,
-    id: String
-});
+import Loader from '@/shared/components/Loader.vue';
+import ErrorView from '@/shared/components/404View.vue';
+import { DetailViewModel } from '../viewmodels/DetailViewModel';
+import { appContainer } from '@/app/di/AppContainer';
+import { TypeRequestEnum } from '../enums/TypeRequestEnum';
 
-const { pkmDetailController } = getControllers();
+const props = defineProps({ name: String });
+
+const pkmDetailController = appContainer.pokemonController();
 
 onMounted(async () => {
-    await pkmDetailController.loadData(props.id);
+    await pkmDetailController.loadData({ endpoint: props.name, req: TypeRequestEnum.DETAIL });
 });
 
-watch(() => props.id, async (newId) => {
-    await pkmDetailController.loadData(newId);
+watch(() => props.name, async (newName) => {
+    await pkmDetailController.loadData({ endpoint: newName, req: TypeRequestEnum.DETAIL });
 });
 </script>
 
@@ -31,9 +31,15 @@ watch(() => props.id, async (newId) => {
         </template>
 
         <template v-else-if="pkmDetailController.data.value && !pkmDetailController.isLoading.value">
-            <div class="flex justify-center py-10">
-                <h1 class="text-[var(--text-primary)] text-[2rem] font-bold text-center">Work in progress...</h1>
-            </div>
+            <template v-if="pkmDetailController.data.value instanceof DetailViewModel && pkmDetailController.data.value.pokemon" >
+                <!-- Detail view content goes here -->
+            </template>
+            
+            <template v-else>
+                <div class="flex justify-center py-10">
+                    <h1 class="text-[var(--text-primary)] text-[2rem] font-bold text-center">Data not found.</h1>
+                </div>
+            </template>
         </template>
     </div>
 </template>

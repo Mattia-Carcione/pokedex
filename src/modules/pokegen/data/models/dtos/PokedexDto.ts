@@ -1,4 +1,4 @@
-import { Base, NamedResource, Names } from "@/shared/core/types/CommonTypes";
+import { Base, NamedResource, Names } from "@/core/types/CommonTypes";
 
 /**
  * Rappresenta il Data Transfer Object (DTO) di un Pokédex regionale.

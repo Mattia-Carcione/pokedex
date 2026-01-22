@@ -1,11 +1,9 @@
-import { Pokemon } from "../../domain/entities/Pokemon";
+import { PokemonVM } from "./types/PokemonVM";
 /**
  * Tipo di ViewModel per la generazione di Pokémon.
  */
 export class HomeViewModel {
   constructor(
-    public readonly generationId: number,
-    public readonly generationName: string,
-    public readonly pokemon: Pokemon[]
+    public readonly pokemon: PokemonVM[]
   ) {}
 };

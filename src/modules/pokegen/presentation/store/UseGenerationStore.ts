@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { IGetGeneration } from "../../domain/usecases/IGetGeneration";
+import { IGetGenerationUseCase } from "../../domain/usecases/IGetGenerationUseCase";
 import { Generation } from "../../domain/entities/Generation";
 
 /**
@@ -14,23 +14,23 @@ export const useGenerationStore = defineStore('generation', {
     actions: {
         /**
          * Recupera i dati della generazione dei Pokémon utilizzando il caso d'uso fornito.
-         * @param getGenerationUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
+         * @param GetGenerationUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
          * @returns Una promessa che risolve quando i dati sono stati recuperati
          * @throws Error se il recupero dei dati fallisce
          */
         async ensureLoaded(
-            getGenerationUseCase: IGetGeneration,
+            GetGenerationUseCase: IGetGenerationUseCase,
         ): Promise<void> {
             this.loading = true;
             this.error = null;
             try {
-                const response = await getGenerationUseCase.execute();
+                const response = await GetGenerationUseCase.execute();
                 const data = response.data;
                 if(response.success && data)
                     this.generationData = data || null;
                 else if(response.success && !data) {
                     this.generationData = null;
-                    this.error = new Error("Generazione non trovata.");
+                    this.error = new Error("Generation data not found.");
                 }
                 else {
                     this.error = response.error;

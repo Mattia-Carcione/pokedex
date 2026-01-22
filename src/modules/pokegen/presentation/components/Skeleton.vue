@@ -4,7 +4,7 @@ const style = props.class ?? 'w-[50px] h-[50px] md:h-[50px] md:w-[50px]';
 </script>
 
 <template>
-    <div :class="style" class="skeleton animate-pulse rounded-full bg-gray-200/50 flex justify-center items-center"
+    <div :class="style" class="skeleton animate-pulse rounded-full bg-gray-200/50 flex justify-center"
         aria-label="Skeleton di caricamento dati">
         <svg :class="style" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
             viewBox="0 0 24 24">
