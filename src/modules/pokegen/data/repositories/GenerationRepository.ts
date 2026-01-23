@@ -36,7 +36,7 @@ export class GenerationRepository implements IGenerationRepository {
             const generation = this.generationMapper.map(data);
             const task = data.pokemon_species.map(async ({ url }) => {
                 const pokemon = await this.pokemonDataSource.fetchData(url);
-                const spriteUrl = pokemon.sprites.other?.home.front_default || pokemon.sprites.front_default || DEFAUL_IMAGE;
+                const spriteUrl = pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE;
                 if(spriteUrl === DEFAUL_IMAGE) {
                     this.logger.warn(`[${this.className}] - Immagine non disponibile per il Pokémon ${pokemon.name} (ID: ${pokemon.id}). Utilizzo dell'immagine di default.`);
                 }
