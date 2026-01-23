@@ -1,8 +1,12 @@
 import { IGenerationRepository } from "@/modules/pokegen/domain/repositories/IGenerationRepository";
 import { Generation } from "@/modules/pokegen/domain/entities/Generation";
-import { IGenerationMapperFacade } from "@/modules/pokegen/data/facade/IGenerationMapperFacade";
-import { IGenerationDataSourceFacade } from "@/modules/pokegen/data/facade/IGenerationDataSourceFacade";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
+import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { GenerationDto } from "../models/Dtos/GenerationDto";
+import { PokemonDto } from "../models/Dtos/PokemonDto";
+import { PokeApiResponseDto } from "../models/Dtos/PokeApiResponseDto";
+import { IGenerationMapper } from "../../application/mappers/contracts/IGenerationMapper";
+import { IPokemonMapper } from "../../application/mappers/contracts/IPokemonMapper";
 
 /**
  * Repository per gestire i dati delle generazioni Pokémon.
@@ -11,8 +15,11 @@ export class GenerationRepository implements IGenerationRepository {
     protected readonly className = "GenerationRepository";
 
     constructor(
-        private readonly ds: IGenerationDataSourceFacade,
-        private readonly mapper: IGenerationMapperFacade,
+        private readonly generationDataSource: IDataSource<GenerationDto>,
+        private readonly pokeApiResponseDataSource: IDataSource<PokeApiResponseDto>,
+        private readonly pokemonDataSource: IDataSource<PokemonDto>,
+        private readonly generationMapper: IGenerationMapper,
+        private readonly pokemonMapper: IPokemonMapper,
         private readonly logger: ILogger
     ) { }
 
@@ -23,11 +30,11 @@ export class GenerationRepository implements IGenerationRepository {
      */
     async getAsync(id: string): Promise<Generation> {
         try {
-            const data = await this.ds.generationDS.fetchData(id);
-            const generation = this.mapper.generationMapper.map(data);
+            const data = await this.generationDataSource.fetchData(id);
+            const generation = this.generationMapper.map(data);
             const task = data.pokemon_species.map(async ({ url }) => {
-                const pokemon = await this.ds.pokemonDS.fetchData(url);
-                return this.mapper.pokemonMapper.map({ pokemon });
+                const pokemon = await this.pokemonDataSource.fetchData(url);
+                return this.pokemonMapper.map({ pokemon });
             });
             const list = await Promise.all(task);
             generation.pokemon = list.sort((a, b) => a.id - b.id);
@@ -46,10 +53,10 @@ export class GenerationRepository implements IGenerationRepository {
      */
     async getAllAsync(): Promise<Generation[]> {
         try {
-            const response = await this.ds.pokeapiDS.fetchData();
+            const response = await this.pokeApiResponseDataSource.fetchData();
             const task = response.results.map(async (resource) => {
-                const data = await this.ds.generationDS.fetchData(resource.url);
-                return this.mapper.generationMapper.map(data);
+                const data = await this.generationDataSource.fetchData(resource.url);
+                return this.generationMapper.map(data);
             });
             const generations = await Promise.all(task);
             this.logger.debug(`[${this.className}] - Tutte le generazioni recuperate con successo.`, generations);
