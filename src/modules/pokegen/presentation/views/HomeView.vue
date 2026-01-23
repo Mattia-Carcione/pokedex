@@ -17,12 +17,9 @@
     const router = useRouter();
     const message = '';
     
-    onMounted(async () => {
-        await pkmByGenController.loadData({endpoint: id, req: TypeRequestEnum.HOME});
-    });
     watch(() => id, async (newId) => {
         await pkmByGenController.loadData({endpoint: newId, req: TypeRequestEnum.HOME});
-    });
+    }, { immediate: true });
 </script>
 
 <template>

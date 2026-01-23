@@ -11,13 +11,9 @@ const props = defineProps({ name: String });
 
 const pkmDetailController = appContainer.pokemonController();
 
-onMounted(async () => {
-    await pkmDetailController.loadData({ endpoint: props.name, req: TypeRequestEnum.DETAIL });
-});
-
 watch(() => props.name, async (newName) => {
     await pkmDetailController.loadData({ endpoint: newName, req: TypeRequestEnum.DETAIL });
-});
+}, { immediate: true });
 </script>
 
 <template>
