@@ -5,7 +5,7 @@
     
     import { AppRouteName } from '@/app/routing/AppRouteName';
     import { appContainer } from '@/app/di/AppContainer';
-    import Loader from '@/shared/presentation/presentation/presentation/presentation/presentation/presentation/components/Loader.vue';
+    import Loader from '@/shared/presentation/components/Loader.vue';
     import CustomSection from '@/shared/presentation/components/CustomSection.vue';
     import Card from '../components/Card.vue';
     import ErrorView from '@/shared/presentation/components/404View.vue';
