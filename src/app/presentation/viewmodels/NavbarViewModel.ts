@@ -1,4 +1,4 @@
-import { GenerationVM } from "@/shared/viewmodels/GenerationVM";
+import { GenerationVM } from "@/shared/presentation/viewmodels/GenerationVM";
 
 /**
  * ViewModel per la barra di navigazione dell'applicazione.

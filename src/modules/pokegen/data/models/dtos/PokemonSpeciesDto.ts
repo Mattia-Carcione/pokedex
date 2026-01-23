@@ -3,7 +3,7 @@ import { NamedResource } from "@/core/types/CommonTypes";
 /**
  * Rappresenta il Data Transfer Object (DTO) della specie di un Pokémon come definito dalla PokeAPI.
  */
-export interface PokemonSpeciesDTO {
+export interface PokemonSpeciesDto {
   id: number;
   name: string;
   order: number;

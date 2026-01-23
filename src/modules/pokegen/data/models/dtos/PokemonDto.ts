@@ -3,7 +3,7 @@ import { Base, NamedResource } from "@/core/types/CommonTypes";
 /**
  * Rappresenta il Data Transfer Object (DTO) di un Pokémon come definito dalla PokeAPI.
  */
-export interface PokemonDTO extends Base {
+export interface PokemonDto extends Base {
   order: number;
   base_experience: number;
   height: number;

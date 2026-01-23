@@ -7,5 +7,5 @@ export interface IMapper<TSource, TDestination> {
      * @param source - L'oggetto sorgente da mappare.
      * @returns L'oggetto destinazione risultante dalla mappatura.
      */
-    map(source: TSource): TDestination;
+    map(source: TSource, ...args: any): TDestination;
 }

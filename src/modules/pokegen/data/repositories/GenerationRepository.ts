@@ -2,11 +2,12 @@ import { IGenerationRepository } from "@/modules/pokegen/domain/repositories/IGe
 import { Generation } from "@/modules/pokegen/domain/entities/Generation";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { GenerationDto } from "../models/Dtos/GenerationDto";
-import { PokemonDto } from "../models/Dtos/PokemonDto";
-import { PokeApiResponseDto } from "../models/Dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "../models/dtos/PokeApiResponseDto";
 import { IGenerationMapper } from "../../application/mappers/contracts/IGenerationMapper";
 import { IPokemonMapper } from "../../application/mappers/contracts/IPokemonMapper";
+import { DEFAUL_IMAGE } from "@/app/const";
+import { GenerationDto } from "../models/dtos/GenerationDto";
+import { PokemonDto } from "../models/dtos/PokemonDto";
 
 /**
  * Repository per gestire i dati delle generazioni Pokémon.
@@ -18,6 +19,7 @@ export class GenerationRepository implements IGenerationRepository {
         private readonly generationDataSource: IDataSource<GenerationDto>,
         private readonly pokeApiResponseDataSource: IDataSource<PokeApiResponseDto>,
         private readonly pokemonDataSource: IDataSource<PokemonDto>,
+        private readonly blobDataSource: IDataSource<Blob>,
         private readonly generationMapper: IGenerationMapper,
         private readonly pokemonMapper: IPokemonMapper,
         private readonly logger: ILogger
@@ -34,7 +36,12 @@ export class GenerationRepository implements IGenerationRepository {
             const generation = this.generationMapper.map(data);
             const task = data.pokemon_species.map(async ({ url }) => {
                 const pokemon = await this.pokemonDataSource.fetchData(url);
-                return this.pokemonMapper.map({ pokemon });
+                const spriteUrl = pokemon.sprites.other?.home.front_default || pokemon.sprites.front_default || DEFAUL_IMAGE;
+                if(spriteUrl === DEFAUL_IMAGE) {
+                    this.logger.warn(`[${this.className}] - Immagine non disponibile per il Pokémon ${pokemon.name} (ID: ${pokemon.id}). Utilizzo dell'immagine di default.`);
+                }
+                const blob = spriteUrl === DEFAUL_IMAGE ? new Blob() : await this.blobDataSource.fetchData(spriteUrl);
+                return this.pokemonMapper.map({ pokemon }, blob);
             });
             const list = await Promise.all(task);
             generation.pokemon = list.sort((a, b) => a.id - b.id);

@@ -4,7 +4,7 @@ import { Base, NamedResource, Names } from "@/core/types/CommonTypes";
  * Rappresenta il Data Transfer Object (DTO) di un Pokédex regionale.
  * Basato sulla risposta dell'endpoint /pokedex/
  */
-export interface PokedexDTO extends Base {
+export interface PokedexDto extends Base {
     /** Se questo Pokédex appartiene alla serie principale di giochi */
     is_main_series: boolean;
     /** Descrizioni localizzate del Pokédex */

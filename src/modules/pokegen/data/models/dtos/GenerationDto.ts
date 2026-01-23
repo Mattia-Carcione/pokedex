@@ -4,7 +4,7 @@ import { Base, NamedResource, Names } from "@/core/types/CommonTypes";
  * Rappresenta il Data Transfer Object (DTO) di una Generazione Pokémon.
  * Basato sulla risposta dell'endpoint /generation/
  */
-export interface GenerationDTO extends Base {
+export interface GenerationDto extends Base {
     /** Elenco delle abilità introdotte in questa generazione (vuoto per la Gen I nel JSON) */
     abilities: NamedResource[];
     /** La regione principale associata a questa generazione */

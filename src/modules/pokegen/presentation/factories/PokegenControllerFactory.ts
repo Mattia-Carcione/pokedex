@@ -1,6 +1,5 @@
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokegenControllerEnum } from "../enums/PokegenControllerEnum";
-import { GenerationStore, PokegenStore } from "../store/types/StoreTypes";
 import { IGetPokemonUseCase } from "../../domain/usecases/IGetPokemonUseCase";
 import { IGetPokemonDetailUseCase } from "../../domain/usecases/IGetPokemonDetailUseCase";
 import { IGetGenerationUseCase } from "../../domain/usecases/IGetGenerationUseCase";
@@ -25,8 +24,8 @@ export class PokegenControllerFactory {
     static create(
         type: PokegenControllerEnum, 
         deps: {
-            pokegenStore: PokegenStore,
-            generationStore: GenerationStore,
+            pokegenStore: any,
+            generationStore: any,
             generationUseCase: IGetGenerationUseCase,
             pokemonUseCase: IGetPokemonUseCase,
             pokemonDetailUseCase: IGetPokemonDetailUseCase,

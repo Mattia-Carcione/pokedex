@@ -4,13 +4,13 @@ import { HttpError } from "@/infrastructure/http/errors/HttpError";
 import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
-import { PokemonSpeciesDTO } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
+import { PokemonSpeciesDto } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
  * Data source per ottenere i dati dei Pokémon.
  */
-export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDTO> {
+export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDto> {
     protected readonly BASE_URI = EndpointApi.PokemonSpecies;
     constructor(
         private readonly httpClient: IHttpClient,
@@ -21,14 +21,14 @@ export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDTO> 
     /**
      * Recupera i dati del Pokémon da un endpoint specifico.
      * @param endpoint - L'endpoint da cui recuperare i dati del Pokémon
-     * @returns Una promessa che risolve i dati del Pokémon tipizzati come PokemonSpeciesDTO
+     * @returns Una promessa che risolve i dati del Pokémon tipizzati come PokemonSpeciesDto
      * 
      * @throws DataSourceError se il recupero dei dati fallisce
      */
-    async fetchData(endpoint: string): Promise<PokemonSpeciesDTO> {
+    async fetchData(endpoint: string): Promise<PokemonSpeciesDto> {
         try {            
             endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
-            const response = await this.httpClient.get<PokemonSpeciesDTO>(endpoint);
+            const response = await this.httpClient.get<PokemonSpeciesDto>(endpoint);
             this.logger.debug("Dati del Pokémon recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {

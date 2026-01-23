@@ -1,27 +1,27 @@
 import pokemonMockData from "@/../assets/mock_data/pokemon-species.json";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
-import { PokemonSpeciesDTO } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
+import { PokemonSpeciesDto } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
 
 /**
  * Mock Data source per ottenere i dati dei Pokémon da file JSON locali.
  * Utile per testing e sviluppo senza dipendere dall'API esterna.
  */
-export class PokemonSpeciesMockDataSource implements IDataSource<PokemonSpeciesDTO> {
-    private mockData: PokemonSpeciesDTO;
+export class PokemonSpeciesMockDataSource implements IDataSource<PokemonSpeciesDto> {
+    private mockData: PokemonSpeciesDto;
 
     constructor() {
-        this.mockData = pokemonMockData as PokemonSpeciesDTO;
+        this.mockData = pokemonMockData as PokemonSpeciesDto;
     }
     
     /**
      * Recupera i dati del Pokémon da mock data locale.
      * @param endpoint - L'endpoint (ignorato nel mock, ritorna sempre lo stesso Pokémon)
-     * @returns Una promessa che risolve i dati del Pokémon tipizzati come PokemonSpeciesDTO
+     * @returns Una promessa che risolve i dati del Pokémon tipizzati come PokemonSpeciesDto
      * 
      * @throws DataSourceError se il recupero dei dati fallisce
      */
-    async fetchData(_endpoint: string): Promise<PokemonSpeciesDTO> {
+    async fetchData(_endpoint: string): Promise<PokemonSpeciesDto> {
         try {
             // Simula un piccolo delay per replicare il comportamento di una chiamata HTTP
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -41,7 +41,7 @@ export class PokemonSpeciesMockDataSource implements IDataSource<PokemonSpeciesD
      * Metodo helper per aggiornare i dati mock durante i test.
      * @param newData - I nuovi dati mock da utilizzare
      */
-    setMockData(newData: PokemonSpeciesDTO): void {
+    setMockData(newData: PokemonSpeciesDto): void {
         this.mockData = newData;
     }
 }

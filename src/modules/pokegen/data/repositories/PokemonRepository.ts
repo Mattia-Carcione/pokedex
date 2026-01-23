@@ -1,12 +1,12 @@
 import { IPokemonRepository } from "../../domain/repositories/IPokemonRepository";
-import { PokemonDto } from "../models/Dtos/PokemonDto";
+import { PokemonDto } from "../models/dtos/PokemonDto";
 import { Pokemon } from "../../domain/entities/Pokemon";
 import { IMapper } from "@/core/contracts/mappers/IMapper";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { NotImplementedError } from "@/core/errors/NotImplementedError";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
-import { PokemonAggregateData } from "../types/PokemonAggregateData";
-import { PokemonSpeciesDto } from "../models/Dtos/PokemonSpeciesDto";
+import { PokemonSpeciesDto } from "../models/dtos/PokemonSpeciesDto";
+import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
 
 /**
  * Repository per gestire i dati dei Pokémon.

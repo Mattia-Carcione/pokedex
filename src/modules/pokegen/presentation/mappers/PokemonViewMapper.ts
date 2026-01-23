@@ -22,16 +22,17 @@ export class PokemonViewMapper implements IPokemonViewMapper {
     map(source: Pokemon): PokemonVM {
         try {
             return {
-                ...source,
+                stats: source.stats,
+                sprite: URL.createObjectURL(source.sprite),
                 height: MathHelper.formatDecimeterValue(source.height),
                 weight: MathHelper.formatDecimeterValue(source.weight),
                 pokedexNumber: source.id.toString().padStart(3, '0'),
-                displayTypes: source.types.map(type => ({
+                types: source.types.map(type => ({
                     color: TYPE_COLORS[type.name],
                     icon: TYPE_ICONS[type.name],
                     name: type.name.charAt(0).toUpperCase() + type.name.slice(1),
                 })),
-                displayName: source.name.charAt(0).toUpperCase() + source.name.slice(1),
+                name: source.name.charAt(0).toUpperCase() + source.name.slice(1),
                 href: { name: AppRouteName.Pokemon, params: { name: source.name }},
             }
         } catch (error) {

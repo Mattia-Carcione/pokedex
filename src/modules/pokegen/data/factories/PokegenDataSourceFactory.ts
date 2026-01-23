@@ -1,23 +1,23 @@
 import { EnvironmentEnum } from "@/app/EnvironmentEnum";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { PokemonDto } from "../models/Dtos/PokemonDto";
 import { createByEnvHelper } from "@/core/utils/factories/CreateByEnvHelper";
 import { PokemonDataSource } from "../datasources/PokemonDataSource";
 import { PokemonMockDataSource } from "../datasources/mock/PokemonMockDataSource";
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
-import { PokemonSpeciesDto } from "../models/Dtos/PokemonSpeciesDto";
 import { PokemonSpeciesDataSource } from "../datasources/PokemonSpeciesDataSources";
 import { PokemonSpeciesMockDataSource } from "../datasources/mock/PokemonSpeciesMockDataSource";
 import { GenerationDataSource } from "../datasources/GenerationDataSource";
 import { GenerationMockDataSource } from "../datasources/mock/GenerationMockDataSource";
-import { GenerationDto } from "../models/Dtos/GenerationDto";
 import { PokeApiResponseDataSource } from "../datasources/PokeApiResponseDataSource";
 import { PokeApiResponseMockDataSource } from "../datasources/mock/PokeApiResponseMockDataSource";
-import { PokegenDataSourceFactoryMappingType } from "../types/PokegenDataSourceFactoryMappingType";
 import { PokegenDataSourceTypesEnum } from "../enums/PokegenDataSourceTypesEnum";
-import { PokeApiResponseDto } from "../models/Dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "../models/dtos/PokeApiResponseDto";
+import { PokegenDataSourceFactoryMappingType } from "../types/PokegenDataSourceFactoryMappingType";
+import { PokemonDto } from "../models/dtos/PokemonDto";
+import { PokemonSpeciesDto } from "../models/dtos/PokemonSpeciesDto";
+import { GenerationDto } from "../models/dtos/GenerationDto";
 
 /**
  * Factory per la creazione delle istanze dei datasource

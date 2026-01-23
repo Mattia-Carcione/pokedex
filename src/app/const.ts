@@ -55,3 +55,8 @@ export const TYPE_ICONS: Record<string, string> = {
   rock: `${BASE_URI}icons/types/rock.svg`,
   steel: `${BASE_URI}icons/types/steel.svg`,
 };
+
+/**
+ * URI dell'immagine di default per i Pokémon senza immagine disponibile.
+ */
+export const DEFAUL_IMAGE = `${BASE_URI}default_image.svg`;

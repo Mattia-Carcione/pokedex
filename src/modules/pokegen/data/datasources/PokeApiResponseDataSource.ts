@@ -4,7 +4,7 @@ import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/I
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/Dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**

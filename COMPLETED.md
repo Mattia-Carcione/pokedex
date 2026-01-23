@@ -217,7 +217,7 @@ const repository = new PokemonRepository(mockDataSource, mapper);
 
 // Uso
 const pokemon = await repository.get('/pokemon/25');
-console.log(pokemon.displayName); // "Pikachu"
+console.log(pokemon.name); // "Pikachu"
 ```
 
 ### Personalizzare Mock Data

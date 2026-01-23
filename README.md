@@ -2,13 +2,16 @@
 
 Applicazione Vue 3 + Vite che esplora i Pokémon per generazione tramite PokeAPI, con fallback a dati mock per ambienti offline/CI. Implementa Clean Architecture con separazione netta tra layers, Dependency Injection e pattern repository.
 
+NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didattico per apprendere l'architettura clean.
+
 ## Caratteristiche
 - Navigazione per generazione (`/generation/:id`) con elenco ordinato di Pokémon.
-- Routing dedicato per il dettaglio (`/pokemon/:name`), attualmente in sviluppo.
+- Pagina dettaglio Pokémon (`/pokemon/:name`) **completata** con dati specie, descrizioni e caratteristiche.
 - Stato centralizzato con Pinia e controller/use-case che orchestrano repository e store.
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
 - Mock data locali in `assets/mock_data` utilizzati in modalità development.
 - Dependency Injection tramite `AppContainer` per gestione delle dipendenze.
+- Immagini di default SVG per Pokémon senza artwork ufficiale.
 
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
@@ -43,7 +46,7 @@ Implementazioni concrete delle interfacce core:
 
 ### Application Layer (`src/app/`)
 Bootstrap e configurazione dell'applicazione:
-- `di/`: **Dependency Injection** con `AppContainer` (crea e gestisce tutte le dipendenze)
+- `di/`: **Dependency Injection** con `AppContainer` e `PokegenContainer` (crea e gestisce tutte le dipendenze)
 - `routing/`: Configurazione Vue Router con `AppRouteName` enum
 - `presentation/`: Layout globali (Hero, Navbar) e ViewModel
 - `styles/`: CSS globali e variabili Tailwind
@@ -53,20 +56,23 @@ Bootstrap e configurazione dell'applicazione:
 Feature PokéGen organizzata in sotto-layer:
 
 #### Domain (`domain/`)
-- `entities/`: `Generation`, `Pokemon` (entità di business)
+- `entities/`: `Generation`, `Pokemon` (entità di business con metodi helper)
 - `repositories/`: Interfacce repository (`IGenerationRepository`, `IPokemonRepository`)
 - `usecases/`: Interfacce use case (`IGetGenerationUseCase`, `IGetPokemonUseCase`, `IGetPokemonDetailUseCase`)
 
 #### Application (`application/`)
 - `mappers/`: `GenerationMapper`, `PokemonMapper` (DTO → Domain)
-- `usecases/`: Implementazioni use case (`GetGenerationUseCase`, `GetPokemonUseCase`)
+- `usecases/`: Implementazioni use case (`GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`)
 
 #### Data (`data/`)
-- `datasources/`: `GenerationDataSource`, `PokemonDataSource` (HTTP) e versioni mock
+- `datasources/`: 
+  - `GenerationDataSource`, `PokemonDataSource`, `PokemonSpeciesDataSource`, `PokeApiResponseDataSource` (HTTP)
+  - Versioni mock per ogni datasource
 - `factories/`: Factory per creare datasource in base all'environment
-- `models/`: DTO e tipi aggregati (`GenerationDTO`, `PokemonDTO`, `PokemonAggregateData`)
+- `models/`: DTO e tipi aggregati (`GenerationDTO`, `PokemonDTO`, `PokemonSpeciesDTO`, `PokemonAggregateData`)
 - `repositories/`: Implementazioni repository con facade per datasource e mapper
 - `enums/`: `EndpointApi` per URL degli endpoint
+- `types/`: Tipi specifici del data layer
 
 #### Presentation (`presentation/`)
 - `controllers/`: `UseGenerationController`, `UsePokemonController` (orchestrano use case e store)
@@ -76,16 +82,18 @@ Feature PokéGen organizzata in sotto-layer:
 - `components/`: Componenti Vue (`Card`, `BadgeType`, `Skeleton`)
 - `views/`: Viste principali (`HomeView`, `DetailView`)
 - `enums/`: `TypeRequestEnum` per discriminare tipo di richiesta
+- `factories/`: Factory per controller
 
 ### Shared Layer (`src/shared/`)
-Componenti e viewmodel riutilizzabili:
-- `components/`: `404View`, `Loader`, `CustomSection`, `ScrollToTop`
-- `viewmodels/`: `GenerationVM` per dati navbar
+Componenti e logica riutilizzabili:
+- `presentation/`: Componenti Vue condivise (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
+- `data/`: Logica di data layer riutilizzabile
+- `factories/`: Factory condivise
 
 ## Rotte
 - `/` – Home (redirect a `/generation/1`)
 - `/generation/:id` – Lista Pokémon di una generazione specifica
-- `/pokemon/:name` – Dettaglio Pokémon (in sviluppo)
+- `/pokemon/:name` – Dettaglio Pokémon **completato** ✅
 - `/:pathMatch(.*)*` – Pagina 404 personalizzata
 
 ## Avvio rapido
@@ -107,11 +115,11 @@ npm run test:coverage # report coverage
 ```
 
 ## Dependency Injection (AppContainer)
-Il `AppContainer` inizializza tutte le dipendenze dell'applicazione:
+Il `AppContainer` + `PokegenContainer` inizializzano tutte le dipendenze dell'applicazione:
 
 1. **Infrastructure**: `AxiosClientFactory`, `HttpErrorMapper`, `Logger`
 2. **Mappers**: `GenerationMapper`, `PokemonMapper`, `NavbarMapper`, `PokemonViewMapper`
-3. **Factories**: `GenerationDataSourceFactory`, `PokemonDataSourceFactory`, etc.
+3. **Factories**: `PokegenDataSourceFactory`, `PokegenRepositoryFactory`, `PokegenControllerFactory`
 4. **DataSources**: Seleziona datasource (API o mock) in base all'`EnvironmentEnum`
 5. **Repositories**: `GenerationRepository`, `PokemonRepository` con facade per datasource e mapper
 6. **Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`
@@ -120,7 +128,7 @@ Il `AppContainer` inizializza tutte le dipendenze dell'applicazione:
 ```typescript
 // Esempio utilizzo in un componente Vue
 const pkmController = appContainer.pokemonController();
-await pkmController.loadData({ endpoint: '1', req: TypeRequestEnum.HOME });
+await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL });
 ```
 
 ## Cache e Retry Strategy
@@ -135,58 +143,66 @@ await pkmController.loadData({ endpoint: '1', req: TypeRequestEnum.HOME });
 src/
   app/
     di/
-      AppContainer.ts           # DI container
+      AppContainer.ts                # DI container principale
+      pokegen/
+        PokegenContainer.ts          # DI container pokegen
     presentation/
-      layout/                   # Hero, Navbar
-      viewmodels/              # NavbarViewModel
+      layout/                        # Hero, Navbar
+      viewmodels/                    # NavbarViewModel
     routing/
-      AppRouteName.ts          # Enum rotte
-      routes.ts                # Configurazione router
+      AppRouteName.ts                # Enum rotte
+      routes.ts                      # Configurazione router
     styles/
-    EnvironmentEnum.ts         # Enum ambienti
+    const.ts                         # Costanti app
+    EnvironmentEnum.ts               # Enum ambienti
   core/
-    contracts/                 # Interfacce astratte
-    costants/                  # BASE_API_URL
-    domain/                    # Result<T, E>
-    enums/                     # ApplicationErrorCode
-    errors/                    # Custom errors
-    types/                     # Tipi comuni
-    utils/                     # Utility pure
+    contracts/                       # Interfacce astratte
+    constants/                       # BASE_API_URL
+    domain/                          # Result<T, E>
+    enums/                           # ApplicationErrorCode
+    errors/                          # Custom errors
+    types/                           # Tipi comuni
+    utils/                           # Utility pure
   infrastructure/
-    cache/                     # CacheDb, CacheKeyFactory
+    cache/                           # CacheDb, CacheKeyFactory
     http/
-      client/axios/            # AxiosHttpClient, interceptor
-      config/                  # HttpConfig
-      enums/                   # ErrorTypeEnum, RetryEnum
-      mappers/                 # HttpErrorMapper
-      utils/                   # Jitter, Retry
-    logger/                    # Logger
+      client/axios/                  # AxiosHttpClient, interceptor
+      config/                        # HttpConfig
+      enums/                         # ErrorTypeEnum, RetryEnum
+      mappers/                       # HttpErrorMapper
+      utils/                         # Jitter, Retry
+    logger/                          # Logger
   modules/
     pokegen/
       application/
-        mappers/               # DTO → Domain
-        usecases/              # Business logic
+        mappers/                     # DTO → Domain
+        usecases/                    # Business logic
       data/
-        datasources/           # API e mock
-        factories/             # Factory per datasource
-        models/                # DTO e tipi
-        repositories/          # Implementazioni repository
+        datasources/                 # API, mock e aggregati
+        factories/                   # Factory per datasource
+        models/                      # DTO e tipi
+        repositories/                # Implementazioni repository
+        types/                       # Tipi specifici data layer
       domain/
-        entities/              # Generation, Pokemon
-        repositories/          # Interfacce repository
-        usecases/              # Interfacce use case
+        entities/                    # Generation, Pokemon
+        repositories/                # Interfacce repository
+        usecases/                    # Interfacce use case
       presentation/
-        components/            # Card, BadgeType
-        controllers/           # Orchestrazione
-        mappers/               # Domain → ViewModel
-        store/                 # Pinia stores
-        viewmodels/            # HomeViewModel, DetailViewModel
-        views/                 # HomeView, DetailView
+        components/                  # Card, BadgeType, Skeleton
+        controllers/                 # Orchestrazione
+        factories/                   # Factory controller
+        mappers/                     # Domain → ViewModel
+        store/                       # Pinia stores
+        viewmodels/                  # HomeViewModel, DetailViewModel
+        views/                       # HomeView, DetailView
   shared/
-    components/                # 404View, Loader
-    viewmodels/                # GenerationVM
+    presentation/                    # Componenti Vue riutilizzabili
+    data/                            # Logica data condivisa
+    factories/                       # Factory condivise
 assets/
-  mock_data/                   # Dati JSON mock
+  mock_data/                         # Dati JSON mock
+public/
+  default_image.svg                  # Immagine default Pokémon
 ```
 
 ## Mock Data vs API
@@ -206,5 +222,7 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ Sistema di generazioni completo con navigazione  
 ✅ Lista Pokémon per generazione con card dettagliate  
 ✅ Cache persistente e retry strategy  
-✅ Clean Architecture con DI  
-🚧 Pagina dettaglio Pokémon (in sviluppo)
+✅ Clean Architecture con DI modulare  
+✅ Immagini di fallback SVG per artwork mancanti  
+✅ Tutti gli datasource e repository completati
+🚧 **Pagina dettaglio Pokémon in sviluppo** 
