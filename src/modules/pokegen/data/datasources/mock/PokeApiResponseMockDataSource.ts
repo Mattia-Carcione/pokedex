@@ -1,17 +1,17 @@
-import resourceListMockData from "@/../assets/mock_data/resource-list.json";
+import PokeApiResponseMockData from "@/../assets/mock_data/resource-list.json";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/modules/pokegen/data/models/Dtos/PokeApiResponseDto";
 
 /**
  * Mock Data source per ottenere la lista delle generazioni Pokémon da file JSON locali.
  * Utile per testing e sviluppo senza dipendere dall'API esterna.
  */
-export class ResourceListMockDataSource implements IDataSource<PokeApiResponseDto> {
+export class PokeApiResponseMockDataSource implements IDataSource<PokeApiResponseDto> {
     private mockData: PokeApiResponseDto;
 
     constructor() {
-        this.mockData = resourceListMockData as PokeApiResponseDto;
+        this.mockData = PokeApiResponseMockData as PokeApiResponseDto;
     }
 
     /**
