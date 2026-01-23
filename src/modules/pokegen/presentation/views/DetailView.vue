@@ -1,8 +1,8 @@
 <script setup>
 import { onMounted, watch } from 'vue';
 
-import Loader from '@/shared/components/Loader.vue';
-import ErrorView from '@/shared/components/404View.vue';
+import Loader from '@/shared/presentation/presentation/components/Loader.vue';
+import ErrorView from '@/shared/presentation/presentation/components/404View.vue';
 import { DetailViewModel } from '../viewmodels/DetailViewModel';
 import { appContainer } from '@/app/di/AppContainer';
 import { TypeRequestEnum } from '../enums/TypeRequestEnum';

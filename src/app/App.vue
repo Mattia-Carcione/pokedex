@@ -1,6 +1,6 @@
 <script setup>
+import ScrollToTop from '@/shared/presentation/components/ScrollToTop.vue';
 import { RouterView } from 'vue-router';
-import ScrollToTop from '@/shared/components/ScrollToTop.vue';
 </script>
 
 <template>
