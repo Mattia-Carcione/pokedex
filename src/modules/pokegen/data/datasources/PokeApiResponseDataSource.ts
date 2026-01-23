@@ -4,13 +4,13 @@ import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/I
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/modules/pokegen/data/models/Dtos/PokeApiResponseDto";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
  * Data source per ottenere la lista delle risorse delle generazioni di Pokémon.
  */
-export class ResourceListDataSource implements IDataSource<PokeApiResponseDto> {
+export class PokeApiResponseDataSource implements IDataSource<PokeApiResponseDto> {
         private readonly BASE_URL = EndpointApi.Generation;
     
         constructor(
