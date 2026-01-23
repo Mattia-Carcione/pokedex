@@ -1,12 +1,12 @@
 import { IPokemonRepository } from "../../domain/repositories/IPokemonRepository";
-import { PokemonDTO } from "../models/dtos/PokemonDto";
+import { PokemonDto } from "../models/Dtos/PokemonDto";
 import { Pokemon } from "../../domain/entities/Pokemon";
 import { IMapper } from "@/core/contracts/mappers/IMapper";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { NotImplementedError } from "@/core/errors/NotImplementedError";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
-import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
-import { PokemonSpeciesDTO } from "../models/dtos/PokemonSpeciesDto";
+import { PokemonAggregateData } from "../types/PokemonAggregateData";
+import { PokemonSpeciesDto } from "../models/Dtos/PokemonSpeciesDto";
 
 /**
  * Repository per gestire i dati dei Pokémon.
@@ -14,8 +14,8 @@ import { PokemonSpeciesDTO } from "../models/dtos/PokemonSpeciesDto";
 export class PokemonRepository implements IPokemonRepository {
     protected readonly className = "PokemonRepository";
     constructor(
-        private readonly dataSource: IDataSource<PokemonDTO>,
-        private readonly speciesDataSource: IDataSource<PokemonSpeciesDTO>,
+        private readonly dataSource: IDataSource<PokemonDto>,
+        private readonly speciesDataSource: IDataSource<PokemonSpeciesDto>,
         private readonly mapper: IMapper<PokemonAggregateData, Pokemon>,
         private readonly logger: ILogger
     ) { }
