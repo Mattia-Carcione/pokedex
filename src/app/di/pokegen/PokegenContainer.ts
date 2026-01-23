@@ -76,7 +76,7 @@ export class PokegenContainer {
         const PokeApiResponseDataSource = PokegenDataSourceFactory
             .create<PokegenDataSourceTypesEnum.PokeApiResponse>(env, PokegenDataSourceTypesEnum.PokeApiResponse, deps);
 
-        const blobDataSource = DataSourceFactory.create<Blob>(env, deps);
+        const blobDataSource = DataSourceFactory.create(env, deps);
 
         // --- REPOSITORIES ---
         const repositoryInput = { generationDataSource, PokeApiResponseDataSource, pokemonDataSource, pokemonSpeciesDataSource, blobDataSource, generationMapper, pokemonMapper, logger: deps.logger };

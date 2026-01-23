@@ -20,8 +20,7 @@ export class DataSourceFactory {
      * @param prod - Funzione che crea il DataSource per l'ambiente di produzione
      * @returns Un'istanza di IDataSource
      */
-    public static create<T>(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<T> {
-        createByEnvHelper<IDataSource<Blob>>(env, () => new BlobDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new BlobMockDataSource());
-        throw new Error("Tipo di DataSource non supportato");
+    public static create(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<Blob> {
+        return createByEnvHelper<IDataSource<Blob>>(env, () => new BlobDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new BlobMockDataSource());
     }
 }
