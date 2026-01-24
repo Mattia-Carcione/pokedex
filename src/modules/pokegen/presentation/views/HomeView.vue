@@ -27,8 +27,8 @@
         <Loader />
     </template>
 
-    <template v-if="pkmByGenController.data.value && !pkmByGenController.isLoading.value">
-        <template v-if="pkmByGenController.data.value instanceof HomeViewModel && pkmByGenController.data.value.pokemon">
+    <template v-if="pkmByGenController.data.value && pkmByGenController.data.value.pokemon">
+        <template v-if="pkmByGenController.data.value instanceof HomeViewModel && pkmByGenController.data.value.pokemon.length > 0">
             <CustomSection>
                 <Card :card="pkm" v-for="pkm in pkmByGenController.data.value.pokemon" :key="pkm.id" />
             </CustomSection>
@@ -39,7 +39,6 @@
                 No Pokémon found for this generation.
             </h2>
         </template>
-        
     </template>
 
     <template v-if="pkmByGenController.error.value">

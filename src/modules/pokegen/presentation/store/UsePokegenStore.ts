@@ -17,24 +17,20 @@ export const usePokegenStore = defineStore('pokegen', {
     actions: {
         /**
          * Recupera i dati della generazione dei Pokémon utilizzando il caso d'uso fornito.
-         * @param GetPokemonUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
+         * @param getPokemonUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
          * @returns Una promessa che risolve quando i dati sono stati recuperati
          * @throws Error se il recupero dei dati fallisce
          */
         async ensureLoaded(
-            GetPokemonUseCase: IGetPokemonUseCase | IGetPokemonDetailUseCase,
+            getPokemonUseCase: IGetPokemonUseCase | IGetPokemonDetailUseCase,
             input: { endpoint: string, req: TypeRequestEnum }
         ): Promise<void> {
-            this.loading = true;
-            this.error = null;
+            this.setInit();
             try {
-                const response = await GetPokemonUseCase.execute(input.endpoint);
-                if(response.success && response.data)
-                    this.pokemon = response.data || null;
-                else if(response.success && !response.data) {
-                    this.pokemon = null;
-                    this.error = new Error("Pokemon data not found.");
-                }
+                const response = await getPokemonUseCase.execute(input.endpoint);
+                if(response.success)
+                    this.pokemon = response.data;
+
                 else {
                     this.error = response.error;
                     this.pokemon = null;
@@ -45,6 +41,16 @@ export const usePokegenStore = defineStore('pokegen', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        /**
+         * Imposta lo stato iniziale dello store.
+         */
+        setInit() {
+            this.pokemon = null;
+            this.error = null;
+            this.typeRequest = null;
+            this.loading = true;
         }
     }
 });

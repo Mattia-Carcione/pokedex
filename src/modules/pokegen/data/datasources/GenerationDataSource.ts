@@ -25,10 +25,10 @@ export class GenerationDataSource implements IDataSource<GenerationDto> {
      * @returns Una promessa che risolve i dati della generazione tipizzati come GenerationDto
      * @throws ExternalServiceUnavailableError se il servizio esterno non è disponibile o si verifica un errore durante il recupero dei dati
      */
-    async fetchData(endpoint: string): Promise<GenerationDto> {
+    async fetchData(endpoint: string, options?: { signal?: AbortSignal }): Promise<GenerationDto> {
         try {
             endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
-            const response = await this.httpClient.get<GenerationDto>(endpoint);
+            const response = await this.httpClient.get<GenerationDto>(endpoint, options);
             this.logger.debug("[GenerationDataSource] - Dati della generazione recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {

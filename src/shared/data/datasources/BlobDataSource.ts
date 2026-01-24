@@ -23,11 +23,9 @@ export class BlobDataSource implements IDataSource<Blob> {
      * @returns I dati Blob recuperati dall'endpoint
      * @throws ExternalServiceUnavailableError se il servizio esterno non è disponibile
      */
-    async fetchData(endpoint: string): Promise<Blob> {
+    async fetchData(endpoint: string, options?: { signal?: AbortSignal, responseType?: 'blob' }): Promise<Blob> {
         try {
-            const response = await this.httpClient.get<Blob>(endpoint, {
-                responseType: 'blob',
-            });
+            const response = await this.httpClient.get<Blob>(endpoint, options);
             return response;
         } catch (error) {
             this.logger.error(this.message + (error as Error).message);

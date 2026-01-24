@@ -26,11 +26,11 @@ export class PokemonDataSource implements IDataSource<PokemonDto> {
      * 
      * @throws ExternalServiceUnavailableError se il recupero dei dati fallisce
      */
-    async fetchData(endpoint: string): Promise<PokemonDto> {
+    async fetchData(endpoint: string, options?: { signal?: AbortSignal }): Promise<PokemonDto> {
         try {
             endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
             endpoint = endpoint.replace(EndpointApi.PokemonSpecies, EndpointApi.Pokemon);
-            const response = await this.httpClient.get<PokemonDto>(endpoint);
+            const response = await this.httpClient.get<PokemonDto>(endpoint, options);
             this.logger.debug("Dati del Pokémon recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {

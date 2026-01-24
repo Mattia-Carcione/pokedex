@@ -4,7 +4,9 @@ import { AxiosClientFactory } from "@/infrastructure/http/client/axios/AxiosClie
 import { BASE_API_URL } from "@/core/costants/BaseApiUrl";
 import { HttpErrorMapper } from "@/infrastructure/http/mappers/HttpErrorMapper";
 import { RetryEnum } from "@/infrastructure/http/enums/RetryEnum";
-import { Logger } from "@/infrastructure/logger/Logger";import { PokegenContainer } from "./pokegen/PokegenContainer";
+import { Logger } from "@/infrastructure/logger/Logger";
+import { PokegenContainer } from "./pokegen/PokegenContainer";
+import { BlobContainer } from "@/shared/factories/BlobContainer";
 
 /**
  * Container per la gestione delle dipendenze dell'applicazione PokéGen.
@@ -12,6 +14,7 @@ import { Logger } from "@/infrastructure/logger/Logger";import { PokegenContaine
 class AppContainer {
     readonly generationController: () => IUseControllerBase;
     readonly pokemonController: () =>IUseControllerBase;
+    readonly blobController: IUseControllerBase;
 
     constructor(env: EnvironmentEnum) {
       // --- LOGGERS ---
@@ -29,9 +32,11 @@ class AppContainer {
       const httpMapper = new HttpErrorMapper(logger);
 
       const { generationController, pokemonController } = PokegenContainer.build(env, {httpClient, httpMapper, logger});
-
+      const { blobController } = BlobContainer.build(env, {httpClient, httpMapper, logger});
+      
       this.generationController = generationController;
       this.pokemonController = pokemonController;
+      this.blobController = blobController;
     }
 }
 

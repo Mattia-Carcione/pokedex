@@ -5,5 +5,5 @@ export abstract class IUseControllerBase {
     /**
      * Gestisce la richiesta della UI.
      */
-    abstract loadData(input?: any): Promise<void>;
+    abstract loadData(input?: any): Promise<any>;
 }

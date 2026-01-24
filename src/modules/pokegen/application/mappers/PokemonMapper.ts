@@ -5,6 +5,7 @@ import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokemonAggregateData } from "../../data/models/types/PokemonAggregateData";
 import { PokemonDto } from "../../data/models/dtos/PokemonDto";
 import { PokemonSpeciesDto } from "../../data/models/dtos/PokemonSpeciesDto";
+import { DEFAUL_IMAGE } from "@/app/const";
 
 /**
  * Mapper per convertire i dati del Pokémon dal Dto al dominio.
@@ -17,7 +18,7 @@ export class PokemonMapper implements IPokemonMapper {
      * @param Dto - L'oggetto PokemonDto da convertire.
      * @returns L'entità Pokemon corrispondente.
      */
-    map(Dto :PokemonAggregateData, blob: Blob) : Pokemon {
+    map(Dto :PokemonAggregateData) : Pokemon {
         const { pokemon, species, evolutions, forms } = Dto;
 
         if (!pokemon.id || !pokemon.name || !pokemon.types || !pokemon.sprites || !pokemon.weight || !pokemon.height || !pokemon.stats) {
@@ -32,10 +33,10 @@ export class PokemonMapper implements IPokemonMapper {
                 pokemon.id,
                 pokemon.species.name,
                 types.sort((a, b) => a.slot - b.slot),
-                blob,
                 pokemon.height,
                 pokemon.weight,
-                pokemon.stats.map(s => ({ name: s.stat.name, base: s.base_stat }))
+                pokemon.stats.map(s => ({ name: s.stat.name, base: s.base_stat })),
+                pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE
             );
 
             if(species)

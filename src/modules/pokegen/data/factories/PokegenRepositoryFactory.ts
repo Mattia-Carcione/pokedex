@@ -29,7 +29,6 @@ export class PokegenRepositoryFactory {
         PokeApiResponseDataSource: IDataSource<PokeApiResponseDto>;
         pokemonDataSource: IDataSource<PokemonDto>;
         pokemonSpeciesDataSource: IDataSource<PokemonSpeciesDto>;
-        blobDataSource: IDataSource<Blob>,
         generationMapper: IGenerationMapper;
         pokemonMapper: IPokemonMapper;
         logger: ILogger;
@@ -40,7 +39,6 @@ export class PokegenRepositoryFactory {
                     deps.generationDataSource, 
                     deps.PokeApiResponseDataSource, 
                     deps.pokemonDataSource, 
-                    deps.blobDataSource,
                     deps.generationMapper, 
                     deps.pokemonMapper, 
                     deps.logger

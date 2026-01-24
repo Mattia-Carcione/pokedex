@@ -23,7 +23,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
         try {
             return {
                 stats: source.stats,
-                sprite: URL.createObjectURL(source.sprite),
+                sprite: source.sprite,
                 height: MathHelper.formatDecimeterValue(source.height),
                 weight: MathHelper.formatDecimeterValue(source.weight),
                 pokedexNumber: source.id.toString().padStart(3, '0'),

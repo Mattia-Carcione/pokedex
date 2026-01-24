@@ -6,12 +6,12 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 
 ## Caratteristiche
 - Navigazione per generazione (`/generation/:id`) con elenco ordinato di Pokémon.
-- Pagina dettaglio Pokémon (`/pokemon/:name`) **completata** con dati specie, descrizioni e caratteristiche.
+- Pagina dettaglio Pokémon (`/pokemon/:name`) **in sviluppo**: controller e mapper sono pronti, l'UI è ancora in costruzione.
 - Stato centralizzato con Pinia e controller/use-case che orchestrano repository e store.
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
 - Mock data locali in `assets/mock_data` utilizzati in modalità development.
-- Dependency Injection tramite `AppContainer` per gestione delle dipendenze.
-- Immagini di default SVG per Pokémon senza artwork ufficiale.
+- Dependency Injection tramite `AppContainer` e container feature-specific (PokéGen, Blob) per la gestione delle dipendenze.
+- Sprite ufficiali scaricati come Blob tramite controller dedicato, con skeleton e fallback SVG per artwork mancanti.
 
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
@@ -85,15 +85,17 @@ Feature PokéGen organizzata in sotto-layer:
 - `factories/`: Factory per controller
 
 ### Shared Layer (`src/shared/`)
-Componenti e logica riutilizzabili:
-- `presentation/`: Componenti Vue condivise (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
-- `data/`: Logica di data layer riutilizzabile
-- `factories/`: Factory condivise
+Componenti e logica riutilizzabili (usati trasversalmente da più feature):
+- `application/`: Use case condivisi (`GetBlobUseCase`)
+- `domain/`: Interfacce (`IBlobRepository`, `IGetBlobUseCase`)
+- `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`
+- `presentation/`: Componenti Vue condivise (`404View`, `Loader`, `CustomSection`, `ScrollToTop`) e `UseBlobController` per recupero sprite/asset
+- `factories/`: `BlobContainer`, `DataSourceFactory` per scegliere datasource (API/mock) in base all'ambiente
 
 ## Rotte
 - `/` – Home (redirect a `/generation/1`)
 - `/generation/:id` – Lista Pokémon di una generazione specifica
-- `/pokemon/:name` – Dettaglio Pokémon **completato** ✅
+- `/pokemon/:name` – Dettaglio Pokémon (UI in sviluppo, dati già esposti dal controller)
 - `/:pathMatch(.*)*` – Pagina 404 personalizzata
 
 ## Avvio rapido
@@ -115,15 +117,16 @@ npm run test:coverage # report coverage
 ```
 
 ## Dependency Injection (AppContainer)
-Il `AppContainer` + `PokegenContainer` inizializzano tutte le dipendenze dell'applicazione:
+Il `AppContainer` + `PokegenContainer` + `BlobContainer` inizializzano tutte le dipendenze dell'applicazione:
 
 1. **Infrastructure**: `AxiosClientFactory`, `HttpErrorMapper`, `Logger`
 2. **Mappers**: `GenerationMapper`, `PokemonMapper`, `NavbarMapper`, `PokemonViewMapper`
-3. **Factories**: `PokegenDataSourceFactory`, `PokegenRepositoryFactory`, `PokegenControllerFactory`
-4. **DataSources**: Seleziona datasource (API o mock) in base all'`EnvironmentEnum`
-5. **Repositories**: `GenerationRepository`, `PokemonRepository` con facade per datasource e mapper
-6. **Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`
-7. **Controllers**: `UseGenerationController`, `UsePokemonController`
+3. **PokéGen Factories**: `PokegenDataSourceFactory`, `PokegenRepositoryFactory`, `PokegenControllerFactory`
+4. **PokéGen DataSources**: Seleziona datasource (API o mock) in base all'`EnvironmentEnum`
+5. **PokéGen Repositories**: `GenerationRepository`, `PokemonRepository` con facade per datasource e mapper
+6. **PokéGen Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`
+7. **PokéGen Controllers**: `UseGenerationController`, `UsePokemonController`
+8. **Blob pipeline**: `DataSourceFactory` (API/mock) → `BlobRepository` → `GetBlobUseCase` → `UseBlobController` per caricare sprite e asset binari
 
 ```typescript
 // Esempio utilizzo in un componente Vue
@@ -157,7 +160,7 @@ src/
     EnvironmentEnum.ts               # Enum ambienti
   core/
     contracts/                       # Interfacce astratte
-    constants/                       # BASE_API_URL
+    costants/                        # BASE_API_URL
     domain/                          # Result<T, E>
     enums/                           # ApplicationErrorCode
     errors/                          # Custom errors
@@ -196,9 +199,20 @@ src/
         viewmodels/                  # HomeViewModel, DetailViewModel
         views/                       # HomeView, DetailView
   shared/
-    presentation/                    # Componenti Vue riutilizzabili
-    data/                            # Logica data condivisa
-    factories/                       # Factory condivise
+    application/
+      usecases/                      # GetBlobUseCase
+    data/
+      datasources/                   # BlobDataSource (API), BlobMockDataSource (mock)
+      factories/                     # DataSourceFactory (seleziona API/mock)
+      repositories/                  # BlobRepository
+    domain/
+      repositories/                  # IBlobRepository
+      usecases/                      # IGetBlobUseCase
+    presentation/
+      components/                    # Loader, 404View, CustomSection, ScrollToTop
+      contorllers/                   # UseBlobController
+      viewmodels/                    # ViewModel condivisi
+    factories/                       # BlobContainer
 assets/
   mock_data/                         # Dati JSON mock
 public/
@@ -223,6 +237,5 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ Lista Pokémon per generazione con card dettagliate  
 ✅ Cache persistente e retry strategy  
 ✅ Clean Architecture con DI modulare  
-✅ Immagini di fallback SVG per artwork mancanti  
-✅ Tutti gli datasource e repository completati
-🚧 **Pagina dettaglio Pokémon in sviluppo** 
+✅ Immagini di fallback SVG per artwork mancanti e sprite caricati via BlobController  
+🚧 **Pagina dettaglio Pokémon**: logica dati pronta, UI da completare

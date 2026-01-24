@@ -7,5 +7,5 @@ export interface IHttpClient {
      * @param url - L'URL a cui effettuare la richiesta GET.
      * @returns Una promessa che risolve i dati della risposta tipizzati come T.
      */
-    get<T>(url: string, options?: any): Promise<T>;
+    get<T>(url: string, options?: { signal?: AbortSignal, responseType?: string }): Promise<T>;
 }

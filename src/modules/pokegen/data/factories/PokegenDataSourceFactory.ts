@@ -1,6 +1,6 @@
 import { EnvironmentEnum } from "@/app/EnvironmentEnum";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { createByEnvHelper } from "@/core/utils/factories/CreateByEnvHelper";
+import { FactoryHelper } from "@/core/utils/factories/FactoryHelper";
 import { PokemonDataSource } from "../datasources/PokemonDataSource";
 import { PokemonMockDataSource } from "../datasources/mock/PokemonMockDataSource";
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
@@ -48,18 +48,18 @@ export class PokegenDataSourceFactory {
     }
 
     private static createPokemonDataSource(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<PokemonDto> {
-        return createByEnvHelper<IDataSource<PokemonDto>>(env, () => new PokemonDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokemonMockDataSource());
+        return FactoryHelper.createByEnvHelper<IDataSource<PokemonDto>>(env, () => new PokemonDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokemonMockDataSource());
     }
 
     private static createPokemonSpeciesDataSource(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<PokemonSpeciesDto> {
-        return createByEnvHelper<IDataSource<PokemonSpeciesDto>>(env, () => new PokemonSpeciesDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokemonSpeciesMockDataSource());
+        return FactoryHelper.createByEnvHelper<IDataSource<PokemonSpeciesDto>>(env, () => new PokemonSpeciesDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokemonSpeciesMockDataSource());
     }
 
     private static createGenerationDataSource(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<GenerationDto> {
-        return createByEnvHelper<IDataSource<GenerationDto>>(env, () => new GenerationDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new GenerationMockDataSource());
+        return FactoryHelper.createByEnvHelper<IDataSource<GenerationDto>>(env, () => new GenerationDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new GenerationMockDataSource());
     }
     
     private static createPokeApiResponseDataSource(env: EnvironmentEnum, deps: { httpClient: IHttpClient, httpMapper: IHttpErrorMapper, logger: ILogger }): IDataSource<PokeApiResponseDto> {
-        return createByEnvHelper<IDataSource<PokeApiResponseDto>>(env, () => new PokeApiResponseDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokeApiResponseMockDataSource());
+        return FactoryHelper.createByEnvHelper<IDataSource<PokeApiResponseDto>>(env, () => new PokeApiResponseDataSource(deps.httpClient, deps.httpMapper, deps.logger), () => new PokeApiResponseMockDataSource());
     }
  }

@@ -1,7 +1,8 @@
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
-import { AxiosInstance, AxiosRequestConfig } from "axios";
+import { AxiosInstance } from "axios";
 import { HttpAxiosError } from "./errors/HttpAxiosError";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
+import { AxiosCustomRequestConfig } from "./types/AxiosCutsomRequestConfig";
 
 
 /**
@@ -18,7 +19,7 @@ export class AxiosHttpClient implements IHttpClient {
      * @param url - L'URL della risorsa da recuperare.
      * @returns Una Promise che risolve con i dati della risposta.
      */
-    async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    async get<T>(url: string, config?: AxiosCustomRequestConfig): Promise<T> {
         try {
             const response = await this.client.get(url, config);
             this.logger.debug("[AxiosHttpClient] - Risposta della richiesta GET a " + url, response);

@@ -11,7 +11,6 @@ import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
  * Data source per ottenere la lista delle risorse delle generazioni di Pokémon.
  */
 export class PokeApiResponseDataSource implements IDataSource<PokeApiResponseDto> {
-        private readonly BASE_URL = EndpointApi.Generation;
     
         constructor(
             protected readonly httpClient: IHttpClient,
@@ -25,9 +24,10 @@ export class PokeApiResponseDataSource implements IDataSource<PokeApiResponseDto
          * 
          * @throws DataSourceError se il recupero dei dati fallisce
          */
-        async fetchData(): Promise<PokeApiResponseDto> {
+        async fetchData(endpoint?: string, options?: { signal?: AbortSignal }): Promise<PokeApiResponseDto> {
             try {
-                const response = await this.httpClient.get<PokeApiResponseDto>(this.BASE_URL);
+                endpoint = endpoint ?? EndpointApi.Generation;
+                const response = await this.httpClient.get<PokeApiResponseDto>(endpoint, options);
                 return response;
             } catch (error) {
                 if(error instanceof HttpError)

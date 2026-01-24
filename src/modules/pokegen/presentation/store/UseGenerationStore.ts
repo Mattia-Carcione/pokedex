@@ -14,24 +14,20 @@ export const useGenerationStore = defineStore('generation', {
     actions: {
         /**
          * Recupera i dati della generazione dei Pokémon utilizzando il caso d'uso fornito.
-         * @param GetGenerationUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
+         * @param getGenerationUseCase - Il caso d'uso per ottenere i dati della generazione dei Pokémon
          * @returns Una promessa che risolve quando i dati sono stati recuperati
          * @throws Error se il recupero dei dati fallisce
          */
         async ensureLoaded(
-            GetGenerationUseCase: IGetGenerationUseCase,
+            getGenerationUseCase: IGetGenerationUseCase,
         ): Promise<void> {
-            this.loading = true;
-            this.error = null;
+            this.setInit();
             try {
-                const response = await GetGenerationUseCase.execute();
+                const response = await getGenerationUseCase.execute();
                 const data = response.data;
-                if(response.success && data)
+                if(response.success)
                     this.generationData = data || null;
-                else if(response.success && !data) {
-                    this.generationData = null;
-                    this.error = new Error("Generation data not found.");
-                }
+
                 else {
                     this.error = response.error;
                     this.generationData = null;
@@ -41,6 +37,15 @@ export const useGenerationStore = defineStore('generation', {
             } finally {
                 this.loading = false;
             }
+        },
+
+        /**
+         * Imposta lo stato iniziale dello store.
+         */
+        setInit() {
+            this.error = null;
+            this.generationData = null;
+            this.loading = true;
         }
     }
 });

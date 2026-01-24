@@ -7,5 +7,5 @@ export interface IDataSource<T> {
      * @param endpoint - L'endpoint da cui recuperare i dati.
      * @returns Una promessa che risolve i dati tipizzati come T.
     */
-    fetchData(endpoint?: string): Promise<T>;
+    fetchData(endpoint?: string, options?: { signal?: AbortSignal, responseType?: string }): Promise<T>;
 }

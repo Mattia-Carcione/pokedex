@@ -10,12 +10,12 @@ export class Pokemon {
         public readonly id: number,
         public readonly name: string,
         public readonly types: { slot: number; name: string; url: string; }[],
-        public readonly sprite: Blob,
         public readonly height: number,
         public readonly weight: number,
         public readonly stats: { name: string; base: number }[],
+        public readonly sprite: string,
     ) {};
-
+    
     public genderRate?: number;
     public flavorText?: { version: string; text: string }[];
     public captureRate?: number;

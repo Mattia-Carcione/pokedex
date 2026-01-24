@@ -26,8 +26,8 @@ watch(() => props.name, async (newName) => {
             <ErrorView :error="pkmDetailController.error.value" />
         </template>
 
-        <template v-else-if="pkmDetailController.data.value && !pkmDetailController.isLoading.value">
-            <template v-if="pkmDetailController.data.value instanceof DetailViewModel && pkmDetailController.data.value.pokemon" >
+        <template v-else-if="pkmDetailController.data.value && pkmDetailController.data.value.pokemon">
+            <template v-if="pkmDetailController.data.value instanceof DetailViewModel && pkmDetailController.data.value.pokemon.length > 0" >
                 <!-- Detail view content goes here -->
             </template>
             

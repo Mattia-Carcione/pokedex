@@ -5,7 +5,6 @@ import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { PokeApiResponseDto } from "../models/dtos/PokeApiResponseDto";
 import { IGenerationMapper } from "../../application/mappers/contracts/IGenerationMapper";
 import { IPokemonMapper } from "../../application/mappers/contracts/IPokemonMapper";
-import { DEFAUL_IMAGE } from "@/app/const";
 import { GenerationDto } from "../models/dtos/GenerationDto";
 import { PokemonDto } from "../models/dtos/PokemonDto";
 
@@ -14,12 +13,11 @@ import { PokemonDto } from "../models/dtos/PokemonDto";
  */
 export class GenerationRepository implements IGenerationRepository {
     protected readonly className = "GenerationRepository";
-
+    
     constructor(
         private readonly generationDataSource: IDataSource<GenerationDto>,
         private readonly pokeApiResponseDataSource: IDataSource<PokeApiResponseDto>,
         private readonly pokemonDataSource: IDataSource<PokemonDto>,
-        private readonly blobDataSource: IDataSource<Blob>,
         private readonly generationMapper: IGenerationMapper,
         private readonly pokemonMapper: IPokemonMapper,
         private readonly logger: ILogger
@@ -36,12 +34,7 @@ export class GenerationRepository implements IGenerationRepository {
             const generation = this.generationMapper.map(data);
             const task = data.pokemon_species.map(async ({ url }) => {
                 const pokemon = await this.pokemonDataSource.fetchData(url);
-                const spriteUrl = pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE;
-                if(spriteUrl === DEFAUL_IMAGE) {
-                    this.logger.warn(`[${this.className}] - Immagine non disponibile per il Pokémon ${pokemon.name} (ID: ${pokemon.id}). Utilizzo dell'immagine di default.`);
-                }
-                const blob = spriteUrl === DEFAUL_IMAGE ? new Blob() : await this.blobDataSource.fetchData(spriteUrl);
-                return this.pokemonMapper.map({ pokemon }, blob);
+                return this.pokemonMapper.map({ pokemon });
             });
             const list = await Promise.all(task);
             generation.pokemon = list.sort((a, b) => a.id - b.id);

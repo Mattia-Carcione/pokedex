@@ -26,7 +26,6 @@ import { PokegenControllerFactory } from "@/modules/pokegen/presentation/factori
 import { PokegenControllerEnum } from "@/modules/pokegen/presentation/enums/PokegenControllerEnum";
 import { PokegenPresentationMapperEnum } from "@/modules/pokegen/presentation/enums/PokegenPresentationMapperEnum";
 import { PokegenPresentationMapperFactory } from "@/modules/pokegen/presentation/factories/PokegenPresentationMapperFactory";
-import { DataSourceFactory } from "@/shared/factories/DataSourceFactory";
 
 /**
  * Classe statica per la creazione dei controller della feature pokegen.
@@ -76,10 +75,8 @@ export class PokegenContainer {
         const PokeApiResponseDataSource = PokegenDataSourceFactory
             .create<PokegenDataSourceTypesEnum.PokeApiResponse>(env, PokegenDataSourceTypesEnum.PokeApiResponse, deps);
 
-        const blobDataSource = DataSourceFactory.create(env, deps);
-
         // --- REPOSITORIES ---
-        const repositoryInput = { generationDataSource, PokeApiResponseDataSource, pokemonDataSource, pokemonSpeciesDataSource, blobDataSource, generationMapper, pokemonMapper, logger: deps.logger };
+        const repositoryInput = { generationDataSource, PokeApiResponseDataSource, pokemonDataSource, pokemonSpeciesDataSource, generationMapper, pokemonMapper, logger: deps.logger };
 
         const generationRepository = PokegenRepositoryFactory
             .create(PokegenRepositoryEnum.Generation, repositoryInput) as IGenerationRepository;

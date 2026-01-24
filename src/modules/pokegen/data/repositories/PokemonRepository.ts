@@ -16,7 +16,7 @@ export class PokemonRepository implements IPokemonRepository {
     constructor(
         private readonly dataSource: IDataSource<PokemonDto>,
         private readonly speciesDataSource: IDataSource<PokemonSpeciesDto>,
-        private readonly mapper: IMapper<PokemonAggregateData, Pokemon>,
+        private readonly pokemonMapper: IMapper<PokemonAggregateData, Pokemon>,
         private readonly logger: ILogger
     ) { }
 
@@ -30,20 +30,24 @@ export class PokemonRepository implements IPokemonRepository {
      */
     async getAsync(endpoint: string): Promise<Pokemon> {
         try {
-            const data = await this.dataSource.fetchData(endpoint);
-            this.logger.debug(`[${this.className}] - Dati del Pokémon recuperati con successo da: ${endpoint}`, data);
-            return this.mapper.map({ pokemon: data });
+            const pokemon = await this.dataSource.fetchData(endpoint);
+            return this.pokemonMapper.map({ pokemon });
         } catch (error) {
             this.logger.error(`[${this.className}] - Errore nel recupero dei dati del Pokémon da: ${endpoint}`, (error as Error).message);
             throw error;
         }
     }
 
+    /**
+     * Recupera i dettagli completi di un Pokémon specifico.
+     * @param name - Il nome del Pokémon di cui recuperare i dettagli
+     * @returns Una promessa che risolve l'entità Pokemon con i dettagli completi
+     */
     async getDetailAsync(name: string): Promise<Pokemon> {
         try {
             const pokemon = await this.dataSource.fetchData(name);
             const species = await this.speciesDataSource.fetchData(name);
-            return this.mapper.map({ pokemon, species});
+            return this.pokemonMapper.map({ pokemon, species });
         } catch (error) {
             this.logger.error(`[${this.className}] - Errore nel recupero dei dettagli del Pokémon: ${name}`, (error as Error).message);
             throw error;

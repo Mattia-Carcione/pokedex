@@ -54,6 +54,8 @@ export class UsePokemonController extends IUseControllerBase {
 
     /**
      * Gestisce la richiesta di generazione dei Pokémon.
+     * @param input Input contenente l'endpoint e il tipo di richiesta.
+     * @returns Una Promise che si risolve quando i dati sono stati caricati.
      */
     async loadData(input: { endpoint: string, req: TypeRequestEnum }): Promise<void> {
         this.logger.debug("[UsePokemonController] - Caricamento dei dati del Pokémon per: ", input);
@@ -63,6 +65,12 @@ export class UsePokemonController extends IUseControllerBase {
             await this.store.ensureLoaded(this.useCase, input);
     }
 
+    /**
+     * Mappa i dati recuperati in base al tipo di richiesta.
+     * @param req Tipo di richiesta (HOME o DETAIL).
+     * @param data Dati dei Pokémon da mappare.
+     * @returns I dati mappati come HomeViewModel, DetailViewModel o un array vuoto.
+     */
     private mapData(req: TypeRequestEnum, data: Pokemon[]): HomeViewModel | never[] | DetailViewModel {
         switch(req) {
             case TypeRequestEnum.HOME:

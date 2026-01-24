@@ -25,10 +25,10 @@ export class PokemonSpeciesDataSource implements IDataSource<PokemonSpeciesDto> 
      * 
      * @throws DataSourceError se il recupero dei dati fallisce
      */
-    async fetchData(endpoint: string): Promise<PokemonSpeciesDto> {
+    async fetchData(endpoint: string, options?: { signal?: AbortSignal }): Promise<PokemonSpeciesDto> {
         try {            
             endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
-            const response = await this.httpClient.get<PokemonSpeciesDto>(endpoint);
+            const response = await this.httpClient.get<PokemonSpeciesDto>(endpoint, options);
             this.logger.debug("Dati del Pokémon recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {
