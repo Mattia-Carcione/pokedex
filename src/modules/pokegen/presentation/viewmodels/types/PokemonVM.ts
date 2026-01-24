@@ -2,6 +2,7 @@
  * ViewModel rappresentante un Pokémon.
  */
 export interface PokemonVM {
+    id: string;
     sprite: string;
     height: number;
     weight: number;

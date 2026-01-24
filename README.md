@@ -11,7 +11,8 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
 - Mock data locali in `assets/mock_data` utilizzati in modalità development.
 - Dependency Injection tramite `AppContainer` e container feature-specific (PokéGen, Blob) per la gestione delle dipendenze.
-- Sprite ufficiali scaricati come Blob tramite controller dedicato, con skeleton e fallback SVG per artwork mancanti.
+- Sprite ufficiali scaricati come Blob tramite controller dedicato, con lazy loading via Intersection Observer, skeleton e fallback SVG per artwork mancanti.
+- Composable `useIntersectionObserver` per ottimizzare il caricamento delle immagini (lazy load).
 
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
@@ -89,7 +90,10 @@ Componenti e logica riutilizzabili (usati trasversalmente da più feature):
 - `application/`: Use case condivisi (`GetBlobUseCase`)
 - `domain/`: Interfacce (`IBlobRepository`, `IGetBlobUseCase`)
 - `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`
-- `presentation/`: Componenti Vue condivise (`404View`, `Loader`, `CustomSection`, `ScrollToTop`) e `UseBlobController` per recupero sprite/asset
+- `presentation/`:
+  - `components/`: Componenti Vue riutilizzati (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
+  - `composables/`: Vue composable (`useIntersectionObserver` per lazy loading ottimizzato)
+  - `contorllers/`: `UseBlobController` per orchestrazione recupero sprite/asset
 - `factories/`: `BlobContainer`, `DataSourceFactory` per scegliere datasource (API/mock) in base all'ambiente
 
 ## Rotte
@@ -210,6 +214,7 @@ src/
       usecases/                      # IGetBlobUseCase
     presentation/
       components/                    # Loader, 404View, CustomSection, ScrollToTop
+      composables/                   # useIntersectionObserver per lazy loading
       contorllers/                   # UseBlobController
       viewmodels/                    # ViewModel condivisi
     factories/                       # BlobContainer

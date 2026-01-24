@@ -22,6 +22,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
     map(source: Pokemon): PokemonVM {
         try {
             return {
+                id: source.id.toString(),
                 stats: source.stats,
                 sprite: source.sprite,
                 height: MathHelper.formatDecimeterValue(source.height),

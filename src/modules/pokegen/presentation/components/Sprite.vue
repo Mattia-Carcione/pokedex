@@ -1,22 +1,41 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import { appContainer } from '@/app/di/AppContainer';
 import Skeleton from './Skeleton.vue';
+import { useIntersectionObserver } from '@/shared/presentation/composables/UseIntersectionObserver';
 
-const { pkm, class: className } = defineProps(['pkm', 'class']);
-const controller = appContainer.blobController;
-const sprite = await controller.loadData(pkm.sprite);
-const img = URL.createObjectURL(sprite);
+const { pkm, className } = defineProps(['pkm', 'className']);
 const style = className ?? 'w-[50px] h-[50px] md:h-[90px] md:w-[90px]';
+
+const controller = appContainer.blobController;
+const img = ref(null);
+const loaded = ref(false);
+const element = ref(null);
+
+const loadImage = async () => {
+    if (img.value) return;
+    try {
+        const blob = await controller.loadData(pkm.sprite);
+        img.value = URL.createObjectURL(blob);
+    } catch (e) {
+        console.error('Error loading sprite image:', e);
+    }
+};
+
+useIntersectionObserver(
+    element,
+    async () => {
+        await loadImage();
+    },
+    { threshold: 0.1 }
+);
 
 </script>
 
 <template>
-    <div :class="style" class="flex justify-center-safe items-center bg-amber-50/50 rounded-full"
+    <div ref="element" :class="`${style} flex justify-center-safe items-center bg-amber-50/50 rounded-full`"
         aria-label="Sprite del Pokémon">
-        <Skeleton :class="style" />
-        <img v-if="sprite" :class="style" class="z-10 object-cover opacity-0 transition-opacity duration-300" :src="img"
-            :alt="`Sprite ufficiale di ${pkm.name}`" loading="lazy"
-            onload="this.previousElementSibling.style.display='none'; this.style.opacity='1';" />
+        <Skeleton v-if="!loaded" :class="style" />
+        <img v-if="img" :src="img" :alt="`Sprite ufficiale di ${pkm.name}`" :class="`${style} z-10 object-cover transition-opacity duration-300`" :style="{ opacity: loaded ? 1 : 0 }" loading="lazy" @load="loaded = true" />
     </div>
 </template>
