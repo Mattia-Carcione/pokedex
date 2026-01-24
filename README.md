@@ -17,7 +17,7 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
 - **HTTP Client**: Axios con interceptor personalizzati (retry, cache)
-- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL)
+- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + Memory Cache in-app con TTL configurabile tramite `fetchWithMemoryCache`
 - **Styling**: Tailwind 4
 - **Testing**: Vitest + @vue/test-utils
 - **TypeScript**: Supporto completo con tsconfig
@@ -36,7 +36,10 @@ Contiene le regole di business indipendenti dal framework:
 
 ### Infrastructure Layer (`src/infrastructure/`)
 Implementazioni concrete delle interfacce core:
-- `cache/`: Gestione cache IndexedDB con `CacheDb` e `CacheKeyFactory`
+- `cache/`: Gestione cache con:
+  - `CacheDb` e `CacheKeyFactory` per IndexedDB (90 giorni TTL)
+  - `CacheHelper` con `fetchWithMemoryCache` per cache in-app (default 1h TTL, configurabile)
+  - Tipi: `CachedItem<T>`, `CacheMap<T>`, `CachedResponse`, `CacheRequestConfig`
 - `http/`: Client HTTP Axios con:
   - `client/axios/`: `AxiosHttpClient`, `AxiosClientFactory`, interceptor (retry, cache)
   - `config/`: Configurazioni di default per retry e jitter
@@ -139,11 +142,14 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
 ```
 
 ## Cache e Retry Strategy
-- **Cache**: IndexedDB con TTL 90 giorni, chiavi generate da `CacheKeyFactory`
+- **Cache IndexedDB**: TTL 90 giorni, chiavi generate da `CacheKeyFactory`
+- **Memory Cache**: TTL configurabile (default 1 ora), helper `fetchWithMemoryCache` negli store Pinia
+  - `UseGenerationStore`: cache memory per generazioni
+  - `UsePokegenStore`: cache memory per Pokémon (home e detail)
 - **Retry**: Exponential backoff con jitter (full, equal, decorrelated)
   - 3 tentativi di default con delay iniziale 1000ms
   - Retry su errori transitori (429, 500, 503, 504) e errori di rete
-- **Interceptor**: Request (cache read) e Response (cache write, retry logic)
+- **Interceptor**: Request (cache read da IndexedDB) e Response (cache write su IndexedDB, retry logic)
 
 ## Struttura progetto completa
 ```
@@ -171,7 +177,11 @@ src/
     types/                           # Tipi comuni
     utils/                           # Utility pure
   infrastructure/
-    cache/                           # CacheDb, CacheKeyFactory
+    cache/
+      CacheDb.ts                     # Gestione IndexedDB
+      CacheKeyFactory.ts             # Generatore chiavi cache
+      helpers/                       # CacheHelper con fetchWithMemoryCache
+      types/                         # CachedItem, CacheMap, CachedResponse
     http/
       client/axios/                  # AxiosHttpClient, interceptor
       config/                        # HttpConfig

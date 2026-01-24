@@ -9,3 +9,10 @@ export interface CachedItem<T = any> {
     expiry: number; // Timestamp di scadenza (Date.now() + CACHE_LIFETIME_MS)
     cachedAt: number;
 }
+
+/**
+ * Mappa della cache, dove la chiave è una stringa e il valore è un CachedItem.
+ */
+export interface CacheMap<T> {
+  [key: string]: CachedItem<T>;
+}
