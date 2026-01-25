@@ -24,9 +24,9 @@ export class PokeApiResponseDataSource implements IDataSource<PokeApiResponseDto
          * 
          * @throws DataSourceError se il recupero dei dati fallisce
          */
-        async fetchData(endpoint?: string, options?: { signal?: AbortSignal }): Promise<PokeApiResponseDto> {
+        async fetchData(endpoint: string = EndpointApi.Generation, options?: { signal?: AbortSignal }): Promise<PokeApiResponseDto> {
+            this.logger.debug("[PokeApiResponseDataSource] - Inizio del recupero dei dati della lista delle risorse delle generazioni di Pokémon.");
             try {
-                endpoint = endpoint ?? EndpointApi.Generation;
                 const response = await this.httpClient.get<PokeApiResponseDto>(endpoint, options);
                 return response;
             } catch (error) {

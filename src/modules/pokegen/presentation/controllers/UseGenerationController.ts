@@ -22,7 +22,6 @@ export class UseGenerationController extends IUseControllerBase {
     get data() {
         return computed(() => {
             const data = this.store.generationData;
-            this.logger.debug("[UseGenerationController] - Dati della generazione: ", data);
             if(!data)
                 return [];
             return this.mapper.map(data);
@@ -42,7 +41,6 @@ export class UseGenerationController extends IUseControllerBase {
      * Recupera l'errore dallo store, se presente.
      */
     get error() {
-        this.logger.debug("[UseGenerationController] - Errore durante il recupero dei dati della generazione", this.store.error);
         return computed(() => this.store.error);
     }
 
@@ -51,5 +49,6 @@ export class UseGenerationController extends IUseControllerBase {
      */
     async loadData(): Promise<void> {
         await this.store.ensureLoaded(this.useCase);
+        this.logger.info("[UseGenerationController] - Generazione dei Pokémon caricata con successo.");
     }
 }

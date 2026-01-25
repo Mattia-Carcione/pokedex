@@ -19,12 +19,12 @@ export class PokemonMapper implements IPokemonMapper {
      * @returns L'entità Pokemon corrispondente.
      */
     map(Dto :PokemonAggregateData) : Pokemon {
+        this.logger.debug("[PokemonMapper] - Inizio della mappatura del Pokémon con ID: " + Dto.pokemon.id);
+
         const { pokemon, species, evolutions, forms } = Dto;
 
-        if (!pokemon.id || !pokemon.name || !pokemon.types || !pokemon.sprites || !pokemon.weight || !pokemon.height || !pokemon.stats) {
-            this.logger.error("[PokemonMapper] - Proprietà richieste mancanti: ", pokemon);
+        if (!pokemon.id || !pokemon.name || !pokemon.types || !pokemon.sprites || !pokemon.weight || !pokemon.height || !pokemon.stats)
             throw new MappingError<PokemonDto>("[PokemonMapper] - Error during Pokémon mapping: Missing required properties.", pokemon);
-        }
         
         try {
             const types = pokemon.types.map(t => ({ slot: t.slot, name: t.type.name, url: t.type.url }));
@@ -48,7 +48,6 @@ export class PokemonMapper implements IPokemonMapper {
 
             return entity;
         } catch (error) {
-            this.logger.error("[PokemonMapper] - Errore durante il mapping del Pokémon. " + (error as Error).message);
             throw new MappingError<PokemonAggregateData>("[PokemonMapper] - Error during Pokémon mapping", Dto, error as Error);
         }
     }
@@ -60,10 +59,10 @@ export class PokemonMapper implements IPokemonMapper {
      * @returns L'entità Pokemon aggiornata con i dati della specie.
      */
     private mapSpecies(pokemon: Pokemon, Dto: PokemonSpeciesDto): Pokemon {
-        if (!Dto.capture_rate || !Dto.genera || !Dto.generation || !Dto.flavor_text_entries) {
-            this.logger.error("[PokemonMapper] - Proprietà richieste mancanti in PokemonSpeciesDto: ", Dto);
+        this.logger.debug("[PokemonMapper] - Inizio della mappatura della specie del Pokémon con ID: " + pokemon.id);
+
+        if (!Dto.capture_rate || !Dto.genera || !Dto.generation || !Dto.flavor_text_entries)
             throw Error("[PokemonMapper] - Error during Pokémon Species mapping: Missing required properties.");
-        }
             
         try {
             pokemon.genus = Dto.genera.find((g: any) => g.language.name === "en")?.genus || "";
@@ -81,7 +80,6 @@ export class PokemonMapper implements IPokemonMapper {
             
             return pokemon;
         } catch (error) {
-            this.logger.error("[PokemonMapper] - Errore durante il mapping della specie del Pokémon. " + (error as Error).message);
             throw Error("[PokemonMapper] - Error during Pokémon Species mapping. " + (error as Error).message);
         }
     }

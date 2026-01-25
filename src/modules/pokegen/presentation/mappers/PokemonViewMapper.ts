@@ -20,6 +20,8 @@ export class PokemonViewMapper implements IPokemonViewMapper {
      * @throws MappingError se la mappatura fallisce
      */
     map(source: Pokemon): PokemonVM {
+        this.logger.debug(`[PokemonViewMapper] - Inizio della mappatura del Pokémon: ${source.name} (ID: ${source.id})`);
+
         try {
             return {
                 id: source.id.toString(),
@@ -37,7 +39,6 @@ export class PokemonViewMapper implements IPokemonViewMapper {
                 href: { name: AppRouteName.Pokemon, params: { name: source.name }},
             }
         } catch (error) {
-            this.logger.error("[PokemonViewMapper] - Errore durante la mappatura del Pokémon", (error as Error).message);
             throw new MappingError<Pokemon>("[PokemonViewMapper] - Error during mapping of Pokémon", source, error as Error);
         }
     }
@@ -49,6 +50,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
      * @throws MappingError se la mappatura fallisce
      */
     mapDetail(source: Pokemon): PokemonVM {
+        this.logger.debug("[PokemonViewMapper] - Inizio della mappatura del dettaglio del Pokémon");
         const pokemon = this.map(source);
         // TODO: Aggiungere ulteriori dettagli specifici per la vista dettaglio
         return pokemon;

@@ -18,15 +18,14 @@ export class GenerationMapper implements IGenerationMapper {
      * @throws MappingError se i dati del Dto sono incompleti o la mappatura fallisce
      */
     map(Dto: GenerationDto): Generation {
-        if (!Dto.id || !Dto.name) {
-            this.logger.error("[GenerationMapper] - Errore durante il mapping della generazione. Proprietà richieste mancanti: ", Dto);
+        this.logger.debug("[GenerationMapper] - Inizio della mappatura della generazione con ID: " + Dto.id);
+        
+        if (!Dto.id || !Dto.name)
             throw new MappingError<GenerationDto>("[GenerationMapper] - Error during generation mapping: missing required properties. ", Dto);
-        }
         
         try {
             return new Generation(Dto.id, Dto.name);
         } catch (error) {
-            this.logger.error("[GenerationMapper] - Errore durante il mapping della generazione. " + (error as Error).message);
             throw new MappingError<GenerationDto>("[GenerationMapper] - Error during generation mapping: ", Dto, error as Error);
         }
     }

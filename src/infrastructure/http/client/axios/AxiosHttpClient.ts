@@ -22,7 +22,6 @@ export class AxiosHttpClient implements IHttpClient {
     async get<T>(url: string, config?: AxiosCustomRequestConfig): Promise<T> {
         try {
             const response = await this.client.get(url, config);
-            this.logger.debug("[AxiosHttpClient] - Risposta della richiesta GET a " + url, response);
             return response.data;
         } catch (err) {
             this.logger.error("[AxiosHttpClient] - Errore nella richiesta GET a " + url + ": " + (err as Error).message);

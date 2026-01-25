@@ -12,7 +12,7 @@ export class Logger implements ILogger {
      * @param optionalParams Opzionali parametri aggiuntivi. 
      */
     info(message: string, ...optionalParams: any[]): void {
-        console.info(message, ...optionalParams);
+        console.info(`[INFO] ${message}`, ...optionalParams);
     }
 
     /**
@@ -21,7 +21,7 @@ export class Logger implements ILogger {
      * @param optionalParams Opzionali parametri aggiuntivi. 
      */
     warn(message: string, ...optionalParams: any[]): void {
-        console.warn(message, ...optionalParams);
+        console.warn(`[WARN] ${message}`, ...optionalParams);
     }
     /**
      * Logga un messaggio di errore.
@@ -29,7 +29,7 @@ export class Logger implements ILogger {
      * @param optionalParams Opzionali parametri aggiuntivi. 
      */
     error(message: string, ...optionalParams: any[]): void {
-        console.error(message, ...optionalParams);
+        console.error(`[ERROR] ${message}`, ...optionalParams);
     }
 
     /**
@@ -39,7 +39,7 @@ export class Logger implements ILogger {
      */
     debug(message: string, ...optionalParams: any[]): void {
         if(this.env === EnvironmentEnum.DEVELOPMENT)
-            console.debug(message, ...optionalParams);
+            console.debug(`[DEBUG] ${message}`, ...optionalParams);
     }
 
     /**
@@ -48,6 +48,6 @@ export class Logger implements ILogger {
      * @param optionalParams Opzionali parametri aggiuntivi. 
      */
     log(message: string, ...optionalParams: any[]): void {
-        console.log(message, ...optionalParams);
+        console.log(`[LOG] ${message}`, ...optionalParams);
     }
 }

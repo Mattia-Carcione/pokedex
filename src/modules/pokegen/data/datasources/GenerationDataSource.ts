@@ -6,13 +6,14 @@ import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { GenerationDto } from "../models/dtos/GenerationDto";
+import { checkEndpoint } from "@/core/utils/network/CheckEndpoint";
 
 /**
  * Data source per ottenere i dati delle generazioni Pokémon.
  */
 export class GenerationDataSource implements IDataSource<GenerationDto> {
     protected readonly BASE_URI = EndpointApi.Generation;
-    private readonly message = "[GenerationDataSource] - Errore nel recupero dei dati della generazione. ";
+
     constructor(
         protected readonly httpClient: IHttpClient,
         protected readonly httpErrorMapper: IHttpErrorMapper,
@@ -26,13 +27,14 @@ export class GenerationDataSource implements IDataSource<GenerationDto> {
      * @throws ExternalServiceUnavailableError se il servizio esterno non è disponibile o si verifica un errore durante il recupero dei dati
      */
     async fetchData(endpoint: string, options?: { signal?: AbortSignal }): Promise<GenerationDto> {
+        this.logger.debug("[GenerationDataSource] - Inizio del recupero dei dati della generazione con endpoint: " + endpoint);
+        
         try {
-            endpoint = endpoint.startsWith("http") ? endpoint : this.BASE_URI + endpoint;
+            endpoint = checkEndpoint(endpoint, this.BASE_URI, "[GenerationDataSource]", this.logger);
+
             const response = await this.httpClient.get<GenerationDto>(endpoint, options);
-            this.logger.debug("[GenerationDataSource] - Dati della generazione recuperati con successo da: " + endpoint, response);
             return response;
         } catch (error) {
-            this.logger.error(this.message + (error as Error).message);
             if(error instanceof HttpError)
                 this.httpErrorMapper.map(error);
 

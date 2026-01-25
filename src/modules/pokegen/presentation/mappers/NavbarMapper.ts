@@ -18,6 +18,8 @@ export class NavBarMapper implements INavbarMapper {
      * @throws MappingError se la mappatura fallisce
      */
     map(source: Generation[]): NavbarViewModel {
+        this.logger.debug(`[NavBarMapper] - Inizio della mappatura delle generazioni per la Navbar: ${source.map(g => g.version).join(", ")}`);
+
         try {
             const data = source.map(gen => {
                 return {
@@ -29,7 +31,6 @@ export class NavBarMapper implements INavbarMapper {
             });
             return new NavbarViewModel(data);
         } catch (error) {
-            this.logger.error("[NavBarMapper] - Errore durante la mappatura della generazione", (error as Error).message);
             throw new MappingError<Generation[]>("[NavBarMapper] - Error during mapping of generation", source, error as Error);
         }
     }

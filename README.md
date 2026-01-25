@@ -32,7 +32,11 @@ Contiene le regole di business indipendenti dal framework:
 - `enums/`: Enum condivisi (`ApplicationErrorCode`)
 - `errors/`: Errori applicativi custom (`NotFoundError`, `MappingError`, `UnauthorizedError`)
 - `types/`: Tipi comuni (`Base`, `NamedResource`, `Names`)
-- `utils/`: Utility pure (`MathHelper`, `delay`)
+- `utils/`: Utility pure e helper:
+  - `async/`: Funzioni asincrone (`delay`)
+  - `factories/`: `FactoryHelper` per istanziare classi in base all'ambiente
+  - `math/`: `MathHelper` per operazioni matematiche
+  - `network/`: Utility di rete per connectivity detection e request optimization
 
 ### Infrastructure Layer (`src/infrastructure/`)
 Implementazioni concrete delle interfacce core:

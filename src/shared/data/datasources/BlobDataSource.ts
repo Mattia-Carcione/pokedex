@@ -9,8 +9,6 @@ import { HttpError } from "@/infrastructure/http/errors/HttpError";
  * Data source per il recupero di dati Blob (ad esempio immagini) da un endpoint esterno.
  */
 export class BlobDataSource implements IDataSource<Blob> {
-    private readonly message = "[BlobDataSource] - Errore nel recupero dei dati dell'immagine. ";
-
     constructor(
         private readonly httpClient: IHttpClient,
         private readonly httpErrorMapper: IHttpErrorMapper,
@@ -24,12 +22,12 @@ export class BlobDataSource implements IDataSource<Blob> {
      * @throws ExternalServiceUnavailableError se il servizio esterno non è disponibile
      */
     async fetchData(endpoint: string, options?: { signal?: AbortSignal, responseType?: 'blob' }): Promise<Blob> {
+        this.logger.debug("[BlobDataSource] - Inizio del recupero dei dati dell'immagine da: " + endpoint);
+
         try {
             const response = await this.httpClient.get<Blob>(endpoint, options);
             return response;
         } catch (error) {
-            console.error(error);
-            this.logger.error(this.message + (error as Error).message);
             if(error instanceof HttpError)
                 this.httpErrorMapper.map(error);
 

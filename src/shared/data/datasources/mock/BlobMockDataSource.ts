@@ -1,6 +1,9 @@
 import { IDataSource } from "@/core/contracts/data/IDataSource";
+import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 export class BlobMockDataSource implements IDataSource<Blob> {
+    constructor(private readonly logger: ILogger) {}
+
     private className = "BlobMockDataSource";
 
     /**
@@ -11,7 +14,7 @@ export class BlobMockDataSource implements IDataSource<Blob> {
     async fetchData(url: string): Promise<Blob> {
         // Simula un piccolo delay per replicare il comportamento di una chiamata HTTP
         await new Promise(resolve => setTimeout(resolve, 10));
-        console.log(`[${this.className}] - fetchData chiamato con URL: ${url}`);
+        this.logger.debug(`[${this.className}] - fetchData chiamato con URL: ${url}`);
         // Simula il recupero di un Blob vuoto
         return new Blob();
     }

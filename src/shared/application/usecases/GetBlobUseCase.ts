@@ -18,11 +18,12 @@ export class GetBlobUseCase implements IGetBlobUseCase {
      * @returns Una Promise che risolve in un Result contenente il Blob o un errore.
      */
     async execute(input: string): Promise<Result<Blob, Error>> {
+        this.logger.debug("[GetBlobUseCase] - Esecuzione del use case per recuperare un blob da: " + input);
+        
         try {
             const blob = await this.blobRepository.getAsync(input);
             return new Result<Blob, Error>(true, blob, null);
         } catch (error) {
-            this.logger.error(`[GetBlobUseCase] - Error executing use case with input ${input}:`, error);
             return new Result<Blob, Error>(false, null, error as Error);
         }
     }

@@ -29,6 +29,8 @@ export class PokemonRepository implements IPokemonRepository {
      * @throws Error se il recupero o la mappatura dei dati fallisce
      */
     async getAsync(endpoint: string): Promise<Pokemon> {
+        this.logger.debug(`[${this.className}] - Inizio del recupero dei dati del Pokémon da: ${endpoint}`);
+
         try {
             const pokemon = await this.dataSource.fetchData(endpoint);
             return this.pokemonMapper.map({ pokemon });
@@ -44,6 +46,8 @@ export class PokemonRepository implements IPokemonRepository {
      * @returns Una promessa che risolve l'entità Pokemon con i dettagli completi
      */
     async getDetailAsync(name: string): Promise<Pokemon> {
+        this.logger.debug(`[${this.className}] - Inizio del recupero dei dettagli del Pokémon: ${name}`);
+        
         try {
             const pokemon = await this.dataSource.fetchData(name);
             const species = await this.speciesDataSource.fetchData(name);

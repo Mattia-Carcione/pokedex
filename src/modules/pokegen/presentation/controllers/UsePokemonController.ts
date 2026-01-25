@@ -28,7 +28,6 @@ export class UsePokemonController extends IUseControllerBase {
     get data(): ComputedRef<never[] | HomeViewModel | DetailViewModel> {
         return computed(() => {
             const data = this.store.pokemon;
-            this.logger.debug("[UsePokemonController] - Dati del Pokémon: ", data);
             if(!data || !this.store.typeRequest)
                 return [];
             return this.mapData(this.store.typeRequest, data);
@@ -48,7 +47,6 @@ export class UsePokemonController extends IUseControllerBase {
      * Recupera l'errore dallo store, se presente.
      */
     get error(): ComputedRef<Error | null> {
-        this.logger.debug("[UsePokemonController] - Errore durante il recupero dei dati del Pokémon", this.store.error);
         return computed(() => this.store.error);
     }
 
@@ -58,11 +56,12 @@ export class UsePokemonController extends IUseControllerBase {
      * @returns Una Promise che si risolve quando i dati sono stati caricati.
      */
     async loadData(input: { endpoint: string, req: TypeRequestEnum }): Promise<void> {
-        this.logger.debug("[UsePokemonController] - Caricamento dei dati del Pokémon per: ", input);
         if(input.req === TypeRequestEnum.DETAIL)
             await this.store.ensureLoaded(this.detailUseCase, input);
         else
             await this.store.ensureLoaded(this.useCase, input);
+        
+        this.logger.info("[UsePokemonController] - Dati dei Pokémon caricati con successo.");
     }
 
     /**

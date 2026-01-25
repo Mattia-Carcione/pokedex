@@ -18,16 +18,18 @@ export class UseBlobController extends IUseControllerBase {
      */
     async loadData(input: string): Promise<Blob> {
         const result = await this.blobUseCase.execute(input);
+        this.logger.info("UseBlobController - loadData: Blob caricato con successo.");
+        
         if(result.success){
             if(result.data)
                 return result.data;
         }
 
         else if (result.error){
-            this.logger.error(`UseBlobController - loadData: ${result.error}`);
             throw new Error(`UseBlobController - loadData: ${result.error}`);
         }
         
+        this.logger.warn("UseBlobController - loadData: Blob non trovato, restituisco un Blob vuoto.");
         return new Blob();
     }
 }

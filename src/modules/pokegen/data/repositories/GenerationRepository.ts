@@ -29,6 +29,8 @@ export class GenerationRepository implements IGenerationRepository {
      * @returns Una promessa che risolve l'entità Generation corrispondente
      */
     async getAsync(id: string): Promise<Generation> {
+        this.logger.debug(`[${this.className}] - Inizio del recupero della generazione con ID: ` + id);
+        
         try {
             const data = await this.generationDataSource.fetchData(id);
             const generation = this.generationMapper.map(data);
@@ -38,7 +40,6 @@ export class GenerationRepository implements IGenerationRepository {
             });
             const list = await Promise.all(task);
             generation.pokemon = list.sort((a, b) => a.id - b.id);
-            this.logger.debug(`[${this.className}] - Generazione ${generation.name} con ID ${generation.version} recuperata con successo.`);
             return generation;
         } catch (error) {
             this.logger.error(`[${this.className}] - Errore nel recupero della generazione con ID ${id}:`, (error as Error).message);
@@ -52,15 +53,15 @@ export class GenerationRepository implements IGenerationRepository {
      * @returns Una promessa che risolve un array di entità Generation
      */
     async getAllAsync(): Promise<Generation[]> {
+        this.logger.debug(`[${this.className}] - Inizio del recupero delle generazioni.`);
+
         try {
             const response = await this.pokeApiResponseDataSource.fetchData();
             const task = response.results.map(async (resource) => {
                 const data = await this.generationDataSource.fetchData(resource.url);
                 return this.generationMapper.map(data);
             });
-            const generations = await Promise.all(task);
-            this.logger.debug(`[${this.className}] - Tutte le generazioni recuperate con successo.`, generations);
-            return generations;
+            return await Promise.all(task);
         } catch (error) {
             this.logger.error(`[${this.className}] - Errore nel recupero delle generazioni:`, (error as Error).message);
             throw error;

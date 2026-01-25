@@ -15,6 +15,8 @@ export class BlobRepository implements IBlobRepository {
      * @returns Una Promise che risolve in un Blob.
      */
     async getAsync(endpoint: string): Promise<Blob> {
+        this.logger.debug(`[BlobRepository] - Fetching blob with endpoint ${endpoint}`);
+
         try {
             const blob = await this.blobDataSource.fetchData(endpoint, { responseType: 'blob' });
             return blob;
