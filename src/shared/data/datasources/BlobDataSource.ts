@@ -28,6 +28,7 @@ export class BlobDataSource implements IDataSource<Blob> {
             const response = await this.httpClient.get<Blob>(endpoint, options);
             return response;
         } catch (error) {
+            console.error(error);
             this.logger.error(this.message + (error as Error).message);
             if(error instanceof HttpError)
                 this.httpErrorMapper.map(error);

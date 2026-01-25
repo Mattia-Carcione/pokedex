@@ -13,7 +13,7 @@ import { BlobContainer } from "@/shared/factories/BlobContainer";
  */
 class AppContainer {
     readonly generationController: () => IUseControllerBase;
-    readonly pokemonController: () =>IUseControllerBase;
+    readonly pokemonController: () => IUseControllerBase;
     readonly blobController: IUseControllerBase;
 
     constructor(env: EnvironmentEnum) {

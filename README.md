@@ -50,7 +50,7 @@ Implementazioni concrete delle interfacce core:
 
 ### Application Layer (`src/app/`)
 Bootstrap e configurazione dell'applicazione:
-- `di/`: **Dependency Injection** con `AppContainer` e `PokegenContainer` (crea e gestisce tutte le dipendenze)
+- `di/`: **Dependency Injection** centralizzato con `AppContainer` (root) e `PokegenContainer` (feature). Usa `FactoryHelper` generico per istanziare classi in base all'ambiente (prod/dev)
 - `routing/`: Configurazione Vue Router con `AppRouteName` enum
 - `presentation/`: Layout globali (Hero, Navbar) e ViewModel
 - `styles/`: CSS globali e variabili Tailwind
@@ -97,7 +97,7 @@ Componenti e logica riutilizzabili (usati trasversalmente da più feature):
   - `components/`: Componenti Vue riutilizzati (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
   - `composables/`: Vue composable (`useIntersectionObserver` per lazy loading ottimizzato)
   - `contorllers/`: `UseBlobController` per orchestrazione recupero sprite/asset
-- `factories/`: `BlobContainer`, `DataSourceFactory` per scegliere datasource (API/mock) in base all'ambiente
+- `factories/`: `BlobContainer` per dependency injection (DataSourceFactory consolidato in AppContainer)
 
 ## Rotte
 - `/` – Home (redirect a `/generation/1`)

@@ -23,12 +23,14 @@ export class FactoryHelper {
      * @param dev (() => T) - Classe da istanziare in ambiente di sviluppo.
      * @returns Ritorna l'istanza della classe in base alla variabile di ambiente passata in input
      */
-    static createByEnvHelper<T>(env: EnvironmentEnum, prod: () => T, dev: () => T): T {
+    static createByEnvHelper<T>(env: EnvironmentEnum, prod: new (...args: any[]) => T, dev: new (...args: any[]) => T, ...args: any[]): T {
         switch (env) {
             case EnvironmentEnum.DEVELOPMENT:
-                return dev();
+                return new dev(...args);
+            case EnvironmentEnum.PRODUCTION:
+                return new prod(...args);
             default:
-                return prod();
+                throw new Error(`FactoryHelper: ambiente non supportato ${env}`);
         }
     }
 }
