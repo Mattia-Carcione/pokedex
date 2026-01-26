@@ -1,19 +1,22 @@
+import { EvolutionStageVM } from "./EvolutionStageVM ";
+
 /**
  * ViewModel rappresentante un Pokémon.
  */
 export interface PokemonVM {
     id: string;
-    sprite: string;
-    height: number;
-    weight: number;
-    stats: { name: string; base: number }[];
-    pokedexNumber: string,
-    types: { color: string; icon: string; name: string }[];
+    pokedexNumber: string;
     name: string;
+    types: { color: string; icon: string; name: string }[];
+    sprite: string;
     href: { name: string; params: { name: string } };
-    genderRate?: number;
+    height?: number;
+    weight?: number;
+    stats?: { name: string; base: number }[];
+    genderRate?: { male: number; female: number; };
     flavorText?: { version: string; text: string }[];
     captureRate?: number;
-    generation?: string;
+    generation?: { href: { name: string; params: { id: number } }, name: string };
     genus?: string;
+    evolution?: EvolutionStageVM[];
 }

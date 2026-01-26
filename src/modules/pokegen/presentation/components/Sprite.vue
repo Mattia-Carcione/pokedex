@@ -4,7 +4,7 @@ import { appContainer } from '@/app/di/AppContainer';
 import Skeleton from './Skeleton.vue';
 import { useIntersectionObserver } from '@/shared/presentation/composables/UseIntersectionObserver';
 
-const { pkm, className } = defineProps(['pkm', 'className']);
+const { pokemon, className } = defineProps(['pokemon', 'className']);
 const style = className ?? 'w-[50px] h-[50px] md:h-[90px] md:w-[90px]';
 
 const controller = appContainer.blobController;
@@ -13,9 +13,9 @@ const loaded = ref(false);
 const element = ref(null);
 
 const loadImage = async () => {
-    if (img.value) return;
+    if (img.value || !pokemon.sprite) return;
     try {
-        const blob = await controller.loadData(pkm.sprite);
+        const blob = await controller.loadData(pokemon.sprite);
         img.value = URL.createObjectURL(blob);
     } catch (e) {
         console.error('Error loading sprite image:', e);
@@ -33,9 +33,9 @@ useIntersectionObserver(
 </script>
 
 <template>
-    <div ref="element" :class="`${style} flex justify-center-safe items-center bg-amber-50/50 rounded-full`"
+    <div ref="element" :class="`${style} flex justify-center-safe items-center bg-[var(--bg-custom)]/50 rounded-full`"
         aria-label="Sprite del Pokémon">
         <Skeleton v-if="!loaded" :class="style" />
-        <img v-if="img" :src="img" :alt="`Sprite ufficiale di ${pkm.name}`" :class="`${style} z-10 object-cover transition-opacity duration-300`" :style="{ opacity: loaded ? 1 : 0 }" loading="lazy" @load="loaded = true" />
+        <img v-if="img" :src="img" :alt="`Sprite ufficiale di ${pokemon.name}`" :class="`${style} z-10 object-cover transition-opacity duration-300`" :style="{ opacity: loaded ? 1 : 0 }" loading="lazy" @load="loaded = true" />
     </div>
 </template>

@@ -6,7 +6,7 @@ const props = defineProps(['number', 'name']);
     <div class="p-1 flex flex-col max-w-2/3 text-wrap" :aria-label="`Numero Pokédex: ${props.id}`">
         <!-- NAME -->
         <span class="font-bold text-amber-50 text-2xl px-3">#{{ props.number }}</span>
-        <div class="bg-gray-200 rounded-full py-2 px-3">
+        <div class="bg-[var(--bg-custom)]/75 rounded-full py-2 px-3">
             <h2 class="font-bold tracking-wide text-2xl capitalize" translate="no">
                 {{ props.name }}
             </h2>

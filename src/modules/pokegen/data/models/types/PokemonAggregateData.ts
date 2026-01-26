@@ -1,3 +1,4 @@
+import { EvolutionChainDto } from "../dtos/EvolutionChainDto";
 import { PokemonDto } from "../dtos/PokemonDto";
 import { PokemonSpeciesDto } from "../dtos/PokemonSpeciesDto";
 
@@ -7,6 +8,7 @@ import { PokemonSpeciesDto } from "../dtos/PokemonSpeciesDto";
 export interface PokemonAggregateData {
     pokemon: PokemonDto;
     species?: PokemonSpeciesDto;
-    evolutions?: any;
+    evolution?: EvolutionChainDto;
+    spritesMap?: Record<string, string>;
     forms?: any;
 }

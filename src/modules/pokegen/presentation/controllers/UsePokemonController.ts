@@ -1,4 +1,4 @@
-import { computed, ComputedRef } from "vue";
+import { computed, ComputedRef, shallowRef, watch } from "vue";
 import { PokegenStore } from "../store/types/StoreTypes";
 import { IGetPokemonUseCase } from "../../domain/usecases/IGetPokemonUseCase";
 import { IGetPokemonDetailUseCase } from "../../domain/usecases/IGetPokemonDetailUseCase";
@@ -14,23 +14,56 @@ import { Pokemon } from "../../domain/entities/Pokemon";
  * Implementazione del controller della generazione dei Pokémon.
  */
 export class UsePokemonController extends IUseControllerBase {
+    private homeVM = shallowRef<HomeViewModel | null>(null);
+    private detailVM = shallowRef<DetailViewModel | null>(null);
+
+    /**
+     * Costruttore del controller.
+     * @param store Lo store della generazione dei Pokémon.
+     * @param useCase Il caso d'uso per ottenere i dati della generazione dei Pokémon.
+     * @param detailUseCase Il caso d'uso per ottenere i dettagli di un Pokémon specifico.
+     * @param mapper Il mapper per convertire i dati del Pokémon in ViewModel.
+     * @param logger Il logger per la registrazione delle operazioni.
+     */
     constructor(
         private readonly store: PokegenStore,
         private readonly useCase: IGetPokemonUseCase,
         private readonly detailUseCase: IGetPokemonDetailUseCase,
         private readonly mapper: IPokemonViewMapper,
         private readonly logger: ILogger
-    ) { super(); }
+    ) {
+        super();
+
+        watch(() => [this.store.pokemon, this.store.typeRequest], ([data, req]) => {
+            if (!data || !req) return;
+            switch (req) {
+                case TypeRequestEnum.HOME:
+                    const homeResponse = data as Pokemon[];
+                    this.buildHomeViewModel(homeResponse);
+                    break;
+                case TypeRequestEnum.DETAIL:
+                    const detailResponse = data as Pokemon[];
+                    this.buildDetailViewModel(detailResponse);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
 
     /**
      * Recupera i dati della generazione dei Pokémon dallo store.
      */
-    get data(): ComputedRef<never[] | HomeViewModel | DetailViewModel> {
+    get data(): ComputedRef<[] | HomeViewModel | DetailViewModel> {
         return computed(() => {
-            const data = this.store.pokemon;
-            if(!data || !this.store.typeRequest)
-                return [];
-            return this.mapData(this.store.typeRequest, data);
+            switch (this.store.typeRequest) {
+                case TypeRequestEnum.HOME:
+                    return this.homeVM.value ?? [];
+                case TypeRequestEnum.DETAIL:
+                    return this.detailVM.value ?? [];
+                default:
+                    return [];
+            }
         });
     }
 
@@ -56,28 +89,38 @@ export class UsePokemonController extends IUseControllerBase {
      * @returns Una Promise che si risolve quando i dati sono stati caricati.
      */
     async loadData(input: { endpoint: string, req: TypeRequestEnum }): Promise<void> {
-        if(input.req === TypeRequestEnum.DETAIL)
+        this.store.setInit(input);
+        if (input.req === TypeRequestEnum.DETAIL)
             await this.store.ensureLoaded(this.detailUseCase, input);
         else
             await this.store.ensureLoaded(this.useCase, input);
-        
+
         this.logger.info("[UsePokemonController] - Dati dei Pokémon caricati con successo.");
     }
+    /** 
+     * Costruisce il ViewModel per la vista principale. 
+     * @param data I dati dei Pokémon da mappare.
+    */
+    private buildHomeViewModel(data: Pokemon[]): void {
+        this.homeVM.value = new HomeViewModel(data.map(p => this.mapper.map(p)));
+    }
 
-    /**
-     * Mappa i dati recuperati in base al tipo di richiesta.
-     * @param req Tipo di richiesta (HOME o DETAIL).
-     * @param data Dati dei Pokémon da mappare.
-     * @returns I dati mappati come HomeViewModel, DetailViewModel o un array vuoto.
-     */
-    private mapData(req: TypeRequestEnum, data: Pokemon[]): HomeViewModel | never[] | DetailViewModel {
-        switch(req) {
-            case TypeRequestEnum.HOME:
-                return new HomeViewModel(data.map(pokemon => this.mapper.map(pokemon)));
-            case TypeRequestEnum.DETAIL:
-                return new DetailViewModel(data.map(pokemon => this.mapper.mapDetail(pokemon))[0], data.map(pokemon => this.mapper.mapDetail(pokemon))[0], data.map(pokemon => this.mapper.mapDetail(pokemon))[0]);
-            default:
-                return [];
-        }
+    /** 
+     * Costruisce il ViewModel per la vista dei dettagli. 
+     * @param data I dati dei Pokémon da mappare.
+    */
+    private buildDetailViewModel(data: Pokemon[]): void {
+        const name = this.store.input?.toLowerCase() || '';
+        const main = data.find(p => p.nameSpecies.toLowerCase() === name);
+        if (!main) return;
+
+        const prev = data.find(p => p.id === main.id - 1) || null;
+        const next = data.find(p => p.id === main.id + 1) || null;
+
+        this.detailVM.value = new DetailViewModel(
+            this.mapper.mapDetail(main),
+            prev ? this.mapper.map(prev) : null,
+            next ? this.mapper.map(next) : null
+        );
     }
 }

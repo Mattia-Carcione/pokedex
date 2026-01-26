@@ -6,7 +6,7 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 
 ## Caratteristiche
 - Navigazione per generazione (`/generation/:id`) con elenco ordinato di Pokémon.
-- Pagina dettaglio Pokémon (`/pokemon/:name`) **in sviluppo**: controller e mapper sono pronti, l'UI è ancora in costruzione.
+- Pagina dettaglio Pokémon (`/pokemon/:name`) completa con card dedicata, stats, flavor text, size/capture rate e catena evolutiva.
 - Stato centralizzato con Pinia e controller/use-case che orchestrano repository e store.
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
 - Mock data locali in `assets/mock_data` utilizzati in modalità development.
@@ -257,4 +257,4 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ Cache persistente e retry strategy  
 ✅ Clean Architecture con DI modulare  
 ✅ Immagini di fallback SVG per artwork mancanti e sprite caricati via BlobController  
-🚧 **Pagina dettaglio Pokémon**: logica dati pronta, UI da completare
+✅ **Pagina dettaglio Pokémon** completa (stats, flavor text, size/capture rate, catena evolutiva)

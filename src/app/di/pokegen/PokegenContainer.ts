@@ -35,6 +35,8 @@ import { GetPokemonDetailUseCase } from "@/modules/pokegen/application/usecases/
 import { UseGenerationController } from "@/modules/pokegen/presentation/controllers/UseGenerationController";
 import { UsePokemonController } from "@/modules/pokegen/presentation/controllers/UsePokemonController";
 import { PokemonSpeciesMockDataSource } from "@/modules/pokegen/data/datasources/mock/PokemonSpeciesMockDataSource";
+import { EvolutionChainDto } from "@/modules/pokegen/data/models/dtos/EvolutionChainDto";
+import { EvolutionChainDataSource } from "@/modules/pokegen/data/datasources/EvolutionChainDataSource";
 
 /**
  * Classe statica per la creazione dei controller della feature pokegen.
@@ -78,6 +80,9 @@ export class PokegenContainer {
         const pokemonSpeciesDataSource = FactoryHelper
             .createByEnvHelper<IDataSource<PokemonSpeciesDto>>(env, PokemonSpeciesDataSource, PokemonSpeciesMockDataSource, ...dataSourceFactoryInput);
 
+        const evolutionChainDataSource = FactoryHelper
+            .createByEnvHelper<IDataSource<EvolutionChainDto>>(env, EvolutionChainDataSource, EvolutionChainDataSource, ...dataSourceFactoryInput);
+
         const pokeApiResponseDataSource = FactoryHelper
             .createByEnvHelper<IDataSource<PokeApiResponseDto>>(env, PokeApiResponseDataSource, PokeApiResponseMockDataSource, ...dataSourceFactoryInput);
 
@@ -86,7 +91,7 @@ export class PokegenContainer {
             .create<IGenerationRepository>(GenerationRepository, generationDataSource, pokeApiResponseDataSource, pokemonDataSource, generationMapper, pokemonMapper, deps.logger);
 
         const pokemonRepository = FactoryHelper
-            .create<IPokemonRepository>(PokemonRepository, pokemonDataSource, pokemonSpeciesDataSource, pokemonMapper, deps.logger);
+            .create<IPokemonRepository>(PokemonRepository, pokemonDataSource, pokemonSpeciesDataSource, evolutionChainDataSource, pokemonMapper, deps.logger);
 
         // --- USE CASES ---
         const generationUseCase = FactoryHelper
@@ -99,11 +104,15 @@ export class PokegenContainer {
             .create<IGetPokemonDetailUseCase>(GetPokemonDetailUseCase, pokemonRepository, deps.logger);
 
         // --- CONTROLLERS ---
+        const genController = () => FactoryHelper
+            .create<UseGenerationController>(UseGenerationController, useGenerationStore(), generationUseCase, navbarMapper, deps.logger);
+        
+        const pkmController = () => FactoryHelper
+            .create<UsePokemonController>(UsePokemonController, usePokegenStore(), pokemonUseCase, pokemonDetailUseCase, pokemonViewMapper, deps.logger);
+        
         return {
-            generationController: () => FactoryHelper
-                .create<UseGenerationController>(UseGenerationController, useGenerationStore(), generationUseCase, navbarMapper, deps.logger),
-            pokemonController: () => FactoryHelper
-                .create<UsePokemonController>(UsePokemonController, usePokegenStore(), pokemonUseCase, pokemonDetailUseCase, pokemonViewMapper, deps.logger),
+            generationController: genController,
+            pokemonController: pkmController,
         }
     }
 }

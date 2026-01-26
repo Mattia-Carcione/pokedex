@@ -24,7 +24,6 @@ export const useGenerationStore = defineStore('generation', {
         async ensureLoaded(
             getGenerationUseCase: IGetGenerationUseCase,
         ): Promise<void> {
-            this.setInit();
             try {
                 const key = `generation:all`;
                 const response = await fetchWithMemoryCache<Generation[]>(
@@ -33,15 +32,10 @@ export const useGenerationStore = defineStore('generation', {
                     () => getGenerationUseCase.execute()
                 );
 
-                if(response.success) {
+                if(response.success)
                     this.generationData = response.data ?? null;
-                    this.error = null;
-                }
-
-                else {
+                else
                     this.error = response.error;
-                    this.generationData = null;
-                }
             } catch (error) {
                 this.error = error as Error;
             } finally {

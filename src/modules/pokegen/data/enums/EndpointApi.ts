@@ -5,4 +5,5 @@ export enum EndpointApi {
     Pokemon = 'pokemon/',
     PokemonSpecies = 'pokemon-species/',
     Generation = 'generation/',
+    EvolutionChain = 'evolution-chain/',
 }

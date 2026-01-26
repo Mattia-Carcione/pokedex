@@ -11,6 +11,7 @@ app.use(pinia);
 app.use(router);
 app.mount('#app');
 
+
 const hero = createApp(Hero);
 hero.use(router);
 hero.mount('#header');

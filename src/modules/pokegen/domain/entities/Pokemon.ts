@@ -1,3 +1,5 @@
+import { PokemonEvolution } from "../types/PokemonEvolution";
+
 /**
  * Rappresenta un Pokémon nel dominio dell'applicazione.
  * @property id (number) - l'id del pokémon
@@ -9,6 +11,7 @@ export class Pokemon {
     constructor (
         public readonly id: number,
         public readonly name: string,
+        public readonly nameSpecies: string,
         public readonly types: { slot: number; name: string; url: string; }[],
         public readonly height: number,
         public readonly weight: number,
@@ -21,6 +24,6 @@ export class Pokemon {
     public captureRate?: number;
     public generation?: string;
     public genus?: string;
-    public evolutionUrl?: string;
+    public evolution?: PokemonEvolution[];
     public varieties?: { is_default: boolean; pokemon: { name: string; url: string; }; }[];
 }

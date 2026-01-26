@@ -6,32 +6,36 @@ import { PokemonAggregateData } from "../../data/models/types/PokemonAggregateDa
 import { PokemonDto } from "../../data/models/dtos/PokemonDto";
 import { PokemonSpeciesDto } from "../../data/models/dtos/PokemonSpeciesDto";
 import { DEFAUL_IMAGE } from "@/app/const";
+import { EvolutionChainDto } from "../../data/models/dtos/EvolutionChainDto";
+import { mapEvolutionDetails } from "./evolution/MapEvolutionDetails";
+import { flattenEvolutionChain } from "./evolution/FlattenEvolutionChain";
 
 /**
  * Mapper per convertire i dati del Pokémon dal Dto al dominio.
  */
 export class PokemonMapper implements IPokemonMapper {
-    constructor(private readonly logger: ILogger) {}
+    constructor(private readonly logger: ILogger) { }
 
     /**
      * Converte un oggetto PokemonDto in un'entità Pokemon del dominio.
      * @param Dto - L'oggetto PokemonDto da convertire.
      * @returns L'entità Pokemon corrispondente.
      */
-    map(Dto :PokemonAggregateData) : Pokemon {
+    map(Dto: PokemonAggregateData): Pokemon {
         this.logger.debug("[PokemonMapper] - Inizio della mappatura del Pokémon con ID: " + Dto.pokemon.id);
 
-        const { pokemon, species, evolutions, forms } = Dto;
+        const { pokemon, species, evolution, forms, spritesMap } = Dto;
 
         if (!pokemon.id || !pokemon.name || !pokemon.types || !pokemon.sprites || !pokemon.weight || !pokemon.height || !pokemon.stats)
             throw new MappingError<PokemonDto>("[PokemonMapper] - Error during Pokémon mapping: Missing required properties.", pokemon);
-        
+
         try {
             const types = pokemon.types.map(t => ({ slot: t.slot, name: t.type.name, url: t.type.url }));
-            
+
             const entity = new Pokemon(
                 pokemon.id,
                 pokemon.species.name,
+                pokemon.name,
                 types.sort((a, b) => a.slot - b.slot),
                 pokemon.height,
                 pokemon.weight,
@@ -39,12 +43,13 @@ export class PokemonMapper implements IPokemonMapper {
                 pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE
             );
 
-            if(species)
+            if (species)
                 this.mapSpecies(entity, species);
 
-            if(evolutions) { }
+            if (evolution && spritesMap)
+                this.mapEvolution(entity, evolution, spritesMap);
 
-            if(forms) { }
+            if (forms) { }
 
             return entity;
         } catch (error) {
@@ -58,29 +63,45 @@ export class PokemonMapper implements IPokemonMapper {
      * @param Dto I dati della specie del Pokémon.
      * @returns L'entità Pokemon aggiornata con i dati della specie.
      */
-    private mapSpecies(pokemon: Pokemon, Dto: PokemonSpeciesDto): Pokemon {
+    private mapSpecies(pokemon: Pokemon, dto: PokemonSpeciesDto): Pokemon {
         this.logger.debug("[PokemonMapper] - Inizio della mappatura della specie del Pokémon con ID: " + pokemon.id);
 
-        if (!Dto.capture_rate || !Dto.genera || !Dto.generation || !Dto.flavor_text_entries)
-            throw Error("[PokemonMapper] - Error during Pokémon Species mapping: Missing required properties.");
-            
+        if (dto.capture_rate === undefined || !dto.genera || !dto.generation || !dto.flavor_text_entries)
+            throw new MappingError<PokemonSpeciesDto>("[PokemonMapper] - Error during Pokémon Species mapping: Missing required properties.");
+        
         try {
-            pokemon.genus = Dto.genera.find((g: any) => g.language.name === "en")?.genus || "";
-            pokemon.flavorText = Dto.flavor_text_entries
-            .filter((entry) => entry.language.name === "en")
-            .map((entry) => ({
-                version: entry.version.name,
-                text: entry.flavor_text.replace(/[\n\f]/g, " ")
-            }));
-            pokemon.captureRate = Dto.capture_rate;
-            pokemon.generation = Dto.generation.name;
-            pokemon.evolutionUrl = Dto.evolution_chain?.url || "";
-            pokemon.genderRate = Dto.gender_rate;
-            pokemon.varieties = Dto.varieties;
-            
+            pokemon.genus = dto.genera.find((g: any) => g.language.name === "en")?.genus || "";
+            pokemon.flavorText = dto.flavor_text_entries
+                .filter((entry) => entry.language.name === "en")
+                .map((entry) => ({
+                    version: entry.version.name,
+                    text: entry.flavor_text.replace(/[\n\f]/g, " ")
+                }));
+            pokemon.captureRate = dto.capture_rate;
+            pokemon.generation = dto.generation.name;
+            pokemon.genderRate = dto.gender_rate;
+            pokemon.varieties = dto.varieties;
             return pokemon;
         } catch (error) {
-            throw Error("[PokemonMapper] - Error during Pokémon Species mapping. " + (error as Error).message);
+            throw new MappingError<PokemonSpeciesDto>("[PokemonMapper] - Error during Pokémon Species mapping. " + (error as Error).message);
+        }
+    }
+
+    /**
+     * Mappa la catena evolutiva del Pokémon nell'entità Pokemon.
+     * @param pokemon L'entità Pokemon da aggiornare.
+     * @param evolution I dati della catena evolutiva del Pokémon.
+     * @returns L'entità Pokemon aggiornata con i dati della catena evolutiva.
+     */
+    private mapEvolution(pokemon: Pokemon, evolution: EvolutionChainDto, spritesMap: Record<string, string> = {}): Pokemon {
+        this.logger.debug("[PokemonMapper] - Inizio della mappatura della catena evolutiva del Pokémon con ID: " + pokemon.id);
+
+        try {
+            const result = flattenEvolutionChain(evolution);
+            pokemon.evolution = mapEvolutionDetails(result, spritesMap);
+            return pokemon;
+        } catch (error) {
+            throw new MappingError<EvolutionChainDto>("[PokemonMapper] - Error during Pokémon Evolution mapping. " + (error as Error).message);
         }
     }
 }

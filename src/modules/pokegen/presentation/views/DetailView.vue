@@ -6,6 +6,7 @@ import ErrorView from '@/shared/presentation/components/404View.vue';
 import { DetailViewModel } from '../viewmodels/DetailViewModel';
 import { appContainer } from '@/app/di/AppContainer';
 import { TypeRequestEnum } from '../enums/TypeRequestEnum';
+import CardDetail from '../components/CardDetail.vue';
 
 const props = defineProps({ name: String });
 
@@ -17,7 +18,7 @@ watch(() => props.name, async (newName) => {
 </script>
 
 <template>
-    <div class="detail-view-wrapper">
+    <section id="detail-view-section" aria-label="details view section" class="detail-view-wrapper">
         <template v-if="pkmDetailController.isLoading.value">
             <Loader />
         </template>
@@ -26,9 +27,15 @@ watch(() => props.name, async (newName) => {
             <ErrorView :error="pkmDetailController.error.value" />
         </template>
 
-        <template v-else-if="pkmDetailController.data.value && pkmDetailController.data.value.pokemon">
-            <template v-if="pkmDetailController.data.value instanceof DetailViewModel && pkmDetailController.data.value.pokemon.length > 0" >
+        <template v-else-if="pkmDetailController.data.value">
+            <template v-if="pkmDetailController.data.value instanceof DetailViewModel && pkmDetailController.data.value.pokemon" >
                 <!-- Detail view content goes here -->
+                 <CardDetail
+                    :pokemon="pkmDetailController.data.value.pokemon"
+                    :prev="pkmDetailController.data.value.prev"
+                    :next="pkmDetailController.data.value.next"
+                    :name="props.name"
+                />
             </template>
             
             <template v-else>
@@ -37,5 +44,5 @@ watch(() => props.name, async (newName) => {
                 </div>
             </template>
         </template>
-    </div>
+    </section>
 </template>

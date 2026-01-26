@@ -22,7 +22,7 @@ const [firstType, secondaryType = firstType] = colors;
                 <BadgeType :types="card.types" />
             </div>
 
-            <Sprite :pkm="card" :className="style" />
+            <Sprite :pokemon="card" :className="style" />
         </RouterLink>
     </article>
 </template>

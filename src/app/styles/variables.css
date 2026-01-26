@@ -2,6 +2,11 @@
    GLOBAL DESIGN VARIABLES
    =============================== */
 :root {
+    /* === BACKGROUND COLORS === */
+    --bg-custom: #FAF3DD;
+    --bg-secondary: #F5F5F5;
+    
+    /* === TYPES COLORS === */
     --color-primary: #FFCB05;
     --color-secondary: #2A75BB;
     --color-bug: #A6B91A;
@@ -23,6 +28,15 @@
     --color-steel: #B7B7CE;
     --color-water: #6390F0;
 
+    /* === STATS COLORS === */
+    --stat-hp: #ef4444;
+    --stat-attack: #f97316;
+    --stat-defense: #eab308;
+    --stat-special-attack: #3b82f6;
+    --stat-special-defense: #22c55e;
+    --stat-speed: #a855f7;
+
+    /* === CONTRAST COLORS === */
     --color-contrast-light: #FFFFFF;
 
     /* === TYPOGRAPHY === */

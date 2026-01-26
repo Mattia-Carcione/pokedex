@@ -7,6 +7,9 @@ import { NotImplementedError } from "@/core/errors/NotImplementedError";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokemonSpeciesDto } from "../models/dtos/PokemonSpeciesDto";
 import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
+import { EvolutionChainDto } from "../models/dtos/EvolutionChainDto";
+import { extractSpeciesNamesFromEvolution } from "../../application/mappers/evolution/ExtractSpeciesNamesFromEvolution";
+import { DEFAUL_IMAGE } from "@/app/const";
 
 /**
  * Repository per gestire i dati dei Pokémon.
@@ -16,6 +19,7 @@ export class PokemonRepository implements IPokemonRepository {
     constructor(
         private readonly dataSource: IDataSource<PokemonDto>,
         private readonly speciesDataSource: IDataSource<PokemonSpeciesDto>,
+        private readonly evolutionDataSource: IDataSource<EvolutionChainDto>,
         private readonly pokemonMapper: IMapper<PokemonAggregateData, Pokemon>,
         private readonly logger: ILogger
     ) { }
@@ -50,8 +54,24 @@ export class PokemonRepository implements IPokemonRepository {
         
         try {
             const pokemon = await this.dataSource.fetchData(name);
-            const species = await this.speciesDataSource.fetchData(name);
-            return this.pokemonMapper.map({ pokemon, species });
+            const species = await this.speciesDataSource.fetchData(pokemon.id.toString());
+            const evolution = await this.evolutionDataSource.fetchData(species.evolution_chain.url);
+            const speciesNames = extractSpeciesNamesFromEvolution(evolution);
+            const spritesMap: Record<string, string> = {};
+            
+            for (const speciesName of speciesNames) {
+                let p = null;
+                try {
+                    p = await this.dataSource.fetchData(speciesName);
+                } catch  {
+                    p = await this.dataSource.fetchData(name);
+                }
+                spritesMap[speciesName] =
+                p.sprites.other?.home.front_default ??
+                p.sprites.front_default ??
+                DEFAUL_IMAGE;
+            }
+            return this.pokemonMapper.map({ pokemon, species, evolution, spritesMap });
         } catch (error) {
             this.logger.error(`[${this.className}] - Errore nel recupero dei dettagli del Pokémon: ${name}`, (error as Error).message);
             throw error;

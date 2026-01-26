@@ -14,7 +14,8 @@ export const usePokegenStore = defineStore('pokegen', {
         pokemon: null as Pokemon[] | null,
         loading: false,
         error: null as Error | null,
-        typeRequest: null as TypeRequestEnum | null
+        typeRequest: null as TypeRequestEnum | null,
+        input: '' as string,
     }),
     actions: {
         /**
@@ -27,9 +28,6 @@ export const usePokegenStore = defineStore('pokegen', {
             getPokemonUseCase: IGetPokemonUseCase | IGetPokemonDetailUseCase,
             input: { endpoint: string, req: TypeRequestEnum }
         ): Promise<void> {
-            this.setInit();
-            this.typeRequest = input.req;
-
             const key = `${input.req}:${input.endpoint}`;
             const response = await fetchWithMemoryCache<Pokemon[]>(
                 key,
@@ -37,13 +35,10 @@ export const usePokegenStore = defineStore('pokegen', {
                 () => getPokemonUseCase.execute(input.endpoint)
             );
 
-            if (response.success) {
+            if (response.success)
                 this.pokemon = response.data ?? null;
-                this.error = null;
-            } else {
-                this.pokemon = null;
+            else 
                 this.error = response.error ?? new Error("Errore sconosciuto");
-            }
 
             this.loading = false;
         },
@@ -51,10 +46,11 @@ export const usePokegenStore = defineStore('pokegen', {
         /**
          * Imposta lo stato iniziale dello store.
          */
-        setInit() {
+        setInit(input: { endpoint: string, req: TypeRequestEnum }): void {
             this.pokemon = null;
             this.error = null;
-            this.typeRequest = null;
+            this.typeRequest = input.req;
+            this.input = input.endpoint;
             this.loading = true;
         }
     }

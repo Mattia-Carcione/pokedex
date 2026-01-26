@@ -7,7 +7,7 @@ const {types} = defineProps(['types']);
 <template>
     <div class="flex gap-1" aria-label="Badge dei tipi Pokémon">
         <div v-for="type in types" :key="type.id"
-            class="flex flex-col justify-center-safe items-center w-14 h-14 bg-amber-50 rounded-full p-1"
+            class="flex flex-col justify-center-safe items-center w-14 h-14 bg-[var(--bg-custom)] rounded-full p-1"
             :aria-label="type.name">
             <Skeleton />
             <img class="rounded-full opacity-0 transition-opacity duration-300" :src="type.icon" :alt="type.name"
