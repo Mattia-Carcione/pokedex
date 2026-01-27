@@ -97,6 +97,7 @@ export class UsePokemonController extends IUseControllerBase {
 
         this.logger.info("[UsePokemonController] - Dati dei Pokémon caricati con successo.");
     }
+    
     /** 
      * Costruisce il ViewModel per la vista principale. 
      * @param data I dati dei Pokémon da mappare.
@@ -112,10 +113,11 @@ export class UsePokemonController extends IUseControllerBase {
     private buildDetailViewModel(data: Pokemon[]): void {
         const name = this.store.input?.toLowerCase() || '';
         const main = data.find(p => p.nameSpecies.toLowerCase() === name);
-        if (!main) return;
 
-        const prev = data.find(p => p.id === main.id - 1) || null;
-        const next = data.find(p => p.id === main.id + 1) || null;
+        if (!main) return;
+        const index = data.indexOf(main);
+        const prev = data[index - 1] ?? null;
+        const next = data[index + 1] ?? null;
 
         this.detailVM.value = new DetailViewModel(
             this.mapper.mapDetail(main),
