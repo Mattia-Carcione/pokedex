@@ -13,7 +13,7 @@ import { PokemonDto } from "../models/dtos/PokemonDto";
  */
 export class GenerationRepository implements IGenerationRepository {
     protected readonly className = "GenerationRepository";
-    
+
     constructor(
         private readonly generationDataSource: IDataSource<GenerationDto>,
         private readonly pokeApiResponseDataSource: IDataSource<PokeApiResponseDto>,
@@ -30,21 +30,17 @@ export class GenerationRepository implements IGenerationRepository {
      */
     async getAsync(id: string): Promise<Generation> {
         this.logger.debug(`[${this.className}] - Inizio del recupero della generazione con ID: ` + id);
-        
-        try {
-            const data = await this.generationDataSource.fetchData(id);
-            const generation = this.generationMapper.map(data);
-            const task = data.pokemon_species.map(async ({ url }) => {
-                const pokemon = await this.pokemonDataSource.fetchData(url);
-                return this.pokemonMapper.map({ pokemon });
-            });
-            const list = await Promise.all(task);
-            generation.pokemon = list.sort((a, b) => a.id - b.id);
-            return generation;
-        } catch (error) {
-            this.logger.error(`[${this.className}] - Errore nel recupero della generazione con ID ${id}:`, (error as Error).message);
-            throw error;
-        }
+
+        const data = await this.generationDataSource.fetchData(id);
+        const generation = this.generationMapper.map(data);
+        const task = data.pokemon_species.map(async ({ url }) => {
+            const pokemon = await this.pokemonDataSource.fetchData(url);
+            return this.pokemonMapper.map({ pokemon });
+        });
+
+        const list = await Promise.all(task);
+        generation.pokemon = list.sort((a, b) => a.id - b.id);
+        return generation;
     }
 
     /**
@@ -55,16 +51,11 @@ export class GenerationRepository implements IGenerationRepository {
     async getAllAsync(): Promise<Generation[]> {
         this.logger.debug(`[${this.className}] - Inizio del recupero delle generazioni.`);
 
-        try {
-            const response = await this.pokeApiResponseDataSource.fetchData();
-            const task = response.results.map(async (resource) => {
-                const data = await this.generationDataSource.fetchData(resource.url);
-                return this.generationMapper.map(data);
-            });
-            return await Promise.all(task);
-        } catch (error) {
-            this.logger.error(`[${this.className}] - Errore nel recupero delle generazioni:`, (error as Error).message);
-            throw error;
-        }
+        const response = await this.pokeApiResponseDataSource.fetchData();
+        const task = response.results.map(async (resource) => {
+            const data = await this.generationDataSource.fetchData(resource.url);
+            return this.generationMapper.map(data);
+        });
+        return await Promise.all(task);
     }
 }
