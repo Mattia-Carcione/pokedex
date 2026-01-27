@@ -25,6 +25,7 @@ export interface PokemonEvolutionVM {
     needsMultiplayer?: boolean;   // indica se serve il moltiplicatore (se presente)
     turnUpsideDown?: boolean;    // indica se il dispositivo deve essere capovolto (se presente)
     usedMove?: string;        // mossa usata richiesta (se presente)
+    href:  { name: string; params: { name: string } }
 }
 
 /**
