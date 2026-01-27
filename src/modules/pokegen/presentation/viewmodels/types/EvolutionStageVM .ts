@@ -1,19 +1,13 @@
-export const pokemonGenderMap: { [key: number]: string } = {
-    1: 'Female',
-    2: 'Male',
-    0: '',
-};
-
 /**
  * ViewModel rappresentante un'evoluzione del Pokémon.
  */
 export interface PokemonEvolutionVM {
     from: string;                // Pokémon di partenza
     to: string;                  // Pokémon evoluto
-    toSprite: string;              // URL dello sprite del Pokémon evoluto
-    fromSprite: string;              // URL dello sprite del Pokémon di partenza
+    sprite: string;              // URL dello sprite del Pokémon evoluto
     minLevel?: number;           // livello minimo per evolvere (se presente)
     item?: string;               // oggetto richiesto (se presente)
+    itemSprite?: string;
     gender?: string; // genere richiesto (se presente)
     timeOfDay?: string;          // momento della giornata (se presente)
     needsOverworldRain?: boolean;// indica se serve la pioggia (se presente)
@@ -32,10 +26,11 @@ export interface PokemonEvolutionVM {
     turnUpsideDown?: boolean;    // indica se il dispositivo deve essere capovolto (se presente)
     usedMove?: string;        // mossa usata richiesta (se presente)
 }
+
 /**
  * ViewModel rappresentante uno stadio di evoluzione del Pokémon.
  */
 export interface EvolutionStageVM {
-    pokemons: { name: string; sprite?: string }[];
+    pokemons: { name: string; sprite?: string, href:  { name: string; params: { name: string } }}[];
     evolutions?: PokemonEvolutionVM[];
 }
