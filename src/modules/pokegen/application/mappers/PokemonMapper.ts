@@ -6,9 +6,8 @@ import { PokemonAggregateData } from "../../data/models/types/PokemonAggregateDa
 import { PokemonDto } from "../../data/models/dtos/PokemonDto";
 import { PokemonSpeciesDto } from "../../data/models/dtos/PokemonSpeciesDto";
 import { DEFAUL_IMAGE } from "@/app/const";
-import { EvolutionChainDto } from "../../data/models/dtos/EvolutionChainDto";
-import { mapEvolutionDetails } from "./evolution/MapEvolutionDetails";
-import { flattenEvolutionChain } from "./evolution/FlattenEvolutionChain";
+import { ChainLinkDto, EvolutionChainDto } from "../../data/models/dtos/EvolutionChainDto";
+import { PokemonEvolution } from "../../domain/types/PokemonEvolution";
 
 /**
  * Mapper per convertire i dati del Pokémon dal Dto al dominio.
@@ -24,7 +23,7 @@ export class PokemonMapper implements IPokemonMapper {
     map(Dto: PokemonAggregateData): Pokemon {
         this.logger.debug("[PokemonMapper] - Inizio della mappatura del Pokémon con ID: " + Dto.pokemon.id);
 
-        const { pokemon, species, evolution, forms, spritesMap } = Dto;
+        const { pokemon, species, evolution, forms } = Dto;
 
         if (!pokemon.id || !pokemon.name || !pokemon.types || !pokemon.sprites || !pokemon.weight || !pokemon.height || !pokemon.stats)
             throw new MappingError<PokemonDto>("[PokemonMapper] - Error during Pokémon mapping: Missing required properties.", pokemon);
@@ -43,11 +42,9 @@ export class PokemonMapper implements IPokemonMapper {
                 pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE
             );
 
-            if (species)
-                this.mapSpecies(entity, species);
+            this.mapSpecies(entity, species);
 
-            if (evolution && spritesMap)
-                this.mapEvolution(entity, evolution, spritesMap);
+            this.mapEvolution(entity, evolution);
 
             if (forms) { }
 
@@ -63,12 +60,13 @@ export class PokemonMapper implements IPokemonMapper {
      * @param Dto I dati della specie del Pokémon.
      * @returns L'entità Pokemon aggiornata con i dati della specie.
      */
-    private mapSpecies(pokemon: Pokemon, dto: PokemonSpeciesDto): Pokemon {
-        this.logger.debug("[PokemonMapper] - Inizio della mappatura della specie del Pokémon con ID: " + pokemon.id);
-
+    private mapSpecies(pokemon: Pokemon, dto?: PokemonSpeciesDto): Pokemon {
+        if(!dto) return pokemon;
         if (dto.capture_rate === undefined || !dto.genera || !dto.generation || !dto.flavor_text_entries)
             throw new MappingError<PokemonSpeciesDto>("[PokemonMapper] - Error during Pokémon Species mapping: Missing required properties.");
-        
+
+        this.logger.debug("[PokemonMapper] - Inizio della mappatura della specie del Pokémon con ID: " + pokemon.id);
+
         try {
             pokemon.genus = dto.genera.find((g: any) => g.language.name === "en")?.genus || "";
             pokemon.flavorText = dto.flavor_text_entries
@@ -93,12 +91,51 @@ export class PokemonMapper implements IPokemonMapper {
      * @param evolution I dati della catena evolutiva del Pokémon.
      * @returns L'entità Pokemon aggiornata con i dati della catena evolutiva.
      */
-    private mapEvolution(pokemon: Pokemon, evolution: EvolutionChainDto, spritesMap: Record<string, string> = {}): Pokemon {
+    private mapEvolution(pokemon: Pokemon, evolution?: EvolutionChainDto): Pokemon {
+        if(!evolution) return pokemon;
+        if(!evolution.chain) 
+            throw new MappingError<EvolutionChainDto>("[PokemonMapper] - Error during Pokémon evolution mapping: Missing required properties.");
+
         this.logger.debug("[PokemonMapper] - Inizio della mappatura della catena evolutiva del Pokémon con ID: " + pokemon.id);
 
         try {
-            const result = flattenEvolutionChain(evolution);
-            pokemon.evolution = mapEvolutionDetails(result, spritesMap);
+            const evolutions: PokemonEvolution[] = [];
+
+            const traverse = (node: ChainLinkDto) => {
+                for (const next of node.evolves_to) {
+                    for (const detail of next.evolution_details) {
+                        evolutions.push({
+                            from: node.species.name,
+                            to: next.species.name,
+                            trigger: detail.trigger.name,
+                            minLevel: detail.min_level ?? undefined,
+                            item: detail.item?.name,
+                            gender: detail.gender,
+                            timeOfDay: detail.time_of_day || undefined,
+                            needsOverworldRain: detail.needs_overworld_rain || undefined,
+                            knownMove: detail.known_move?.name,
+                            knownMoveType: detail.known_move_type?.name,
+                            location: detail.location?.name,
+                            minHappiness: detail.min_happiness ?? undefined,
+                            minBeauty: detail.min_beauty ?? undefined,
+                            minAffection: detail.min_affection ?? undefined,
+                            relativePhysicalStats: detail.relative_physical_stats ?? undefined,
+                            partySpecies: detail.party_species?.name,
+                            partyType: detail.party_type?.name,
+                            tradeSpecies: detail.trade_species?.name,
+                            minMoveCount: detail.min_move_count ?? undefined,
+                            needsMultiplayer: detail.needs_multiplayer || undefined,
+                            turnUpsideDown: detail.turn_upside_down || undefined,
+                            usedMove: detail.used_move?.name
+                        });
+                    }
+
+                    traverse(next);
+                }
+            };
+
+            traverse(evolution.chain);
+            pokemon.evolution = evolutions;
             return pokemon;
         } catch (error) {
             throw new MappingError<EvolutionChainDto>("[PokemonMapper] - Error during Pokémon Evolution mapping. " + (error as Error).message);

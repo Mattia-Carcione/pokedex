@@ -27,7 +27,7 @@ export class BlobContainer {
     httpClient: IHttpClient;
     httpMapper: IHttpErrorMapper;
     logger: ILogger;
-}): {blobController: IUseControllerBase } {
+}): {blobController: () => IUseControllerBase } {
         const blobDataSource = FactoryHelper.createByEnvHelper<IDataSource<Blob>>(env, BlobDataSource, BlobMockDataSource, deps.httpClient, deps.httpMapper, deps.logger);
 
         const blobRepository = FactoryHelper.create(BlobRepository, blobDataSource, deps.logger);
@@ -35,7 +35,7 @@ export class BlobContainer {
         const blobUseCase = FactoryHelper.create(GetBlobUseCase, blobRepository, deps.logger);
 
         return {
-            blobController: FactoryHelper.create(UseBlobController, blobUseCase, deps.logger)
+            blobController: () => FactoryHelper.create(UseBlobController, blobUseCase, deps.logger)
         }
     }
 }

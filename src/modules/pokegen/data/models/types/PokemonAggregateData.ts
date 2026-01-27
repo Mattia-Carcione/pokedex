@@ -9,6 +9,5 @@ export interface PokemonAggregateData {
     pokemon: PokemonDto;
     species?: PokemonSpeciesDto;
     evolution?: EvolutionChainDto;
-    spritesMap?: Record<string, string>;
     forms?: any;
 }

@@ -2,7 +2,7 @@
  * Classe di utilità per operazioni matematiche.
  */
 export class MathHelper {
-  private constructor() {}
+  private constructor() { }
 
   /**
    * Converte un valore numerico in una percentuale formattata a due cifre decimali.
@@ -26,7 +26,7 @@ export class MathHelper {
    * Converte un numero romano in numero arabo.
    */
   static convertToArabicNumber(roman: string): number {
-    if(!roman) return 0;
+    if (!roman) return 0;
 
     roman = roman.toUpperCase();
     const mappaRomana: { [key: string]: number } = {
@@ -72,22 +72,22 @@ export class MathHelper {
     // Mappa dei valori romani principali
     const mappaRomana: { [key: number]: string } = {
       1000: 'M',
-      900:  'CM',
-      500:  'D',
-      400:  'CD',
-      100:  'C',
-      90:   'XC',
-      50:   'L',
-      40:   'XL',
-      10:   'X',
-      9:    'IX',
-      5:    'V',
-      4:    'IV',
-      1:    'I'
+      900: 'CM',
+      500: 'D',
+      400: 'CD',
+      100: 'C',
+      90: 'XC',
+      50: 'L',
+      40: 'XL',
+      10: 'X',
+      9: 'IX',
+      5: 'V',
+      4: 'IV',
+      1: 'I'
     };
 
     let risultato = "";
-    
+
     // Ordiniamo le chiavi in modo decrescente
     const chiavi = Object.keys(mappaRomana)
       .map(Number)
@@ -101,5 +101,19 @@ export class MathHelper {
     }
 
     return risultato;
+  }
+
+  /**
+ * Funzione per mappare il tasso di genere del Pokémon
+ * @param genderRate (number) il numero di tasso di genere espresso in ottavi
+ */
+  static mapGenderRate(genderRate: number): { male: number; female: number; } | undefined {
+    if (genderRate < 0) return undefined;
+    if (genderRate === 0) return { male: 100, female: 0 }
+    if (genderRate > 0) {
+      const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
+      const maleRate = Number(100 - femaleRate);
+      return { male: maleRate, female: femaleRate }
+    }
   }
 }

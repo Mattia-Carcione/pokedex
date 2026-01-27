@@ -4,8 +4,8 @@
 export interface PokemonEvolution {
     from: string;                // Pokémon di partenza
     to: string;                  // Pokémon evoluto
-    toSprite: string;              // URL dello sprite del Pokémon evoluto
-    fromSprite: string;              // URL dello sprite del Pokémon di partenza
+    spriteFrom?: string;
+    spriteTo?: string;
     trigger: string;             // tipo di evoluzione ("level-up", "use-item", ecc.)
     minLevel?: number;           // livello minimo per evolvere (se presente)
     item?: string;               // oggetto richiesto (se presente)

@@ -6,15 +6,15 @@ import { TYPE_COLORS, TYPE_ICONS } from "@/app/const";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { MathHelper } from "@/core/utils/math/MathHelper";
 import { PokemonVM } from "../viewmodels/types/PokemonVM";
-import { mapEvolutionGroupsForView } from "./evolution/MapEvolutionGroupsForView";
 import { StringHelper } from "@/core/utils/string/StringHelper";
-import { mapEvolutionStagesForView } from "./evolution/MapEvolutionStagesForView";
+import { PokemonEvolution } from "../../domain/types/PokemonEvolution";
+import { EvolutionStageVM } from "../viewmodels/types/EvolutionStageVM ";
 
 /**
  * Mapper per convertire i dati del Pokémon in un HomeViewModel.
  */
 export class PokemonViewMapper implements IPokemonViewMapper {
-    constructor(private readonly logger: ILogger) {}
+    constructor(private readonly logger: ILogger) { }
 
     /**
      * Mappa un array di entità Pokemon in un HomeViewModel.
@@ -36,7 +36,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
                     name: StringHelper.capitalize(type.name),
                 })),
                 name: StringHelper.capitalize(source.name),
-                href: { name: AppRouteName.Pokemon, params: { name: source.nameSpecies }},
+                href: { name: AppRouteName.Pokemon, params: { name: source.nameSpecies } },
             }
         } catch (error) {
             throw new MappingError<Pokemon>("[PokemonViewMapper] - Error during mapping of Pokémon", source, error as Error);
@@ -53,47 +53,88 @@ export class PokemonViewMapper implements IPokemonViewMapper {
         this.logger.debug("[PokemonViewMapper] - Inizio della mappatura del dettaglio del Pokémon");
         const pokemon = this.map(source);
 
-        if(!source.evolution) return pokemon;
-        
-        const grouped = mapEvolutionGroupsForView(source);
-        pokemon.evolution = mapEvolutionStagesForView(grouped);
-        if(pokemon.evolution?.length <= 0) {
-            this.logger.warn("[PokemonViewMapper] - Nessuna evoluzione trovata durante la mappatura del dettaglio del Pokémon");
-            pokemon.evolution = [{
-                pokemons: [{
-                    name: pokemon.name,
-                    sprite: pokemon.sprite
-                }],
-                evolutions: []
-            }]
-        }
         pokemon.height = MathHelper.formatDecimeterValue(source.height);
         pokemon.weight = MathHelper.formatDecimeterValue(source.weight);
         pokemon.stats = source.stats;
         pokemon.flavorText = source.flavorText;
         pokemon.genus = source.genus;
-
         const [generation, roman] = StringHelper.splitByHyphen(source.generation || '');
         const label = StringHelper.capitalize(generation);
         const generationId = MathHelper.convertToArabicNumber(roman);
-        pokemon.generation = { href: {name: AppRouteName.Generation, params: { id: generationId } }, name: `${label} ${roman?.toUpperCase()}` };
-        pokemon.genderRate = this.mapGenderRate(source.genderRate || -1);
+        pokemon.generation = { href: { name: AppRouteName.Generation, params: { id: generationId } }, name: `${label} ${roman?.toUpperCase()}` };
+        pokemon.genderRate = MathHelper.mapGenderRate(source.genderRate || -1);
         pokemon.captureRate = MathHelper.formatPercentageValue(source.captureRate || 0);
+
+        if (source.evolution)
+            pokemon.evolution = this.buildEvolutionVM(source.evolution);
+
         // TODO: Aggiungere ulteriori dettagli specifici per la vista dettaglio
         return pokemon;
     }
 
-    /**
-     * Funzione per mappare il tasso di genere del Pokémon
-     * @param genderRate (number) il numero di tasso di genere espresso in ottavi
-     */
-    private mapGenderRate(genderRate: number): { male: number; female: number; } | undefined {
-        if(genderRate < 0) return undefined;
-        if (genderRate === 0) return { male: 100, female: 0 }
-        if (genderRate > 0) {
-            const femaleRate = Number(((genderRate / 8) * 100).toFixed(2));
-            const maleRate = Number(100 - femaleRate);
-            return { male: maleRate, female: femaleRate }
-        }
+    private buildEvolutionVM(evolutions: PokemonEvolution[]): EvolutionStageVM[] {
+        const stages: EvolutionStageVM[] = [];
+
+        const mapByFrom = new Map<string, PokemonEvolution[]>();
+        evolutions.forEach(e => {
+            if (!mapByFrom.has(e.from)) mapByFrom.set(e.from, []);
+            mapByFrom.get(e.from)!.push(e);
+        });
+
+        const visited = new Set<string>();
+
+        const traverse = (fromName: string): EvolutionStageVM[] => {
+            if (visited.has(fromName)) return [];
+            visited.add(fromName);
+
+            const currentEvolutions = mapByFrom.get(fromName) || [];
+            const currentStage: EvolutionStageVM = {
+                pokemons: currentEvolutions.length > 0
+                    ? [{ name: fromName, sprite: currentEvolutions[0].spriteFrom, href: { name: AppRouteName.Pokemon, params: { name: fromName } } }]
+                    : [{ name: fromName, sprite: undefined, href: { name: AppRouteName.Pokemon, params: { name: fromName } } }]
+            };
+
+            if (currentEvolutions.length > 0) {
+                currentStage.evolutions = currentEvolutions.map(e => ({
+                    from: e.from,
+                    to: e.to,
+                    sprite: e.spriteTo!,
+                    minLevel: e.minLevel,
+                    item: e.item,
+                    href: { name: AppRouteName.Pokemon, params: { name: e.to } },
+                    itemSprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${e.item?.toLowerCase()}.png`,
+                    gender: e.gender?.toString(),
+                    timeOfDay: e.timeOfDay,
+                    needsOverworldRain: e.needsOverworldRain,
+                    knownMove: e.knownMove,
+                    knownMoveType: e.knownMoveType,
+                    location: e.location,
+                    minHappiness: e.minHappiness,
+                    minBeauty: e.minBeauty,
+                    minAffection: e.minAffection,
+                    relativePhysicalStats: e.relativePhysicalStats,
+                    partySpecies: e.partySpecies,
+                    partyType: e.partyType,
+                    tradeSpecies: e.tradeSpecies,
+                    minMoveCount: e.minMoveCount,
+                    needsMultiplayer: e.needsMultiplayer,
+                    turnUpsideDown: e.turnUpsideDown,
+                    usedMove: e.usedMove
+                }));
+
+                currentStage.evolutions.forEach(ev => {
+                    stages.push(...traverse(ev.to));
+                });
+            }
+
+            stages.push(currentStage);
+            return [currentStage];
+        };
+
+        // prendi il primo Pokémon come root (da evolution[0].from)
+        traverse(evolutions[0].from);
+
+        return stages;
     }
+
 }

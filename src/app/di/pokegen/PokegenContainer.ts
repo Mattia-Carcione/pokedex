@@ -37,6 +37,10 @@ import { UsePokemonController } from "@/modules/pokegen/presentation/controllers
 import { PokemonSpeciesMockDataSource } from "@/modules/pokegen/data/datasources/mock/PokemonSpeciesMockDataSource";
 import { EvolutionChainDto } from "@/modules/pokegen/data/models/dtos/EvolutionChainDto";
 import { EvolutionChainDataSource } from "@/modules/pokegen/data/datasources/EvolutionChainDataSource";
+import { INavigationPokemonLoaderService } from "@/modules/pokegen/application/services/contracts/INavigationPokemonLoaderService";
+import { NavigationPokemonLoaderService } from "@/modules/pokegen/application/services/NavigationPokemonLoaderService";
+import { IEvolutionSpriteEnricherService } from "@/modules/pokegen/application/services/contracts/IEvolutionSpriteEnricherService";
+import { EvolutionSpriteEnricherService } from "@/modules/pokegen/application/services/EvolutionSpriteEnricherService";
 
 /**
  * Classe statica per la creazione dei controller della feature pokegen.
@@ -93,6 +97,13 @@ export class PokegenContainer {
         const pokemonRepository = FactoryHelper
             .create<IPokemonRepository>(PokemonRepository, pokemonDataSource, pokemonSpeciesDataSource, evolutionChainDataSource, pokemonMapper, deps.logger);
 
+        // --- SERVICES ---
+        const navigationPokemonLoaderService = FactoryHelper
+            .create<INavigationPokemonLoaderService>(NavigationPokemonLoaderService, pokemonRepository, deps.logger);
+
+        const evolutionSpriteEnricherService = FactoryHelper
+            .create<IEvolutionSpriteEnricherService>(EvolutionSpriteEnricherService, pokemonRepository, deps.logger);
+
         // --- USE CASES ---
         const generationUseCase = FactoryHelper
             .create<IGetGenerationUseCase>(GetGenerationUseCase, generationRepository, deps.logger);
@@ -101,7 +112,7 @@ export class PokegenContainer {
             .create<IGetPokemonUseCase>(GetPokemonUseCase, generationRepository, deps.logger);
 
         const pokemonDetailUseCase = FactoryHelper
-            .create<IGetPokemonDetailUseCase>(GetPokemonDetailUseCase, pokemonRepository, deps.logger);
+            .create<IGetPokemonDetailUseCase>(GetPokemonDetailUseCase, pokemonRepository, navigationPokemonLoaderService, evolutionSpriteEnricherService, deps.logger);
 
         // --- CONTROLLERS ---
         const genController = () => FactoryHelper

@@ -8,8 +8,6 @@ import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokemonSpeciesDto } from "../models/dtos/PokemonSpeciesDto";
 import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
 import { EvolutionChainDto } from "../models/dtos/EvolutionChainDto";
-import { extractSpeciesNamesFromEvolution } from "../../application/mappers/evolution/ExtractSpeciesNamesFromEvolution";
-import { DEFAUL_IMAGE } from "@/app/const";
 
 /**
  * Repository per gestire i dati dei Pokémon.
@@ -35,13 +33,8 @@ export class PokemonRepository implements IPokemonRepository {
     async getAsync(endpoint: string): Promise<Pokemon> {
         this.logger.debug(`[${this.className}] - Inizio del recupero dei dati del Pokémon da: ${endpoint}`);
 
-        try {
-            const pokemon = await this.dataSource.fetchData(endpoint);
-            return this.pokemonMapper.map({ pokemon });
-        } catch (error) {
-            this.logger.error(`[${this.className}] - Errore nel recupero dei dati del Pokémon da: ${endpoint}`, (error as Error).message);
-            throw error;
-        }
+        const pokemon = await this.dataSource.fetchData(endpoint);
+        return this.pokemonMapper.map({ pokemon });
     }
 
     /**
@@ -51,31 +44,11 @@ export class PokemonRepository implements IPokemonRepository {
      */
     async getDetailAsync(name: string): Promise<Pokemon> {
         this.logger.debug(`[${this.className}] - Inizio del recupero dei dettagli del Pokémon: ${name}`);
-        
-        try {
-            const pokemon = await this.dataSource.fetchData(name);
-            const species = await this.speciesDataSource.fetchData(pokemon.id.toString());
-            const evolution = await this.evolutionDataSource.fetchData(species.evolution_chain.url);
-            const speciesNames = extractSpeciesNamesFromEvolution(evolution);
-            const spritesMap: Record<string, string> = {};
-            
-            for (const speciesName of speciesNames) {
-                let p = null;
-                try {
-                    p = await this.dataSource.fetchData(speciesName);
-                } catch  {
-                    p = await this.dataSource.fetchData(name);
-                }
-                spritesMap[speciesName] =
-                p.sprites.other?.home.front_default ??
-                p.sprites.front_default ??
-                DEFAUL_IMAGE;
-            }
-            return this.pokemonMapper.map({ pokemon, species, evolution, spritesMap });
-        } catch (error) {
-            this.logger.error(`[${this.className}] - Errore nel recupero dei dettagli del Pokémon: ${name}`, (error as Error).message);
-            throw error;
-        }
+
+        const pokemon = await this.dataSource.fetchData(name);
+        const species = await this.speciesDataSource.fetchData(pokemon.id.toString());
+        const evolution = await this.evolutionDataSource.fetchData(species.evolution_chain.url);
+        return this.pokemonMapper.map({ pokemon, species, evolution });
     }
 
     /**
