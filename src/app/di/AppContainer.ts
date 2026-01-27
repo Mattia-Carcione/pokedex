@@ -12,13 +12,14 @@ import { BlobContainer } from "@/shared/factories/BlobContainer";
  * Container per la gestione delle dipendenze dell'applicazione PokéGen.
  */
 class AppContainer {
-    readonly generationController: () => IUseControllerBase;
-    readonly pokemonController: () => IUseControllerBase;
-    readonly blobController: IUseControllerBase;
+  readonly generationController: () => IUseControllerBase;
+  readonly pokemonController: () => IUseControllerBase;
+  readonly blobController: () => IUseControllerBase;
 
-    constructor(env: EnvironmentEnum) {
+  constructor(env: EnvironmentEnum) {
+    const logger = new Logger(env);
+    try {
       // --- LOGGERS ---
-        const logger = new Logger(env);
 
       // --- INFRASTRUCTURE ---
       const httpFactory = new AxiosClientFactory(logger);
@@ -31,13 +32,19 @@ class AppContainer {
       // --- MAPPERS ---
       const httpMapper = new HttpErrorMapper(logger);
 
-      const { generationController, pokemonController } = PokegenContainer.build(env, {httpClient, httpMapper, logger});
-      const { blobController } = BlobContainer.build(env, {httpClient, httpMapper, logger});
-      
+      const { generationController, pokemonController } = PokegenContainer.build(env, { httpClient, httpMapper, logger });
+      const { blobController } = BlobContainer.build(env, { httpClient, httpMapper, logger });
+
       this.generationController = generationController;
       this.pokemonController = pokemonController;
       this.blobController = blobController;
+
+      logger.info("[AppContainer] - App avviata con successo.")
+    } catch (error) {
+      logger.error("[AppContainer] - Errore durante l'avvio dell'app." + (error as Error).message, error);
+      throw error;
     }
+  }
 }
 
 /**
