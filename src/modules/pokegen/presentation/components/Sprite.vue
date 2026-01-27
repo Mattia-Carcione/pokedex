@@ -7,7 +7,7 @@ import { useIntersectionObserver } from '@/shared/presentation/composables/UseIn
 const { pokemon, className } = defineProps(['pokemon', 'className']);
 const style = className ?? 'w-[50px] h-[50px] md:h-[90px] md:w-[90px]';
 
-const controller = appContainer.blobController;
+const controller = appContainer.blobController();
 const img = ref(null);
 const loaded = ref(false);
 const element = ref(null);
