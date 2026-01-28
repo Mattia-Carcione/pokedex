@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import Sprite from "./Sprite.vue";
+import { RouterLink } from "vue-router";
 
 const { pokemon } = defineProps(['pokemon']);
 const style = 'w-25 h-25 lg:w-[150px] lg:h-[150px]';
@@ -9,14 +10,13 @@ const arrayLength = pokemon.evolution.some(
         (stage.evolutions?.length ?? 0) > 2 ||
         (stage.pokemons?.length ?? 0) > 2
 );
-console.warn(arrayLength);
 </script>
 <template>
-    <div class="mt-3 bg-[var(--bg-custom)]/50 rounded-xl p-5">
+    <div class="mt-3 bg-[var(--bg-custom)]/50 rounded-xl p-1">
         <h2 class="font-bold text-xl p-3">Evolution Chain</h2>
 
         <!-- container principale: colonne -->
-        <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-center items-center w-full`">
+        <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-center items-center gap-6 w-full`">
             <template v-for="(stage, i) in pokemon.evolution" :key="i">
                 <!-- Colonna dello stage -->
                 <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} items-center gap-4 justify-evenly w-full lg:w-auto`">
@@ -24,10 +24,10 @@ console.warn(arrayLength);
                     <!-- Ciclo dei Pokémon base in questo stage -->
                     <template v-if="i === 0">
                         <div class="flex flex-col items-center gap-4">
-                            <Routerlink :to="stage.pokemons.href" :aria-label="`Vai al Pokémon ${stage.pokemons.name}`">
+                            <RouterLink :to="stage.pokemons.href" :aria-label="`Vai al Pokémon ${stage.pokemons.name}`">
                                 <Sprite :pokemon="{ name: stage.pokemons.name, sprite: stage.pokemons.sprite }" :className="style" />
                                 <div class="capitalize font-semibold text-center">{{ stage.pokemons.name }}</div>
-                            </Routerlink>
+                            </RouterLink>
                         </div>
                     </template>
 
@@ -97,10 +97,10 @@ console.warn(arrayLength);
 
                                 <!-- Pokémon evoluto -->
                                 <div class="flex flex-col items-center">
-                                    <Routerlink :to="evo.href" :aria-label="`Vai al Pokémon ${evo.to}`">
+                                    <RouterLink :to="evo.href" :aria-label="`Vai al Pokémon ${evo.to}`">
                                         <Sprite :pokemon="{ name: evo.to, sprite: evo.sprite }" :className="style" />
                                         <div class="capitalize text-sm font-semibold mt-1">{{ evo.to }}</div>
-                                    </Routerlink>
+                                    </RouterLink>
                                 </div>
                             </div>
                         </template>
