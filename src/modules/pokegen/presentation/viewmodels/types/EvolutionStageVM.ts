@@ -32,6 +32,6 @@ export interface PokemonEvolutionVM {
  * ViewModel rappresentante uno stadio di evoluzione del Pokémon.
  */
 export interface EvolutionStageVM {
-    pokemons: { name: string; sprite?: string, href:  { name: string; params: { name: string } }}[];
+    pokemons: { name: string; sprite?: string, href:  { name: string; params: { name: string } }};
     evolutions?: PokemonEvolutionVM[];
 }

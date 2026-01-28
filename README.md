@@ -258,3 +258,11 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ Clean Architecture con DI modulare  
 ✅ Immagini di fallback SVG per artwork mancanti e sprite caricati via BlobController  
 ✅ **Pagina dettaglio Pokémon** completa (stats, flavor text, size/capture rate, catena evolutiva)
+
+## Ultimi aggiornamenti
+- **v1.2.0**: Refactoring mapper e servizi di evoluzione
+  - Estratto `EvolutionSpriteEnricherService` per enrichment sprite evoluzione
+  - Estratto `NavigationPokemonLoaderService` per caricamento dati navigazione
+  - Refactored `PokemonMapper` con ottimizzazione algoritmo traversal catena evolutiva (da ricorsivo a Map-based)
+  - Refactored `PokemonViewMapper` con separazione logica di enrichment
+  - Miglioramento maintainability e testabilità della logica di evoluzione

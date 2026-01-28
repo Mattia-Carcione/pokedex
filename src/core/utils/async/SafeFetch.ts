@@ -4,10 +4,9 @@
  * @param fetcher - La funzione di fetch da utilizzare
  * @returns Una promessa che risolve il risultato della fetch o null
  */
-export async function safeFetch<T>(input: number, fetcher: (endpoint: string) => Promise<T>): Promise<T | null> {
-    if (input <= 0) return null;
+export async function safeFetch<T>(fetcher: (endpoint?: any) => Promise<T>, endpoint?: any): Promise<T | null> {
     try {
-        return await fetcher(input.toString());
+        return await fetcher(endpoint);
     } catch (error) {
         return null;
     }

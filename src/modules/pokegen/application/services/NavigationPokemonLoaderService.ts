@@ -5,20 +5,27 @@ import { INavigationPokemonLoaderService } from "./contracts/INavigationPokemonL
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { ServiceError } from "@/core/errors/ServiceError";
 
+/**
+ * Servizio per il caricamento dei Pokémon per la navigazione.
+ */
 export class NavigationPokemonLoaderService implements INavigationPokemonLoaderService {
     constructor(
         private readonly repository: IPokemonRepository,
         private readonly logger: ILogger,
     ) {}
 
+    /**
+     * Carica i Pokémon adiacenti per la navigazione.
+     * @param input Il Pokémon di riferimento per il caricamento.
+     */
     async load(input: Pokemon): Promise<Pokemon[]> {
         this.logger.debug("[NavigationPokemonLoaderService] - Esecuzione del servizio per ottenere i dati per la navigazione pokemon per la card dettaglio: " + input.name);
         try {
             const fetcher = (id: string) => this.repository.getAsync(id);
     
             const [prev, next] = await Promise.all([
-                safeFetch<Pokemon>(input.id - 1, fetcher),
-                safeFetch<Pokemon>(input.id + 1, fetcher),
+                safeFetch<Pokemon>(fetcher, (input.id - 1).toString()),
+                safeFetch<Pokemon>(fetcher, (input.id + 1).toString()),
             ]);
     
             return [prev, next].filter(Boolean) as Pokemon[];

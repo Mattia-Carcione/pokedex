@@ -1,4 +1,4 @@
-import { EvolutionStageVM } from "./EvolutionStageVM ";
+import { EvolutionStageVM } from "./EvolutionStageVM";
 
 /**
  * ViewModel rappresentante un Pokémon.

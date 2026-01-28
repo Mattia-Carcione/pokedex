@@ -97,48 +97,60 @@ export class PokemonMapper implements IPokemonMapper {
             throw new MappingError<EvolutionChainDto>("[PokemonMapper] - Error during Pokémon evolution mapping: Missing required properties.");
 
         this.logger.debug("[PokemonMapper] - Inizio della mappatura della catena evolutiva del Pokémon con ID: " + pokemon.id);
-
         try {
-            const evolutions: PokemonEvolution[] = [];
-
-            const traverse = (node: ChainLinkDto) => {
-                for (const next of node.evolves_to) {
-                    for (const detail of next.evolution_details) {
-                        evolutions.push({
-                            from: node.species.name,
-                            to: next.species.name,
-                            trigger: detail.trigger.name,
-                            minLevel: detail.min_level ?? undefined,
-                            item: detail.item?.name,
-                            gender: detail.gender,
-                            timeOfDay: detail.time_of_day || undefined,
-                            needsOverworldRain: detail.needs_overworld_rain || undefined,
-                            knownMove: detail.known_move?.name,
-                            knownMoveType: detail.known_move_type?.name,
-                            location: detail.location?.name,
-                            minHappiness: detail.min_happiness ?? undefined,
-                            minBeauty: detail.min_beauty ?? undefined,
-                            minAffection: detail.min_affection ?? undefined,
-                            relativePhysicalStats: detail.relative_physical_stats ?? undefined,
-                            partySpecies: detail.party_species?.name,
-                            partyType: detail.party_type?.name,
-                            tradeSpecies: detail.trade_species?.name,
-                            minMoveCount: detail.min_move_count ?? undefined,
-                            needsMultiplayer: detail.needs_multiplayer || undefined,
-                            turnUpsideDown: detail.turn_upside_down || undefined,
-                            usedMove: detail.used_move?.name
-                        });
-                    }
-
-                    traverse(next);
-                }
-            };
-
-            traverse(evolution.chain);
-            pokemon.evolution = evolutions;
+            const evolutionMap: Map<string, PokemonEvolution> = new Map<string, PokemonEvolution>();
+            const traverseMap = this.traverse(evolution.chain, evolutionMap);
+            pokemon.evolution = Array.from(traverseMap.values());
+            console.warn(pokemon.evolution);
             return pokemon;
         } catch (error) {
             throw new MappingError<EvolutionChainDto>("[PokemonMapper] - Error during Pokémon Evolution mapping. " + (error as Error).message);
         }
     }
+
+    /**
+     * Funzione ricorsiva per attraversare la catena evolutiva e raccogliere le evoluzioni.
+     * @param node Il nodo corrente della catena evolutiva.
+     * @returns Una mappa delle evoluzioni del Pokémon.
+     */
+    private traverse(node: ChainLinkDto, evolutionsMap: Map<string, PokemonEvolution>): Map<string, PokemonEvolution> {
+        try {
+            for (const next of node.evolves_to) {
+                const key = `${node.species.name}|${next.species.name}`;
+                if (!evolutionsMap.has(key)) {
+                    const detail = next.evolution_details[0]; // prendi solo il primo dettaglio disponibile
+                    evolutionsMap.set(key, {
+                        from: node.species.name,
+                        to: next.species.name,
+                        trigger: detail.trigger.name,
+                        minLevel: detail.min_level ?? undefined,
+                        item: detail.item?.name,
+                        gender: detail.gender,
+                        timeOfDay: detail.time_of_day || undefined,
+                        needsOverworldRain: detail.needs_overworld_rain || undefined,
+                        knownMove: detail.known_move?.name,
+                        knownMoveType: detail.known_move_type?.name,
+                        location: detail.location?.name,
+                        minHappiness: detail.min_happiness ?? undefined,
+                        minBeauty: detail.min_beauty ?? undefined,
+                        minAffection: detail.min_affection ?? undefined,
+                        relativePhysicalStats: detail.relative_physical_stats ?? undefined,
+                        partySpecies: detail.party_species?.name,
+                        partyType: detail.party_type?.name,
+                        tradeSpecies: detail.trade_species?.name,
+                        minMoveCount: detail.min_move_count ?? undefined,
+                        needsMultiplayer: detail.needs_multiplayer || undefined,
+                        turnUpsideDown: detail.turn_upside_down || undefined,
+                        usedMove: detail.used_move?.name
+                    });
+                }
+                this.traverse(next, evolutionsMap);
+            }
+            return evolutionsMap;
+        } catch(error) {
+            this.logger.error("[PokemonMapper] - Error during traverse of Pokémon Evolution mapping. " + (error as Error).message);
+            throw error;
+        }
+    };
 }
+

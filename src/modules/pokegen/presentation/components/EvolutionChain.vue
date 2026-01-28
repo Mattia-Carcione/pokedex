@@ -9,23 +9,24 @@ const arrayLength = pokemon.evolution.some(
         (stage.evolutions?.length ?? 0) > 2 ||
         (stage.pokemons?.length ?? 0) > 2
 );
+console.warn(arrayLength);
 </script>
 <template>
     <div class="mt-3 bg-[var(--bg-custom)]/50 rounded-xl p-5">
         <h2 class="font-bold text-xl p-3">Evolution Chain</h2>
 
         <!-- container principale: colonne -->
-        <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-around items-center gap-6`">
+        <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-center items-center w-full`">
             <template v-for="(stage, i) in pokemon.evolution" :key="i">
                 <!-- Colonna dello stage -->
-                <div class="flex flex-col items-center gap-4 w-full lg:w-auto">
+                <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} items-center gap-4 justify-evenly w-full lg:w-auto`">
 
                     <!-- Ciclo dei Pokémon base in questo stage -->
-                    <template v-if="i === 0" v-for="pokemon in stage.pokemons" :key="pokemon.name">
-                        <div class="flex flex-col items-center gap-1">
-                            <Routerlink :to="pokemon.href" :aria-label="`Vai al Pokémon ${pokemon.name}`">
-                                <Sprite :pokemon="{ name: pokemon.name, sprite: pokemon.sprite }" :className="style" />
-                                <div class="capitalize font-semibold text-center">{{ pokemon.name }}</div>
+                    <template v-if="i === 0">
+                        <div class="flex flex-col items-center gap-4">
+                            <Routerlink :to="stage.pokemons.href" :aria-label="`Vai al Pokémon ${stage.pokemons.name}`">
+                                <Sprite :pokemon="{ name: stage.pokemons.name, sprite: stage.pokemons.sprite }" :className="style" />
+                                <div class="capitalize font-semibold text-center">{{ stage.pokemons.name }}</div>
                             </Routerlink>
                         </div>
                     </template>
