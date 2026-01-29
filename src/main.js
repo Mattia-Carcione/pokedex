@@ -6,6 +6,7 @@ import Navbar from './app/presentation/layout/Navbar.vue';
 import pinia from './app/providers/Pinia';
 import router from './app/routing';
 import Footer from './app/presentation/layout/Footer.vue';
+import SearchInput from './shared/presentation/components/SearchInput.vue';
 
 const app = createApp(App);
 app.use(pinia);
@@ -16,6 +17,10 @@ app.mount('#app');
 const hero = createApp(Hero);
 hero.use(router);
 hero.mount('#header');
+
+const search = createApp(SearchInput);
+search.use(router);
+search.mount('#search');
 
 const nav = createApp(Navbar);
 nav.use(router);

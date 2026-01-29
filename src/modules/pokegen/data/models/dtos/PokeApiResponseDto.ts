@@ -1,6 +1,5 @@
 import { NamedResource } from "@/core/types/CommonTypes";
 
-
 /**
  * Elenco paginato delle risorse disponibili per quell'API
  * 

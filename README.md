@@ -7,17 +7,18 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 ## Caratteristiche
 - Navigazione per generazione (`/generation/:id`) con elenco ordinato di Pokémon.
 - Pagina dettaglio Pokémon (`/pokemon/:name`) completa con card dedicata, stats, flavor text, size/capture rate e catena evolutiva.
+- Ricerca Pokémon con input dedicato e debounce, basata su indice PokeAPI locale e fetch dei dettagli.
 - Stato centralizzato con Pinia e controller/use-case che orchestrano repository e store.
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
-- Mock data locali in `assets/mock_data` utilizzati in modalità development.
-- Dependency Injection tramite `AppContainer` e container feature-specific (PokéGen, Blob) per la gestione delle dipendenze.
+- Mock data locali in `assets/mock_data` utilizzati in modalità development (incl. `pokeapi-list.json`).
+- Dependency Injection tramite `AppContainer` e container feature-specific (PokéGen, Shared) per la gestione delle dipendenze.
 - Sprite ufficiali scaricati come Blob tramite controller dedicato, con lazy loading via Intersection Observer, skeleton e fallback SVG per artwork mancanti.
 - Composable `useIntersectionObserver` per ottimizzare il caricamento delle immagini (lazy load).
 
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
 - **HTTP Client**: Axios con interceptor personalizzati (retry, cache)
-- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + Memory Cache in-app con TTL configurabile tramite `fetchWithMemoryCache`
+- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + InMemoryCache in-app con TTL configurabile (via `InMemoryCache.set)
 - **Styling**: Tailwind 4
 - **Testing**: Vitest + @vue/test-utils
 - **TypeScript**: Supporto completo con tsconfig
@@ -40,10 +41,10 @@ Contiene le regole di business indipendenti dal framework:
 
 ### Infrastructure Layer (`src/infrastructure/`)
 Implementazioni concrete delle interfacce core:
-- `cache/`: Gestione cache con:
+- `cache/`: `InMemoryCache` (TTL in-app e chiavi univoche)
+- `indexedDb/`: Gestione cache persistente con:
   - `CacheDb` e `CacheKeyFactory` per IndexedDB (90 giorni TTL)
-  - `CacheHelper` con `fetchWithMemoryCache` per cache in-app (default 1h TTL, configurabile)
-  - Tipi: `CachedItem<T>`, `CacheMap<T>`, `CachedResponse`, `CacheRequestConfig`
+  - Tipi: `CacheItem`, `CacheMap`, `CachedResponse`, `CacheRequestConfig`
 - `http/`: Client HTTP Axios con:
   - `client/axios/`: `AxiosHttpClient`, `AxiosClientFactory`, interceptor (retry, cache)
   - `config/`: Configurazioni di default per retry e jitter
@@ -78,7 +79,6 @@ Feature PokéGen organizzata in sotto-layer:
 - `datasources/`: 
   - `GenerationDataSource`, `PokemonDataSource`, `PokemonSpeciesDataSource`, `PokeApiResponseDataSource` (HTTP)
   - Versioni mock per ogni datasource
-- `factories/`: Factory per creare datasource in base all'environment
 - `models/`: DTO e tipi aggregati (`GenerationDTO`, `PokemonDTO`, `PokemonSpeciesDTO`, `PokemonAggregateData`)
 - `repositories/`: Implementazioni repository con facade per datasource e mapper
 - `enums/`: `EndpointApi` per URL degli endpoint
@@ -94,18 +94,18 @@ Feature PokéGen organizzata in sotto-layer:
 - `components/`: Componenti Vue (`Card`, `BadgeType`, `Skeleton`, `EvolutionChain`)
 - `views/`: Viste principali (`HomeView`, `DetailView`)
 - `enums/`: `TypeRequestEnum` per discriminare tipo di richiesta
-- `factories/`: Factory per controller
+- `routes.ts`: Rotte della feature
 
 ### Shared Layer (`src/shared/`)
 Componenti e logica riutilizzabili (usati trasversalmente da più feature):
-- `application/`: Use case condivisi (`GetBlobUseCase`)
-- `domain/`: Interfacce (`IBlobRepository`, `IGetBlobUseCase`)
-- `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`
+- `application/`: Use case condivisi (`GetBlobUseCase`, `GetPokeApiUseCase`)
+- `domain/`: Interfacce (`IBlobRepository`, `IGetBlobUseCase`, `IPokeApiRepository`, `IGetPokeApiUseCase`)
+- `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`, `PokeApiResponseDataSource`, `PokeApiRepository`
 - `presentation/`:
   - `components/`: Componenti Vue riutilizzati (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
   - `composables/`: Vue composable (`useIntersectionObserver` per lazy loading ottimizzato)
-  - `contorllers/`: `UseBlobController` per orchestrazione recupero sprite/asset
-- `factories/`: `BlobContainer` per dependency injection (DataSourceFactory consolidato in AppContainer)
+  - `controllers/`: `UseBlobController`, `UsePokeApiController` (indice e ricerca PokeAPI)
+- `factories/`: `SharedContainer` per dependency injection (Blob + PokeAPI + cache)
 
 ## Rotte
 - `/` – Home (lista generazioni, redirect da /generation/1)
@@ -132,16 +132,16 @@ npm run test:coverage # report coverage
 ```
 
 ## Dependency Injection (AppContainer)
-Il `AppContainer` + `PokegenContainer` + `BlobContainer` inizializzano tutte le dipendenze dell'applicazione:
+Il `AppContainer` + `PokegenContainer` + `SharedContainer` inizializzano tutte le dipendenze dell'applicazione:
 
 1. **Infrastructure**: `AxiosClientFactory`, `HttpErrorMapper`, `Logger`
 2. **Mappers**: `GenerationMapper`, `PokemonMapper`, `NavbarMapper`, `PokemonViewMapper`
-3. **PokéGen Factories**: `PokegenDataSourceFactory`, `PokegenRepositoryFactory`, `PokegenControllerFactory`
-4. **PokéGen DataSources**: Seleziona datasource (API o mock) in base all'`EnvironmentEnum`
-5. **PokéGen Repositories**: `GenerationRepository`, `PokemonRepository` con facade per datasource e mapper
-6. **PokéGen Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`
+3. **PokéGen DataSources**: Selezione API/mock via `FactoryHelper.createByEnvHelper`
+4. **PokéGen Repositories**: `GenerationRepository`, `PokemonRepository` con facade per datasource e mapper
+5. **PokéGen Services**: `NavigationPokemonLoaderService`, `EvolutionSpriteEnricherService`
+6. **PokéGen Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`, `GetSearchPokemonUseCase`
 7. **PokéGen Controllers**: `UseGenerationController`, `UsePokemonController`
-8. **Blob pipeline**: `DataSourceFactory` (API/mock) → `BlobRepository` → `GetBlobUseCase` → `UseBlobController` per caricare sprite e asset binari
+8. **Shared pipeline**: `BlobRepository` + `PokeApiRepository` → `GetBlobUseCase` + `GetPokeApiUseCase` → `UseBlobController` + `UsePokeApiController`
 
 ```typescript
 // Esempio utilizzo in un componente Vue
@@ -151,7 +151,7 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
 
 ## Cache e Retry Strategy
 - **Cache IndexedDB**: TTL 90 giorni, chiavi generate da `CacheKeyFactory`
-- **Memory Cache**: TTL configurabile (default 1 ora), helper `fetchWithMemoryCache` negli store Pinia
+- **InMemory Cache**: TTL configurabile (default 1 ora)
   - `UseGenerationStore`: cache memory per generazioni
   - `UsePokegenStore`: cache memory per Pokémon (home e detail)
 - **Retry**: Exponential backoff con jitter (full, equal, decorrelated)
@@ -186,10 +186,11 @@ src/
     utils/                           # Utility pure
   infrastructure/
     cache/
+      InMemoryCache.ts               # Cache in memoria
+    indexedDb/
       CacheDb.ts                     # Gestione IndexedDB
       CacheKeyFactory.ts             # Generatore chiavi cache
-      helpers/                       # CacheHelper con fetchWithMemoryCache
-      types/                         # CachedItem, CacheMap, CachedResponse
+      types/                         # CacheItem, CacheMap, CachedResponse
     http/
       client/axios/                  # AxiosHttpClient, interceptor
       config/                        # HttpConfig
@@ -204,7 +205,6 @@ src/
         usecases/                    # Business logic
       data/
         datasources/                 # API, mock e aggregati
-        factories/                   # Factory per datasource
         models/                      # DTO e tipi
         repositories/                # Implementazioni repository
         types/                       # Tipi specifici data layer
@@ -215,27 +215,26 @@ src/
       presentation/
         components/                  # Card, BadgeType, Skeleton, EvolutionChain
         controllers/                 # Orchestrazione
-        factories/                   # Factory controller
         mappers/                     # Domain → ViewModel (+ utils/evolution/)
         store/                       # Pinia stores
         viewmodels/                  # HomeViewModel, DetailViewModel
         views/                       # HomeView, DetailView
+        routes.ts                    # Rotte della feature
   shared/
     application/
-      usecases/                      # GetBlobUseCase
+      usecases/                      # GetBlobUseCase, GetPokeApiUseCase
     data/
-      datasources/                   # BlobDataSource (API), BlobMockDataSource (mock)
-      factories/                     # DataSourceFactory (seleziona API/mock)
-      repositories/                  # BlobRepository
+      datasources/                   # BlobDataSource, PokeApiResponseDataSource (+ mock)
+      repositories/                  # BlobRepository, PokeApiRepository
     domain/
-      repositories/                  # IBlobRepository
-      usecases/                      # IGetBlobUseCase
+      repositories/                  # IBlobRepository, IPokeApiRepository
+      usecases/                      # IGetBlobUseCase, IGetPokeApiUseCase
     presentation/
       components/                    # Loader, 404View, CustomSection, ScrollToTop
       composables/                   # useIntersectionObserver per lazy loading
-      contorllers/                   # UseBlobController
+      controllers/                   # UseBlobController, UsePokeApiController
       viewmodels/                    # ViewModel condivisi
-    factories/                       # BlobContainer
+    factories/                       # SharedContainer
 assets/
   mock_data/                         # Dati JSON mock
 public/
@@ -246,6 +245,8 @@ public/
 - **Development** (`npm run dev`): Usa mock data da `assets/mock_data/`
 - **Production** (`npm run build`): Usa PokeAPI in produzione
 - **Testing**: Usa mock data per test deterministici
+
+Nota: l'indice completo per la ricerca è in `assets/mock_data/pokeapi-list.json`.
 
 La selezione avviene automaticamente tramite le factory in base a `EnvironmentEnum`.
 
@@ -264,6 +265,10 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ **Pagina dettaglio Pokémon** completa (stats, flavor text, size/capture rate, catena evolutiva)
 
 ## Ultimi aggiornamenti
+- **v1.4.0**: Refactoring cache + ricerca PokeAPI condivisa
+  - Spostata la cache persistente in `infrastructure/indexedDb` e introdotta `InMemoryCache`
+  - Aggiunti `PokeApiRepository`, `GetPokeApiUseCase` e `UsePokeApiController`
+  - Aggiunta ricerca Pokémon con input dedicato (debounce) e lista indicizzata
 - **v1.3.0**: Refactoring mapper e utility di evoluzione
   - Estratto `Traverse` da `PokemonMapper` in file separato `mappers/utils/Traverse.ts`
   - Estratto `BuildPokemonVM` e `BuildEvolutionVM` da `PokemonViewMapper` in `presentation/mappers/utils/evolution/`

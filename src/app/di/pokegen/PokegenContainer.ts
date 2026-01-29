@@ -8,7 +8,6 @@ import { usePokegenStore } from "@/modules/pokegen/presentation/store/UsePokegen
 import { NavBarMapper } from "@/modules/pokegen/presentation/mappers/NavbarMapper";
 import { IGenerationRepository } from "@/modules/pokegen/domain/repositories/IGenerationRepository";
 import { IPokemonRepository } from "@/modules/pokegen/domain/repositories/IPokemonRepository";
-import { IUseControllerBase } from "@/core/contracts/presentation/IUseControllerBase";
 import { IGetGenerationUseCase } from "@/modules/pokegen/domain/usecases/IGetGenerationUseCase";
 import { IGetPokemonUseCase } from "@/modules/pokegen/domain/usecases/IGetPokemonUseCase";
 import { IGetPokemonDetailUseCase } from "@/modules/pokegen/domain/usecases/IGetPokemonDetailUseCase";
@@ -25,8 +24,7 @@ import { PokemonMockDataSource } from "@/modules/pokegen/data/datasources/mock/P
 import { PokemonSpeciesDto } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
 import { PokemonSpeciesDataSource } from "@/modules/pokegen/data/datasources/PokemonSpeciesDataSources";
 import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
-import { PokeApiResponseMockDataSource } from "@/modules/pokegen/data/datasources/mock/PokeApiResponseMockDataSource";
-import { PokeApiResponseDataSource } from "@/modules/pokegen/data/datasources/PokeApiResponseDataSource";
+import { PokeApiResponseMockDataSource } from "@/shared/data/datasources/mock/PokeApiResponseMockDataSource";
 import { GenerationRepository } from "@/modules/pokegen/data/repositories/GenerationRepository";
 import { PokemonRepository } from "@/modules/pokegen/data/repositories/PokemonRepository";
 import { GetGenerationUseCase } from "@/modules/pokegen/application/usecases/GetGenerationUseCase";
@@ -41,6 +39,18 @@ import { INavigationPokemonLoaderService } from "@/modules/pokegen/application/s
 import { NavigationPokemonLoaderService } from "@/modules/pokegen/application/services/NavigationPokemonLoaderService";
 import { IEvolutionSpriteEnricherService } from "@/modules/pokegen/application/services/contracts/IEvolutionSpriteEnricherService";
 import { EvolutionSpriteEnricherService } from "@/modules/pokegen/application/services/EvolutionSpriteEnricherService";
+import { PokeApiRepository } from "@/shared/data/repositories/PokeApiRepository";
+import { IGetPokeApiUseCase } from "@/shared/domain/usecases/IGetPokeApiUseCase";
+import { GetPokeApiUseCase } from "@/shared/application/usecases/GetPokeApiUseCase";
+import { UsePokeApiController } from "@/shared/presentation/controllers/UsePokeApiController";
+import { usePokeApiStore } from "@/shared/presentation/stores/UsePokeApiStore";
+import { IUsePokeApiController } from "@/shared/presentation/controllers/contracts/IUsePokeApiController";
+import { PokeApiResponseDataSource } from "@/shared/data/datasources/PokeApiResponseDataSource";
+import { IUseGenerationController } from "@/modules/pokegen/presentation/controllers/contracts/IUseGenerationController";
+import { IUsePokemonController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokemonController";
+import { IGetSearchPokemonUseCase } from "@/modules/pokegen/domain/usecases/IGetSearchPokemonUseCase";
+import { GetSearchPokemonUseCase } from "@/modules/pokegen/application/usecases/GetSearchPokemonUseCase";
+import { ICache } from "@/core/contracts/infrastructure/cache/ICache";
 
 /**
  * Classe statica per la creazione dei controller della feature pokegen.
@@ -59,10 +69,12 @@ export class PokegenContainer {
     static build(env: EnvironmentEnum, deps: {
         httpClient: IHttpClient;
         httpMapper: IHttpErrorMapper;
+        cache: ICache<any>;
         logger: ILogger;
     }): {
-        generationController: () => IUseControllerBase;
-        pokemonController: () => IUseControllerBase;
+        generationController: () => IUseGenerationController;
+        pokemonController: () => IUsePokemonController;
+        pokeApiController: () => IUsePokeApiController;
     } {
         // --- MAPPERS ---
         const generationMapper = FactoryHelper.create<GenerationMapper>(GenerationMapper, deps.logger);
@@ -92,10 +104,13 @@ export class PokegenContainer {
 
         // --- REPOSITORIES ---
         const generationRepository = FactoryHelper
-            .create<IGenerationRepository>(GenerationRepository, generationDataSource, pokeApiResponseDataSource, pokemonDataSource, generationMapper, pokemonMapper, deps.logger);
+            .create<IGenerationRepository>(GenerationRepository, generationDataSource, pokeApiResponseDataSource, pokemonDataSource, generationMapper, pokemonMapper, deps.cache, deps.logger);
 
         const pokemonRepository = FactoryHelper
-            .create<IPokemonRepository>(PokemonRepository, pokemonDataSource, pokemonSpeciesDataSource, evolutionChainDataSource, pokemonMapper, deps.logger);
+            .create<IPokemonRepository>(PokemonRepository, pokemonDataSource, pokemonSpeciesDataSource, evolutionChainDataSource, pokemonMapper, deps.cache, deps.logger);
+
+        const pokeapiRepository = FactoryHelper
+            .create<PokeApiRepository>(PokeApiRepository, pokeApiResponseDataSource, deps.cache, deps.logger);
 
         // --- SERVICES ---
         const navigationPokemonLoaderService = FactoryHelper
@@ -114,16 +129,26 @@ export class PokegenContainer {
         const pokemonDetailUseCase = FactoryHelper
             .create<IGetPokemonDetailUseCase>(GetPokemonDetailUseCase, pokemonRepository, navigationPokemonLoaderService, evolutionSpriteEnricherService, deps.logger);
 
+        const pokeapiUseCase = FactoryHelper
+            .create<IGetPokeApiUseCase>(GetPokeApiUseCase, pokeapiRepository, deps.logger);
+
+        const searchPokemonUseCase = FactoryHelper
+            .create<IGetSearchPokemonUseCase>(GetSearchPokemonUseCase, pokemonRepository, deps.logger);
+
         // --- CONTROLLERS ---
         const genController = () => FactoryHelper
             .create<UseGenerationController>(UseGenerationController, useGenerationStore(), generationUseCase, navbarMapper, deps.logger);
         
         const pkmController = () => FactoryHelper
-            .create<UsePokemonController>(UsePokemonController, usePokegenStore(), pokemonUseCase, pokemonDetailUseCase, pokemonViewMapper, deps.logger);
+            .create<UsePokemonController>(UsePokemonController, usePokegenStore(), usePokeApiStore(), pokemonUseCase, pokemonDetailUseCase, searchPokemonUseCase, pokemonViewMapper, deps.logger);
         
-        return {
+        const pkApiController = () => FactoryHelper
+            .create<UsePokeApiController>(UsePokeApiController, usePokeApiStore(), pokeapiUseCase, deps.logger);
+        
+            return {
             generationController: genController,
             pokemonController: pkmController,
+            pokeApiController: pkApiController,
         }
     }
 }

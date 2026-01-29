@@ -75,7 +75,8 @@ export class PokemonViewMapper implements IPokemonViewMapper {
             // TODO: Aggiungere ulteriori dettagli specifici per la vista dettaglio
             return pokemon;
         } catch (error) {
-            throw new MappingError<Pokemon>("[PokemonViewMapper] - Error during mapping of Pokémon", source, error as Error);
+            this.logger.error("[PokemonViewMapper] - Error during mapping detail of Pokémon: " + (error as Error).message);
+            throw new MappingError<Pokemon>("[PokemonViewMapper] - Error during mapping detail of Pokémon", source, error as Error);
         }
     }
 
@@ -87,7 +88,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
      */
     private mapEvolutionToVM(evolutions: PokemonEvolution[], pokemon: PokemonVM): EvolutionStageVM[] {
         this.logger.debug("[PokemonViewMapper] - Inizio della mappatura dell'evoluzione del pokemon");
-        if(!evolutions || evolutions.length === 0) {
+        if(!evolutions || evolutions?.length === 0) {
             this.logger.warn("[PokemonViewMapper] - Nessuna evoluzione trovata per il pokemon. Eseguo mappatura fallback.");
             return [{
                 pokemons: buildPokemonVM(pokemon.name, pokemon.sprite),

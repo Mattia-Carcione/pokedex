@@ -11,5 +11,5 @@
     },
     "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["src/**/*", "test/**/*", "env.d.ts", "vitest.config.ts"]
+  "include": ["src/**/*", "test/**/*", "env.d.ts", "vitest.config.ts", "src/shared/data/repositories/PokemonListRepository.ts"]
 }

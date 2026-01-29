@@ -2,18 +2,20 @@ import { computed, ComputedRef, shallowRef, watch } from "vue";
 import { PokegenStore } from "../store/types/StoreTypes";
 import { IGetPokemonUseCase } from "../../domain/usecases/IGetPokemonUseCase";
 import { IGetPokemonDetailUseCase } from "../../domain/usecases/IGetPokemonDetailUseCase";
-import { IUseControllerBase } from "@/core/contracts/presentation/IUseControllerBase";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { IPokemonViewMapper } from "../mappers/contracts/IPokemonViewMapper";
 import { HomeViewModel } from "../viewmodels/HomeViewModel";
 import { DetailViewModel } from "../viewmodels/DetailViewModel";
 import { TypeRequestEnum } from "../enums/TypeRequestEnum";
 import { Pokemon } from "../../domain/entities/Pokemon";
+import { IUsePokemonController } from "./contracts/IUsePokemonController";
+import { PokeApiStore } from "@/shared/presentation/stores/types/SharedStoreTypes";
+import { IGetSearchPokemonUseCase } from "../../domain/usecases/IGetSearchPokemonUseCase";
 
 /**
  * Implementazione del controller della generazione dei Pokémon.
  */
-export class UsePokemonController extends IUseControllerBase {
+export class UsePokemonController extends IUsePokemonController {
     private homeVM = shallowRef<HomeViewModel | null>(null);
     private detailVM = shallowRef<DetailViewModel | null>(null);
 
@@ -27,8 +29,10 @@ export class UsePokemonController extends IUseControllerBase {
      */
     constructor(
         private readonly store: PokegenStore,
+        private readonly pokeApiStore: PokeApiStore,
         private readonly useCase: IGetPokemonUseCase,
         private readonly detailUseCase: IGetPokemonDetailUseCase,
+        private readonly pokeSearchUseCase: IGetSearchPokemonUseCase,
         private readonly mapper: IPokemonViewMapper,
         private readonly logger: ILogger
     ) {
@@ -38,6 +42,7 @@ export class UsePokemonController extends IUseControllerBase {
             if (!data || !req) return;
             switch (req) {
                 case TypeRequestEnum.HOME:
+                case TypeRequestEnum.SEARCH:
                     const homeResponse = data as Pokemon[];
                     this.buildHomeViewModel(homeResponse);
                     break;
@@ -58,6 +63,7 @@ export class UsePokemonController extends IUseControllerBase {
         return computed(() => {
             switch (this.store.typeRequest) {
                 case TypeRequestEnum.HOME:
+                case TypeRequestEnum.SEARCH:
                     return this.homeVM.value ?? [];
                 case TypeRequestEnum.DETAIL:
                     return this.detailVM.value ?? [];
@@ -97,7 +103,28 @@ export class UsePokemonController extends IUseControllerBase {
 
         this.logger.info("[UsePokemonController] - Dati dei Pokémon caricati con successo.");
     }
-    
+
+    /**
+     * Esegue una ricerca locale tra i Pokémon per nome.
+     * @param prefix Il prefisso da cercare.
+     * @returns Una lista di risorse nominate che corrispondono al prefisso.
+     */
+    async searching(input: { endpoint: string, req: TypeRequestEnum }): Promise<void> {
+        this.store.setInit(input);
+        this.store.pokemon = [];
+        await this.pokeApiStore.search(input.endpoint, this.pokeSearchUseCase);
+
+        const data = this.pokeApiStore.data;
+        if (!data || data.length === 0) {
+            this.store.loading = false;
+            this.store.error = new Error(`No Pokémon found for the given search criteria: ${input.endpoint}.`);
+            return;
+        }
+
+        this.store.pokemon = data;
+        this.store.loading = false;
+    }
+
     /** 
      * Costruisce il ViewModel per la vista principale. 
      * @param data I dati dei Pokémon da mappare.

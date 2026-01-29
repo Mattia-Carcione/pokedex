@@ -1,15 +1,12 @@
 import { defineStore } from "pinia";
 import { IGetGenerationUseCase } from "../../domain/usecases/IGetGenerationUseCase";
 import { Generation } from "../../domain/entities/Generation";
-import { CacheMap } from "@/infrastructure/cache/types/CacheItem";
-import { fetchWithMemoryCache } from "@/infrastructure/cache/helpers/CacheHelper";
 
 /**
  * Store Pinia per gestire lo stato della generazione dei Pokémon.
  */
 export const useGenerationStore = defineStore('generation', {
     state: () => ({
-        cache: {} as CacheMap<Generation[]>,
         generationData: null as Generation[] | null,
         loading: false,
         error: null as Error | null,
@@ -24,25 +21,15 @@ export const useGenerationStore = defineStore('generation', {
         async ensureLoaded(
             getGenerationUseCase: IGetGenerationUseCase,
         ): Promise<void> {
-            try {
-                const key = `generation:all`;
-                const response = await fetchWithMemoryCache<Generation[]>(
-                    key,
-                    this.cache,
-                    () => getGenerationUseCase.execute()
-                );
+            const response = await getGenerationUseCase.execute();
 
-                if(response.success)
-                    this.generationData = response.data ?? null;
-                else
-                    this.error = response.error;
-            } catch (error) {
-                this.error = error as Error;
-            } finally {
-                this.loading = false;
-            }
+            if(response.success)
+                this.generationData = response.data ?? null;
+            else
+                this.error = response.error ?? new Error("Error unknown");
+
+            this.loading = false;
         },
-
         /**
          * Imposta lo stato iniziale dello store.
          */

@@ -1,6 +1,14 @@
 <script setup>
-import ScrollToTop from '@/shared/presentation/components/ScrollToTop.vue';
+import { onMounted } from "vue";
+import { appContainer } from './di/AppContainer';
 import { RouterView } from 'vue-router';
+import ScrollToTop from '@/shared/presentation/components/ScrollToTop.vue';
+
+const pokeApiController = appContainer.pokeApiController();
+
+onMounted(async () => {
+  await pokeApiController.loadData();
+});
 </script>
 
 <template>
@@ -9,5 +17,3 @@ import { RouterView } from 'vue-router';
     </Suspense>
     <ScrollToTop />
 </template>
-
-<style scoped></style>

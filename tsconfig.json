@@ -22,6 +22,6 @@
     },
     "types": ["vitest/globals", "vite/client"]
   },
-  "include": ["src", "test", "vitest.config.ts", "vite.config.js"],
+  "include": ["src", "test", "vitest.config.ts", "vite.config.js", "src/shared/data/repositories/PokeApiRepository.ts"],
   "exclude": ["node_modules", "dist", "test/examples/**/*"]
 }

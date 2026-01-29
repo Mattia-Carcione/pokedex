@@ -3,5 +3,6 @@
  */
 export enum TypeRequestEnum {
     HOME = "HOME",
-    DETAIL = "DETAIL"
+    DETAIL = "DETAIL",
+    SEARCH = "SEARCH"
 }

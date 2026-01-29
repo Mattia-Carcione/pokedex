@@ -24,7 +24,7 @@ export class NavigationPokemonLoaderService implements INavigationPokemonLoaderS
             const fetcher = (id: string) => this.repository.getAsync(id);
     
             const [prev, next] = await Promise.all([
-                safeFetch<Pokemon>(fetcher, (input.id - 1).toString()),
+                (input.id - 1) > 0 ? safeFetch<Pokemon>(fetcher, (input.id - 1).toString()) : undefined,
                 safeFetch<Pokemon>(fetcher, (input.id + 1).toString()),
             ]);
     

@@ -13,9 +13,5 @@
                 {{ TITLE }}
             </h1>
         </RouterLink>
-        <p id="set-gen"
-            class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
-            Select a Generation:
-        </p>
     </div>
 </template>

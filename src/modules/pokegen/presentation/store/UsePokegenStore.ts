@@ -3,14 +3,12 @@ import { IGetPokemonUseCase } from "../../domain/usecases/IGetPokemonUseCase";
 import { Pokemon } from "../../domain/entities/Pokemon";
 import { IGetPokemonDetailUseCase } from "../../domain/usecases/IGetPokemonDetailUseCase";
 import { TypeRequestEnum } from "../enums/TypeRequestEnum";
-import { CacheMap } from "@/infrastructure/cache/types/CacheItem";
-import { fetchWithMemoryCache } from "@/infrastructure/cache/helpers/CacheHelper";
+
 /**
  * Store Pinia per gestire lo stato della generazione dei Pokémon.
  */
 export const usePokegenStore = defineStore('pokegen', {
     state: () => ({
-        cache: {} as CacheMap<Pokemon[]>,
         pokemon: null as Pokemon[] | null,
         loading: false,
         error: null as Error | null,
@@ -28,17 +26,12 @@ export const usePokegenStore = defineStore('pokegen', {
             getPokemonUseCase: IGetPokemonUseCase | IGetPokemonDetailUseCase,
             input: { endpoint: string, req: TypeRequestEnum }
         ): Promise<void> {
-            const key = `${input.req}:${input.endpoint}`;
-            const response = await fetchWithMemoryCache<Pokemon[]>(
-                key,
-                this.cache,
-                () => getPokemonUseCase.execute(input.endpoint)
-            );
+            const response = await getPokemonUseCase.execute(input.endpoint)
 
             if (response.success)
                 this.pokemon = response.data ?? null;
             else 
-                this.error = response.error ?? new Error("Errore sconosciuto");
+                this.error = response.error ?? new Error("Error unknown");
 
             this.loading = false;
         },

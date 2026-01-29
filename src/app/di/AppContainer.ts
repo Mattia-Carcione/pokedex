@@ -6,20 +6,24 @@ import { HttpErrorMapper } from "@/infrastructure/http/mappers/HttpErrorMapper";
 import { RetryEnum } from "@/infrastructure/http/enums/RetryEnum";
 import { Logger } from "@/infrastructure/logger/Logger";
 import { PokegenContainer } from "./pokegen/PokegenContainer";
-import { BlobContainer } from "@/shared/factories/BlobContainer";
+import { SharedContainer } from "@/shared/factories/SharedContainer";
+import { IUsePokeApiController } from "@/shared/presentation/controllers/contracts/IUsePokeApiController";
+import { IUseGenerationController } from "@/modules/pokegen/presentation/controllers/contracts/IUseGenerationController";
+import { IUsePokemonController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokemonController";
 
 /**
  * Container per la gestione delle dipendenze dell'applicazione PokéGen.
  */
 class AppContainer {
-  readonly generationController: () => IUseControllerBase;
-  readonly pokemonController: () => IUseControllerBase;
+  readonly generationController: () => IUseGenerationController;
+  readonly pokemonController: () => IUsePokemonController;
   readonly blobController: () => IUseControllerBase;
+  readonly pokeApiController: () => IUsePokeApiController;
 
   constructor(env: EnvironmentEnum) {
+    // --- LOGGERS ---
     const logger = new Logger(env);
     try {
-      // --- LOGGERS ---
 
       // --- INFRASTRUCTURE ---
       const httpFactory = new AxiosClientFactory(logger);
@@ -32,12 +36,15 @@ class AppContainer {
       // --- MAPPERS ---
       const httpMapper = new HttpErrorMapper(logger);
 
-      const { generationController, pokemonController } = PokegenContainer.build(env, { httpClient, httpMapper, logger });
-      const { blobController } = BlobContainer.build(env, { httpClient, httpMapper, logger });
+      // --- CONTAINERS ---
+      const { blobController, cache } = SharedContainer.build(env, { httpClient, httpMapper, logger });
+      const { generationController, pokemonController, pokeApiController } = PokegenContainer.build(env, { httpClient, httpMapper, cache, logger });
 
+      // --- ASSIGNMENTS ---
       this.generationController = generationController;
       this.pokemonController = pokemonController;
       this.blobController = blobController;
+      this.pokeApiController = pokeApiController;
 
       logger.info("[AppContainer] - App avviata con successo.")
     } catch (error) {

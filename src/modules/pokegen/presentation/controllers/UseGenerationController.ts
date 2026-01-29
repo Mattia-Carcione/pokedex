@@ -1,12 +1,12 @@
 import { computed } from "vue";
-import { IUseControllerBase } from "../../../../core/contracts/presentation/IUseControllerBase";
 import { GenerationStore } from "../store/types/StoreTypes";
 import { IGetGenerationUseCase } from "../../domain/usecases/IGetGenerationUseCase";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { INavbarMapper } from "../mappers/contracts/INavbarMapper";
+import { IUseGenerationController } from "./contracts/IUseGenerationController";
 
 /** * Implementazione del controller della generazione dei Pokémon. */
-export class UseGenerationController extends IUseControllerBase {
+export class UseGenerationController extends IUseGenerationController {
 
     constructor(
         private readonly store: GenerationStore,

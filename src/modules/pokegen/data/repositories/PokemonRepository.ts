@@ -8,6 +8,7 @@ import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokemonSpeciesDto } from "../models/dtos/PokemonSpeciesDto";
 import { PokemonAggregateData } from "../models/types/PokemonAggregateData";
 import { EvolutionChainDto } from "../models/dtos/EvolutionChainDto";
+import { ICache } from "@/core/contracts/infrastructure/cache/ICache";
 
 /**
  * Repository per gestire i dati dei Pokémon.
@@ -19,6 +20,7 @@ export class PokemonRepository implements IPokemonRepository {
         private readonly speciesDataSource: IDataSource<PokemonSpeciesDto>,
         private readonly evolutionDataSource: IDataSource<EvolutionChainDto>,
         private readonly pokemonMapper: IMapper<PokemonAggregateData, Pokemon>,
+        private readonly cache: ICache<Pokemon>,
         private readonly logger: ILogger
     ) { }
 
@@ -33,8 +35,18 @@ export class PokemonRepository implements IPokemonRepository {
     async getAsync(endpoint: string): Promise<Pokemon> {
         this.logger.debug(`[${this.className}] - Inizio del recupero dei dati del Pokémon da: ${endpoint}`);
 
-        const pokemon = await this.dataSource.fetchData(endpoint);
-        return this.pokemonMapper.map({ pokemon });
+        const key = this.cache.generateKey(this.className, "getAsync", endpoint);
+        const cached = this.cache.get(key);
+        if (cached) {
+            this.logger.debug(`[${this.className}] - Pokémon trovato nella cache da: ${endpoint}`);
+            return cached;
+        }
+
+        this.logger.debug(`[${this.className}] - Cache miss per ${endpoint}, recupero dati`);
+        const data = await this.dataSource.fetchData(endpoint);
+        const pokemon = this.pokemonMapper.map({ pokemon: data });
+        this.cache.set(key, pokemon, 1000 * 60 * 60);
+        return pokemon;
     }
 
     /**
@@ -45,10 +57,20 @@ export class PokemonRepository implements IPokemonRepository {
     async getDetailAsync(name: string): Promise<Pokemon> {
         this.logger.debug(`[${this.className}] - Inizio del recupero dei dettagli del Pokémon: ${name}`);
 
-        const pokemon = await this.dataSource.fetchData(name);
-        const species = await this.speciesDataSource.fetchData(pokemon.id.toString());
+        const key = this.cache.generateKey(this.className, "getDetailAsync", name);
+        const cached = this.cache.get(key);
+        if (cached) {
+            this.logger.debug(`[${this.className}] - Dettagli del Pokémon trovati nella cache: ${name}`);
+            return cached;
+        }
+
+        this.logger.debug(`[${this.className}] - Cache miss per i dettagli di ${name}, recupero dati`);
+        const data = await this.dataSource.fetchData(name);
+        const species = await this.speciesDataSource.fetchData(data.species.name);
         const evolution = await this.evolutionDataSource.fetchData(species.evolution_chain.url);
-        return this.pokemonMapper.map({ pokemon, species, evolution });
+        const pokemon = this.pokemonMapper.map({ pokemon: data, species, evolution });
+        this.cache.set(key, pokemon, 1000 * 60 * 60);
+        return pokemon;
     }
 
     /**

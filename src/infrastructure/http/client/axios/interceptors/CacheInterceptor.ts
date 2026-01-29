@@ -1,9 +1,9 @@
 // import { CachedResponse } from "@/core/types/CacheTypes";
-import { CacheDb } from "@/infrastructure/cache/CacheDb";
+import { CacheDb } from "@/infrastructure/indexedDb/CacheDb";
 import { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import { CacheKeyFactory } from "@/infrastructure/cache/CacheKeyFactory";
+import { CacheKeyFactory } from "@/infrastructure/indexedDb/CacheKeyFactory";
 import { CachedAxiosResponse, CustomAxiosRequestConfig } from "../types/CacheAxiosConfig";
-import { CachedResponse } from "@/infrastructure/cache/types/CachedResponse";
+import { CachedResponse } from "@/infrastructure/indexedDb/types/CachedResponse";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
