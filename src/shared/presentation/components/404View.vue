@@ -8,11 +8,11 @@
 </script>
 
 <template>
-    <div class="container mx-auto px-4 h-dvh">
+    <div class="container mx-auto px-4">
         <h1 class="text-6xl font-bold text-[#ee6052] text-center mt-12">Something went wrong.</h1>
 
         <div class="flex flex-wrap mt-8">
-            <div class="w-full md:w-1/2 flex justify-center">
+            <div class="w-1/2 flex justify-center items-center w-full">
                 <img src="/404.png" alt="sad pokemon" class="h-full w-full">
             </div>
 

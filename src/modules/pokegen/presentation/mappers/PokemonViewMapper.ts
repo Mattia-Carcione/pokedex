@@ -8,7 +8,9 @@ import { MathHelper } from "@/core/utils/math/MathHelper";
 import { PokemonVM } from "../viewmodels/types/PokemonVM";
 import { StringHelper } from "@/core/utils/string/StringHelper";
 import { PokemonEvolution } from "../../domain/types/PokemonEvolution";
-import { EvolutionStageVM, PokemonEvolutionVM } from "../viewmodels/types/EvolutionStageVM";
+import { EvolutionStageVM } from "../viewmodels/types/EvolutionStageVM";
+import { buildPokemonVM } from "./utils/evolution/BuildPokemonVM";
+import { buildEvolutionVM } from "./utils/evolution/BuildEvolutionVM";
 
 /**
  * Mapper per convertire i dati del Pokémon in un HomeViewModel.
@@ -68,12 +70,11 @@ export class PokemonViewMapper implements IPokemonViewMapper {
             pokemon.captureRate = MathHelper.formatPercentageValue(source.captureRate || 0);
 
             if (source.evolution)
-                pokemon.evolution = this.mapEvolutionToVM(source.evolution);
+                pokemon.evolution = this.mapEvolutionToVM(source.evolution, pokemon);
 
             // TODO: Aggiungere ulteriori dettagli specifici per la vista dettaglio
             return pokemon;
         } catch (error) {
-            this.logger.error("[PokemonViewMapper] - Error during mapping of Pokémon detail: " + (error as Error).message);
             throw new MappingError<Pokemon>("[PokemonViewMapper] - Error during mapping of Pokémon", source, error as Error);
         }
     }
@@ -84,62 +85,28 @@ export class PokemonViewMapper implements IPokemonViewMapper {
      * @returns L'array di PokemonEvolutionVM risultante dalla mappatura
      * @throws MappingError se la mappatura fallisce
      */
-    private mapEvolutionToVM(evolutions: PokemonEvolution[]): EvolutionStageVM[] {
+    private mapEvolutionToVM(evolutions: PokemonEvolution[], pokemon: PokemonVM): EvolutionStageVM[] {
         this.logger.debug("[PokemonViewMapper] - Inizio della mappatura dell'evoluzione del pokemon");
-        try {
-            const buildPokemonVM = (name: string, sprite?: string): { name: string; sprite?: string, href:  { name: string; params: { name: string } }} => ({
-                name,
-                sprite: sprite ?? DEFAUL_IMAGE,
-                href: {
-                    name: AppRouteName.Pokemon,
-                    params: { name }
-                }
-            });
-            const buildEvolutionVM = (e: PokemonEvolution): PokemonEvolutionVM => ({
-                    from: e.from,
-                    to: e.to,
-                    sprite: e.spriteTo ?? DEFAUL_IMAGE,
-                    minLevel: e.minLevel,
-                    item: e.item,
-                    itemSprite: e.item ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${e.item.toLowerCase()}.png` : undefined,
-                    gender: e.gender?.toString(),
-                    timeOfDay: e.timeOfDay,
-                    needsOverworldRain: e.needsOverworldRain,
-                    knownMove: e.knownMove,
-                    knownMoveType: e.knownMoveType,
-                    location: e.location,
-                    minHappiness: e.minHappiness,
-                    minBeauty: e.minBeauty,
-                    minAffection: e.minAffection,
-                    relativePhysicalStats: e.relativePhysicalStats,
-                    partySpecies: e.partySpecies,
-                    partyType: e.partyType,
-                    tradeSpecies: e.tradeSpecies,
-                    minMoveCount: e.minMoveCount,
-                    needsMultiplayer: e.needsMultiplayer,
-                    turnUpsideDown: e.turnUpsideDown,
-                    usedMove: e.usedMove,
-                    href: { name: AppRouteName.Pokemon, params: { name: e.to } }
-                }
-            );
-
-            const stageMap: Record<string, EvolutionStageVM> = {};
-
-            for (const evo of evolutions) {
-                if (!stageMap[evo.from]) {
-                    // nuovo stage
-                    stageMap[evo.from] = {
-                        pokemons: buildPokemonVM(evo.from, evo.spriteFrom ?? DEFAUL_IMAGE),
-                        evolutions: []
-                    };
-                }
-                stageMap[evo.from].evolutions!.push(buildEvolutionVM(evo));
-            }
-
-            return Object.values(stageMap);
-        } catch (error) {
-            this.logger.error("[PokemonViewMapper] - Error during mapping evolution to VM: " + (error as Error).message);
-            throw error;
+        if(!evolutions || evolutions.length === 0) {
+            this.logger.warn("[PokemonViewMapper] - Nessuna evoluzione trovata per il pokemon. Eseguo mappatura fallback.");
+            return [{
+                pokemons: buildPokemonVM(pokemon.name, pokemon.sprite),
+                evolutions: []
+            }];
         }
+
+        const stageMap: Record<string, EvolutionStageVM> = {};
+        for (const evo of evolutions) {
+            if (!stageMap[evo.from]) {
+                // nuovo stage
+                stageMap[evo.from] = {
+                    pokemons: buildPokemonVM(evo.from, evo.spriteFrom ?? DEFAUL_IMAGE),
+                    evolutions: []
+                };
+            }
+            stageMap[evo.from].evolutions!.push(buildEvolutionVM(evo));
+        }
+
+        return Object.values(stageMap);
     }
 }
