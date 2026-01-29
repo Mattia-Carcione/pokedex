@@ -54,9 +54,9 @@ Implementazioni concrete delle interfacce core:
 
 ### Application Layer (`src/app/`)
 Bootstrap e configurazione dell'applicazione:
-- `di/`: **Dependency Injection** centralizzato con `AppContainer` (root) e `PokegenContainer` (feature). Usa `FactoryHelper` generico per istanziare classi in base all'ambiente (prod/dev)
-- `routing/`: Configurazione Vue Router con `AppRouteName` enum
-- `presentation/`: Layout globali (Hero, Navbar) e ViewModel
+- `di/`: **Dependency Injection** centralizzato con `AppContainer` (root) e `PokegenContainer` (feature). Usa `FactoryHelper` generico per istanziare classi in base all'ambiente (prod/dev).
+- `routing/`: Configurazione Vue Router con `AppRouteName` enum (Home = '/')
+- `presentation/`: Layout globali (Hero, Navbar, Footer) e ViewModel
 - `styles/`: CSS globali e variabili Tailwind
 - `EnvironmentEnum`: Enum per ambienti (DEVELOPMENT, PRODUCTION, TESTING)
 
@@ -69,7 +69,9 @@ Feature PokéGen organizzata in sotto-layer:
 - `usecases/`: Interfacce use case (`IGetGenerationUseCase`, `IGetPokemonUseCase`, `IGetPokemonDetailUseCase`)
 
 #### Application (`application/`)
-- `mappers/`: `GenerationMapper`, `PokemonMapper` (DTO → Domain)
+- `mappers/`: 
+  - `GenerationMapper`, `PokemonMapper` (DTO → Domain)
+  - `utils/`: Utility per mapper (`Traverse` per traversal ricorsivo catena evolutiva)
 - `usecases/`: Implementazioni use case (`GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`)
 
 #### Data (`data/`)
@@ -85,9 +87,11 @@ Feature PokéGen organizzata in sotto-layer:
 #### Presentation (`presentation/`)
 - `controllers/`: `UseGenerationController`, `UsePokemonController` (orchestrano use case e store)
 - `store/`: Store Pinia (`UseGenerationStore`, `UsePokegenStore`)
-- `mappers/`: `NavbarMapper`, `PokemonViewMapper` (Domain → ViewModel)
+- `mappers/`: 
+  - `NavbarMapper`, `PokemonViewMapper` (Domain → ViewModel)
+  - `utils/evolution/`: Utility builder (`BuildPokemonVM`, `BuildEvolutionVM`)
 - `viewmodels/`: `HomeViewModel`, `DetailViewModel`, `PokemonVM`
-- `components/`: Componenti Vue (`Card`, `BadgeType`, `Skeleton`)
+- `components/`: Componenti Vue (`Card`, `BadgeType`, `Skeleton`, `EvolutionChain`)
 - `views/`: Viste principali (`HomeView`, `DetailView`)
 - `enums/`: `TypeRequestEnum` per discriminare tipo di richiesta
 - `factories/`: Factory per controller
@@ -104,7 +108,7 @@ Componenti e logica riutilizzabili (usati trasversalmente da più feature):
 - `factories/`: `BlobContainer` per dependency injection (DataSourceFactory consolidato in AppContainer)
 
 ## Rotte
-- `/` – Home (redirect a `/generation/1`)
+- `/` – Home (lista generazioni, redirect da /generation/1)
 - `/generation/:id` – Lista Pokémon di una generazione specifica
 - `/pokemon/:name` – Dettaglio Pokémon (UI in sviluppo, dati già esposti dal controller)
 - `/:pathMatch(.*)*` – Pagina 404 personalizzata
@@ -160,14 +164,14 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
 src/
   app/
     di/
-      AppContainer.ts                # DI container principale
+      AppContainer.ts                # DI container principale (nota: DEV invertito)
       pokegen/
         PokegenContainer.ts          # DI container pokegen
     presentation/
-      layout/                        # Hero, Navbar
+      layout/                        # Hero, Navbar, Footer
       viewmodels/                    # NavbarViewModel
     routing/
-      AppRouteName.ts                # Enum rotte
+      AppRouteName.ts                # Enum rotte (Home = '/')
       routes.ts                      # Configurazione router
     styles/
     const.ts                         # Costanti app
@@ -196,7 +200,7 @@ src/
   modules/
     pokegen/
       application/
-        mappers/                     # DTO → Domain
+        mappers/                     # DTO → Domain (+ utils/Traverse)
         usecases/                    # Business logic
       data/
         datasources/                 # API, mock e aggregati
@@ -209,10 +213,10 @@ src/
         repositories/                # Interfacce repository
         usecases/                    # Interfacce use case
       presentation/
-        components/                  # Card, BadgeType, Skeleton
+        components/                  # Card, BadgeType, Skeleton, EvolutionChain
         controllers/                 # Orchestrazione
         factories/                   # Factory controller
-        mappers/                     # Domain → ViewModel
+        mappers/                     # Domain → ViewModel (+ utils/evolution/)
         store/                       # Pinia stores
         viewmodels/                  # HomeViewModel, DetailViewModel
         views/                       # HomeView, DetailView
@@ -260,9 +264,12 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ **Pagina dettaglio Pokémon** completa (stats, flavor text, size/capture rate, catena evolutiva)
 
 ## Ultimi aggiornamenti
-- **v1.2.0**: Refactoring mapper e servizi di evoluzione
-  - Estratto `EvolutionSpriteEnricherService` per enrichment sprite evoluzione
-  - Estratto `NavigationPokemonLoaderService` per caricamento dati navigazione
-  - Refactored `PokemonMapper` con ottimizzazione algoritmo traversal catena evolutiva (da ricorsivo a Map-based)
-  - Refactored `PokemonViewMapper` con separazione logica di enrichment
-  - Miglioramento maintainability e testabilità della logica di evoluzione
+- **v1.3.0**: Refactoring mapper e utility di evoluzione
+  - Estratto `Traverse` da `PokemonMapper` in file separato `mappers/utils/Traverse.ts`
+  - Estratto `BuildPokemonVM` e `BuildEvolutionVM` da `PokemonViewMapper` in `presentation/mappers/utils/evolution/`
+  - Creato componente `Footer.vue` dedicato per il footer dell'app
+  - Corretto route home da 'home' a '/' in `AppRouteName`
+  - Estratto `main.js` per montare Footer su elemento dedicato `#footer`
+  - Refactored `EvolutionChain.vue` per miglior feedback visuale (messaggio "no evolution")
+  - Refactored `PokemonViewMapper.mapEvolutionToVM()` per gestire fallback evoluzione
+  - Miglioramento maintainability, testabilità e separazione responsabilità mapper
