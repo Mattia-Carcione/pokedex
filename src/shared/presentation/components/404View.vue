@@ -11,9 +11,9 @@
     <div class="container mx-auto px-4">
         <h1 class="text-6xl font-bold text-[#ee6052] text-center mt-12">Something went wrong.</h1>
 
-        <div class="flex flex-wrap mt-8">
-            <div class="w-1/2 flex justify-center items-center w-full">
-                <img src="/404.png" alt="sad pokemon" class="h-full w-full">
+        <div class="flex flex-wrap mt-8 justify-center items-center">
+            <div class="w-1/2 flex justify-center items-center">
+                <img src="/404.png" alt="sad pokemon" class="w-35 md:w-48 lg:w-60"/>
             </div>
 
             <div class="w-full md:w-1/2 mt-8 md:mt-0 flex flex-col items-center">
