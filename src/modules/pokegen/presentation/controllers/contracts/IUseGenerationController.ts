@@ -1,4 +1,4 @@
-import { NavbarViewModel } from "@/app/presentation/viewmodels/NavbarViewModel";
+import { NavbarViewModel } from "@/modules/pokegen/presentation/viewmodels/NavbarViewModel";
 import { IUseControllerBase } from "@/core/contracts/presentation/IUseControllerBase";
 import { ComputedRef } from "vue";
 

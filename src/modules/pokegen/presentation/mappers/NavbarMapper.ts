@@ -1,8 +1,8 @@
-import { NavbarViewModel } from "@/app/presentation/viewmodels/NavbarViewModel";
+import { NavbarViewModel } from "@/modules/pokegen/presentation/viewmodels/NavbarViewModel";
 import { Generation } from "../../domain/entities/Generation";
 import { INavbarMapper } from "./contracts/INavbarMapper";
 import { MappingError } from "@/core/errors/MappingError";
-import { AppRouteName } from "@/app/routing/AppRouteName";
+import { PokegenRouteName } from "@/modules/pokegen/presentation/routing/PokegenRouteName";
 import { MathHelper } from "@/core/utils/math/MathHelper";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
@@ -25,7 +25,7 @@ export class NavBarMapper implements INavbarMapper {
                 return {
                     version: gen.version,
                     displayVersion: MathHelper.convertToRomanNumber(gen.version),
-                    href: { name: AppRouteName.Generation, params: { id: Number(gen.version) } },
+                    href: { name: PokegenRouteName.Generation, params: { id: Number(gen.version) } },
                     label: `Vai alla Generazione: ${gen.version}`,
                 }
             });

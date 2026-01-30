@@ -1,4 +1,4 @@
-import { EnvironmentEnum } from "@/app/EnvironmentEnum";
+import { EnvironmentEnum } from "@/core/enums/EnvironmentEnum";
 
 /**
  * Classe factory helper per la creazione di istanze in base all'ambiente.

@@ -13,18 +13,26 @@ const toggle = () => {
     <section id="flavor-text-section" class="flex flex-col space-y-2 w-full mx-auto rounded-xl bg-[var(--bg-custom)]/50 p-1">
 
         <!-- HEADER -->
-        <div class="flex items-center gap-2 p-3 cursor-pointer select-none" @click="toggle">
-            <h2 class="font-bold text-xl flex items-center">
-                Flavor Text Entry
-            </h2>
+        <header class="flex items-center gap-2 p-3 select-none">
+            <button
+                type="button"
+                class="flex items-center gap-2 w-full text-left"
+                @click="toggle"
+                :aria-expanded="expanded"
+                aria-controls="flavor-text-content"
+            >
+                <h2 class="font-bold text-xl flex items-center">
+                    Flavor Text Entry
+                </h2>
 
-            <!-- TOGGLE -->
-            <span class="inline-block transition-transform duration-200" :class="expanded ? 'rotate-0' : '-rotate-90'">
-                <img src="/icons/arrowDown.svg" class="h-10 w-10" alt="">
-            </span>
-        </div>
+                <!-- TOGGLE -->
+                <span class="inline-block transition-transform duration-200" :class="expanded ? 'rotate-0' : '-rotate-90'">
+                    <img src="/icons/arrowDown.svg" class="h-10 w-10" alt="">
+                </span>
+            </button>
+        </header>
         <!-- CICLO GENERAZIONI -->
-        <div v-show="expanded" class="bg-amber-50/75 rounded-xl md:p-2">
+        <div id="flavor-text-content" v-show="expanded" class="bg-amber-50/75 rounded-xl md:p-2">
             <template v-for="item in flavorText" :key="item.version">
                 <!-- TABELLA -->
                 <h3 class="text-center font-bold text-lg pb-3">

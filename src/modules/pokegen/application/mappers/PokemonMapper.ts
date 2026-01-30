@@ -5,7 +5,6 @@ import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { PokemonAggregateData } from "../../data/models/types/PokemonAggregateData";
 import { PokemonDto } from "../../data/models/dtos/PokemonDto";
 import { PokemonSpeciesDto } from "../../data/models/dtos/PokemonSpeciesDto";
-import { DEFAUL_IMAGE } from "@/app/const";
 import { EvolutionChainDto } from "../../data/models/dtos/EvolutionChainDto";
 import { PokemonEvolution } from "../../domain/types/PokemonEvolution";
 import { traverse } from "./utils/Traverse";
@@ -40,7 +39,7 @@ export class PokemonMapper implements IPokemonMapper {
                 pokemon.height,
                 pokemon.weight,
                 pokemon.stats.map(s => ({ name: s.stat.name, base: s.base_stat })),
-                pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? DEFAUL_IMAGE
+                pokemon.sprites.other?.home.front_default ?? pokemon.sprites.front_default ?? ""
             );
 
             this.mapSpecies(entity, species);

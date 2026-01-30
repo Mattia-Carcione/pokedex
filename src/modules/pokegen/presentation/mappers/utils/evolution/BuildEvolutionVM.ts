@@ -1,8 +1,8 @@
 import { PokemonEvolution } from "@/modules/pokegen/domain/types/PokemonEvolution";
 import { PokemonEvolutionVM } from "../../../viewmodels/types/EvolutionStageVM";
-import { DEFAUL_IMAGE } from "@/app/const";
+import { DEFAULT_POKEMON_IMAGE } from "@/modules/pokegen/presentation/config/PokegenAssets";
 import { pokemonGenderMap } from "../../../enums/PokemonGendereMap";
-import { AppRouteName } from "@/app/routing/AppRouteName";
+import { PokegenRouteName } from "@/modules/pokegen/presentation/routing/PokegenRouteName";
 
 /**
  * Costruisce un oggetto PokemonEvolutionVM per la visualizzazione dell'evoluzione del Pokémon.
@@ -13,7 +13,7 @@ export function buildEvolutionVM(e: PokemonEvolution): PokemonEvolutionVM {
     return ({
         from: e.from,
         to: e.to,
-        sprite: e.spriteTo ?? DEFAUL_IMAGE,
+        sprite: e.spriteTo ?? DEFAULT_POKEMON_IMAGE,
         minLevel: e.minLevel,
         item: e.item,
         itemSprite: e.item ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/${e.item.toLowerCase()}.png` : undefined,
@@ -34,6 +34,6 @@ export function buildEvolutionVM(e: PokemonEvolution): PokemonEvolutionVM {
         needsMultiplayer: e.needsMultiplayer,
         turnUpsideDown: e.turnUpsideDown,
         usedMove: e.usedMove,
-        href: { name: AppRouteName.Pokemon, params: { name: e.to } }
+        href: { name: PokegenRouteName.Pokemon, params: { name: e.to } }
     });
 }

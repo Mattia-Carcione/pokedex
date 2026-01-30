@@ -5,25 +5,62 @@
   <meta charset="UTF-8">
   <link rel="icon" href="/poke-icon.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PokéGen</title>
+  <title>PokéGen Pokédex | Pokémon by Generation, Stats & Evolutions</title>
+  <meta name="description" content="PokéGen is a Pokédex to explore Pokémon by generation, with stats, evolutions, types, and lore. Search any Pokémon instantly.">
+  <meta name="keywords" content="Pokédex, Pokemon, Pokémon, generations, evolution chain, stats, types, PokéAPI, PokéGen, Pokéball, poké ball, creatures, monsters, gaming, anime, pocket monsters">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0075BE">
+  <meta name="author" content="PokéGen">
+
+  <meta property="og:title" content="PokéGen Pokédex | Pokémon by Generation, Stats & Evolutions">
+  <meta property="og:description" content="PokéGen is a Pokédex to explore Pokémon by generation, with stats, evolutions, types, and lore. Search any Pokémon instantly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/">
+  <meta property="og:image" content="/poke-icon.svg">
+  <meta property="og:site_name" content="PokéGen">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PokéGen Pokédex | Pokémon by Generation, Stats & Evolutions">
+  <meta name="twitter:description" content="PokéGen is a Pokédex to explore Pokémon by generation, with stats, evolutions, types, and lore. Search any Pokémon instantly.">
+  <meta name="twitter:image" content="/poke-icon.svg">
+
+  <script type="application/ld+json" id="structured-data">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "#website",
+          "name": "PokéGen",
+          "url": "/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "/?search={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+  </script>
 </head>
 
 <body id="home">
-  <header id="header"></header>
-  <div id="search" class="sticky top-1 z-[999] text-center relative w-full max-w-xs mx-auto">
+  <header id="header" class="text-center" role="banner"></header>
+  <section id="search" class="sticky top-1 z-[999] text-center relative w-full max-w-xs mx-auto" aria-label="Search">
 
-  </div>
+  </section>
   <div class="text-center mt-3">
-    <p id="set-gen"
+    <h2 id="set-gen"
         class="font-bold text-[2rem] text-[var(--color-primary)] [text-shadow:-1px_-1px_0_#0075BE,1px_-1px_0_#0075BE,-1px_1px_0_#0075BE,1px_1px_0_#0075BE]">
         Select a Generation:
-    </p>
+    </h2>
   </div>
-  <div id="nav" aria-label="Sezione per la navbar" class="sticky top-16 z-[999]">
+  <section id="nav" aria-label="Sezione per la navbar" class="sticky top-16 z-[999]">
     
-  </div>
+  </section>
   <main id="app"></main>
-  <footer id="footer" class="footer bg-gray-700 text-white text-center py-2 mt-12"></footer>
+  <footer id="footer" class="footer bg-gray-700 text-white text-center py-10"></footer>
   <script type="module" src="/src/main.js"></script>
 </body>
 

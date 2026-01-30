@@ -2,12 +2,12 @@ import { IGenerationRepository } from "@/modules/pokegen/domain/repositories/IGe
 import { Generation } from "@/modules/pokegen/domain/entities/Generation";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { PokeApiResponseDto } from "../models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/shared/data/models/dtos/PokeApiResponseDto";
 import { IGenerationMapper } from "../../application/mappers/contracts/IGenerationMapper";
 import { IPokemonMapper } from "../../application/mappers/contracts/IPokemonMapper";
 import { GenerationDto } from "../models/dtos/GenerationDto";
 import { PokemonDto } from "../models/dtos/PokemonDto";
-import { EndpointApi } from "../enums/EndpointApi";
+import { EndpointApi } from "@/shared/data/enums/EndpointApi";
 import { ICache } from "@/core/contracts/infrastructure/cache/ICache";
 
 /**

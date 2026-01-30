@@ -16,13 +16,16 @@ const [firstType, secondaryType = firstType] = colors;
         :style="{ background: `linear-gradient(150deg, ${firstType} 50%, ${secondaryType} 50%)` }">
         <RouterLink :to="card.href" :aria-label="`Vai alla scheda dettagliata di ${card.name}`"
             class="block p-5">
-            <div class="flex justify-between py-2 items-center">
+            <header class="flex justify-between py-2 items-center">
                 <BadgeName :number="card.pokedexNumber" :name="card.name" />
 
                 <BadgeType :types="card.types" />
-            </div>
+            </header>
 
-            <Sprite :pokemon="card" :className="style" />
+            <figure class="flex items-center justify-center">
+                <Sprite :pokemon="card" :className="style" />
+                <figcaption class="sr-only">{{ card.name }} sprite</figcaption>
+            </figure>
         </RouterLink>
     </article>
 </template>

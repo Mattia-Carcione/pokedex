@@ -1,6 +1,4 @@
-import { usePokeApiStore } from "../UsePokeApiStore";
-
 /**
- * Tipo che rappresenta lo store di generazione.
+ * @deprecated Spostato in modules/pokegen/presentation/store/types/StoreTypes.
  */
-export type PokeApiStore = ReturnType<typeof usePokeApiStore>;
+export {};

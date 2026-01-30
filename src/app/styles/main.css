@@ -75,3 +75,12 @@ main {
     opacity: 1;
     transform: scaleX(1);
 }
+
+#terms p, #privacy p {
+    line-height: 1.6;
+    text-align: justify;
+    text-justify: inter-word;
+    color: var(--color-secondary);
+    font-size: 1rem;
+    font-weight: 700;
+}

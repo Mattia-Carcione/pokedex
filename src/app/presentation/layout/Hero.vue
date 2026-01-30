@@ -7,11 +7,9 @@
 </script>
 
 <template>
-    <div class="text-center">
-        <RouterLink :to="{ name: AppRouteName.Home }" aria-label="Vai alla home">
-            <h1 class="pokemon my-5" translate="no">
-                {{ TITLE }}
-            </h1>
-        </RouterLink>
-    </div>
+    <RouterLink :to="{ name: AppRouteName.Home }" class="mx-auto max-w-fit" aria-label="Vai alla home">
+        <h1 class="pokemon my-5" translate="no">
+            {{ TITLE }}
+        </h1>
+    </RouterLink>
 </template>

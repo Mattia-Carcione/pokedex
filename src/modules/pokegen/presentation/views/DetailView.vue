@@ -1,11 +1,13 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { watch } from 'vue';
 
-import Loader from '@/shared/presentation/components/Loader.vue';
-import ErrorView from '@/shared/presentation/components/404View.vue';
 import { DetailViewModel } from '../viewmodels/DetailViewModel';
 import { appContainer } from '@/app/di/AppContainer';
 import { TypeRequestEnum } from '../enums/TypeRequestEnum';
+import { usePokegenDetailSeo } from '@/modules/pokegen/presentation/composables/usePokegenSeo';
+
+import Loader from '@/shared/presentation/components/Loader.vue';
+import ErrorView from '@/shared/presentation/components/404View.vue';
 import CardDetail from '../components/CardDetail.vue';
 
 const props = defineProps({ name: String });
@@ -15,6 +17,8 @@ const pkmDetailController = appContainer.pokemonController();
 watch(() => props.name, async (newName) => {
     await pkmDetailController.loadData({ endpoint: newName, req: TypeRequestEnum.DETAIL });
 }, { immediate: true });
+
+usePokegenDetailSeo(pkmDetailController);
 </script>
 
 <template>
@@ -40,7 +44,7 @@ watch(() => props.name, async (newName) => {
             
             <template v-else>
                 <div class="flex justify-center py-10">
-                    <h1 class="text-[var(--text-primary)] text-[2rem] font-bold text-center">Data not found.</h1>
+                    <p class="text-[var(--text-primary)] text-[2rem] font-bold text-center" role="status">Data not found.</p>
                 </div>
             </template>
         </template>

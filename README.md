@@ -1,6 +1,6 @@
 # PokéGen
 
-Applicazione Vue 3 + Vite che esplora i Pokémon per generazione tramite PokeAPI, con fallback a dati mock per ambienti offline/CI. Implementa Clean Architecture con separazione netta tra layers, Dependency Injection e pattern repository.
+Applicazione Vue 3 + Vite che esplora i Pokémon per generazione tramite PokeAPI, con fallback a dati mock per ambienti offline/CI. Implementa Clean Architecture con separazione netta tra layers, Dependency Injection e pattern repository. Include SEO dinamico, structured data, sitemap/robots e pagine legali.
 
 NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didattico per apprendere l'architettura clean.
 
@@ -14,11 +14,15 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 - Dependency Injection tramite `AppContainer` e container feature-specific (PokéGen, Shared) per la gestione delle dipendenze.
 - Sprite ufficiali scaricati come Blob tramite controller dedicato, con lazy loading via Intersection Observer, skeleton e fallback SVG per artwork mancanti.
 - Composable `useIntersectionObserver` per ottimizzare il caricamento delle immagini (lazy load).
+- SEO dinamico con meta tag OG/Twitter, JSON-LD e breadcrumb per rotta.
+- `robots.txt` e `sitemap.xml` generati in `public/`.
+- Pagine legali (`/privacy`, `/terms`) e footer con disclaimer.
+- Build metadata automatico (versione e last updated) aggiornato ad ogni build.
 
 ## Stack tecnico
 - **Frontend**: Vue 3, Vite, Vue Router, Pinia
 - **HTTP Client**: Axios con interceptor personalizzati (retry, cache)
-- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + InMemoryCache in-app con TTL configurabile (via `InMemoryCache.set)
+- **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + InMemoryCache in-app con TTL configurabile (via `InMemoryCache.set`)
 - **Styling**: Tailwind 4
 - **Testing**: Vitest + @vue/test-utils
 - **TypeScript**: Supporto completo con tsconfig
@@ -30,7 +34,7 @@ Contiene le regole di business indipendenti dal framework:
 - `contracts/`: Interfacce per application, data, infrastructure e presentation
   - `IUseCaseBase`, `IRepository`, `IDataSource`, `IHttpClient`, `ILogger`, `IMapper`
 - `domain/`: Entità di dominio (`Result<T, E>`)
-- `enums/`: Enum condivisi (`ApplicationErrorCode`)
+- `enums/`: Enum condivisi (`ApplicationErrorCode`, `EnvironmentEnum`)
 - `errors/`: Errori applicativi custom (`NotFoundError`, `MappingError`, `UnauthorizedError`)
 - `types/`: Tipi comuni (`Base`, `NamedResource`, `Names`)
 - `utils/`: Utility pure e helper:
@@ -56,10 +60,14 @@ Implementazioni concrete delle interfacce core:
 ### Application Layer (`src/app/`)
 Bootstrap e configurazione dell'applicazione:
 - `di/`: **Dependency Injection** centralizzato con `AppContainer` (root) e `PokegenContainer` (feature). Usa `FactoryHelper` generico per istanziare classi in base all'ambiente (prod/dev).
-- `routing/`: Configurazione Vue Router con `AppRouteName` enum (Home = '/')
-- `presentation/`: Layout globali (Hero, Navbar, Footer) e ViewModel
-- `styles/`: CSS globali e variabili Tailwind
-- `EnvironmentEnum`: Enum per ambienti (DEVELOPMENT, PRODUCTION, TESTING)
+- `routing/`: Configurazione Vue Router con `AppRouteName` enum (Home = '/') e hook `afterEach` per applicare SEO per rotta.
+- `presentation/`: Layout globali (Hero, Navbar, Footer).
+- `styles/`: CSS globali e variabili Tailwind.
+
+### Config Layer (`src/config/`)
+Configurazioni applicative indipendenti dai layer core:
+- `appConfig.ts`: `BASE_API_URL`.
+- `buildMeta.ts`: `APP_VERSION` e `LAST_UPDATED` (auto-aggiornati da `scripts/updateBuildMetadata.js`).
 
 ### Modules Layer (`src/modules/pokegen/`)
 Feature PokéGen organizzata in sotto-layer:
@@ -81,8 +89,8 @@ Feature PokéGen organizzata in sotto-layer:
   - Versioni mock per ogni datasource
 - `models/`: DTO e tipi aggregati (`GenerationDTO`, `PokemonDTO`, `PokemonSpeciesDTO`, `PokemonAggregateData`)
 - `repositories/`: Implementazioni repository con facade per datasource e mapper
-- `enums/`: `EndpointApi` per URL degli endpoint
 - `types/`: Tipi specifici del data layer
+*Nota*: gli endpoint API sono centralizzati in `src/shared/data/enums/EndpointApi`.
 
 #### Presentation (`presentation/`)
 - `controllers/`: `UseGenerationController`, `UsePokemonController` (orchestrano use case e store)
@@ -102,15 +110,17 @@ Componenti e logica riutilizzabili (usati trasversalmente da più feature):
 - `domain/`: Interfacce (`IBlobRepository`, `IGetBlobUseCase`, `IPokeApiRepository`, `IGetPokeApiUseCase`)
 - `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`, `PokeApiResponseDataSource`, `PokeApiRepository`
 - `presentation/`:
-  - `components/`: Componenti Vue riutilizzati (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
-  - `composables/`: Vue composable (`useIntersectionObserver` per lazy loading ottimizzato)
-  - `controllers/`: `UseBlobController`, `UsePokeApiController` (indice e ricerca PokeAPI)
+  - `components/`: Componenti Vue riutilizzati (`404View`, `Loader`, `CustomSection`, `ScrollToTop`, `AppMetaInfo`, `PrivacyView`, `TermsView`)
+  - `composables/`: Vue composables (`useIntersectionObserver`, `useSeo` per meta tag e JSON-LD)
+  - `controllers/`: `UseBlobController` (indice e ricerca PokeAPI spostati nella feature PokéGen)
 - `factories/`: `SharedContainer` per dependency injection (Blob + PokeAPI + cache)
 
 ## Rotte
-- `/` – Home (lista generazioni, redirect da /generation/1)
+- `/` – Home (redirect a `/generation/1`)
 - `/generation/:id` – Lista Pokémon di una generazione specifica
 - `/pokemon/:name` – Dettaglio Pokémon (UI in sviluppo, dati già esposti dal controller)
+- `/privacy` – Privacy Policy
+- `/terms` – Terms of Service
 - `/:pathMatch(.*)*` – Pagina 404 personalizzata
 
 ## Avvio rapido
@@ -119,7 +129,7 @@ Componenti e logica riutilizzabili (usati trasversalmente da più feature):
 ```bash
 npm install
 npm run dev        # sviluppo (usa mock data)
-npm run build      # build produzione (usa PokeAPI)
+npm run build      # build produzione (usa PokeAPI) + aggiorna build metadata
 npm run preview    # anteprima build locale
 npm run deploy     # build e deploy su GitHub Pages
 ```
@@ -141,7 +151,8 @@ Il `AppContainer` + `PokegenContainer` + `SharedContainer` inizializzano tutte l
 5. **PokéGen Services**: `NavigationPokemonLoaderService`, `EvolutionSpriteEnricherService`
 6. **PokéGen Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`, `GetSearchPokemonUseCase`
 7. **PokéGen Controllers**: `UseGenerationController`, `UsePokemonController`
-8. **Shared pipeline**: `BlobRepository` + `PokeApiRepository` → `GetBlobUseCase` + `GetPokeApiUseCase` → `UseBlobController` + `UsePokeApiController`
+8. **Shared pipeline**: `BlobRepository` → `GetBlobUseCase` → `UseBlobController`
+9. **PokéGen PokeAPI pipeline**: `PokeApiRepository` → `GetPokeApiUseCase` → `UsePokeApiController`
 
 ```typescript
 // Esempio utilizzo in un componente Vue
@@ -159,6 +170,12 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
   - Retry su errori transitori (429, 500, 503, 504) e errori di rete
 - **Interceptor**: Request (cache read da IndexedDB) e Response (cache write su IndexedDB, retry logic)
 
+## SEO e Metadata
+- Meta tag dinamici per route (OG/Twitter) con `applyRouteSeo`.
+- JSON-LD con `createStructuredData` e `createPokemonStructuredData`.
+- `public/robots.txt` e `public/sitemap.xml` per indicizzazione.
+- Build metadata (`APP_VERSION`, `LAST_UPDATED`) in `src/config/buildMeta.ts` aggiornati da `scripts/updateBuildMetadata.js`.
+
 ## Struttura progetto completa
 ```
 src/
@@ -169,18 +186,18 @@ src/
         PokegenContainer.ts          # DI container pokegen
     presentation/
       layout/                        # Hero, Navbar, Footer
-      viewmodels/                    # NavbarViewModel
     routing/
       AppRouteName.ts                # Enum rotte (Home = '/')
       routes.ts                      # Configurazione router
+      index.js                       # Router + SEO afterEach
     styles/
-    const.ts                         # Costanti app
-    EnvironmentEnum.ts               # Enum ambienti
+  config/
+    appConfig.ts                     # BASE_API_URL
+    buildMeta.ts                     # APP_VERSION, LAST_UPDATED
   core/
     contracts/                       # Interfacce astratte
-    costants/                        # BASE_API_URL
     domain/                          # Result<T, E>
-    enums/                           # ApplicationErrorCode
+    enums/                           # ApplicationErrorCode, EnvironmentEnum
     errors/                          # Custom errors
     types/                           # Tipi comuni
     utils/                           # Utility pure
@@ -214,8 +231,11 @@ src/
         usecases/                    # Interfacce use case
       presentation/
         components/                  # Card, BadgeType, Skeleton, EvolutionChain
+        composables/                 # usePokegenSeo
+        config/                      # PokegenAssets
         controllers/                 # Orchestrazione
         mappers/                     # Domain → ViewModel (+ utils/evolution/)
+        routing/                     # PokegenRouteName
         store/                       # Pinia stores
         viewmodels/                  # HomeViewModel, DetailViewModel
         views/                       # HomeView, DetailView
@@ -230,15 +250,17 @@ src/
       repositories/                  # IBlobRepository, IPokeApiRepository
       usecases/                      # IGetBlobUseCase, IGetPokeApiUseCase
     presentation/
-      components/                    # Loader, 404View, CustomSection, ScrollToTop
-      composables/                   # useIntersectionObserver per lazy loading
-      controllers/                   # UseBlobController, UsePokeApiController
+      components/                    # Loader, 404View, CustomSection, ScrollToTop, AppMetaInfo, PrivacyView, TermsView
+      composables/                   # useIntersectionObserver, useSeo
+      controllers/                   # UseBlobController
       viewmodels/                    # ViewModel condivisi
     factories/                       # SharedContainer
 assets/
   mock_data/                         # Dati JSON mock
 public/
   default_image.svg                  # Immagine default Pokémon
+  robots.txt                         # Robots
+  sitemap.xml                        # Sitemap
 ```
 
 ## Mock Data vs API
@@ -263,27 +285,21 @@ Build Vite + deploy automatico su branch `gh-pages` con `404.html` per SPA routi
 ✅ Clean Architecture con DI modulare  
 ✅ Immagini di fallback SVG per artwork mancanti e sprite caricati via BlobController  
 ✅ **Pagina dettaglio Pokémon** completa (stats, flavor text, size/capture rate, catena evolutiva)
+✅ SEO per rotta (meta, JSON-LD) + sitemap/robots
+✅ Pagine legali (privacy/terms) + build metadata nel footer
 
 ## Ultimi aggiornamenti
-- **v1.4.0**: Refactoring cache + ricerca PokeAPI condivisa
-  - Spostata la cache persistente in `infrastructure/indexedDb` e introdotta `InMemoryCache`
-  - Aggiunti `PokeApiRepository`, `GetPokeApiUseCase` e `UsePokeApiController`
-  - Aggiunta ricerca Pokémon con input dedicato (debounce) e lista indicizzata
-- **v1.3.0**: Refactoring mapper e utility di evoluzione
-  - Estratto `Traverse` da `PokemonMapper` in file separato `mappers/utils/Traverse.ts`
-  - Estratto `BuildPokemonVM` e `BuildEvolutionVM` da `PokemonViewMapper` in `presentation/mappers/utils/evolution/`
-  - Creato componente `Footer.vue` dedicato per il footer dell'app
-  - Corretto route home da 'home' a '/' in `AppRouteName`
-  - Estratto `main.js` per montare Footer su elemento dedicato `#footer`
-  - Refactored `EvolutionChain.vue` per miglior feedback visuale (messaggio "no evolution")
-  - Refactored `PokemonViewMapper.mapEvolutionToVM()` per gestire fallback evoluzione
-  - Miglioramento maintainability, testabilità e separazione responsabilità mapper
+- **v0.0.15**: SEO + routing e config refactor
+  - Aggiunto SEO per rotta (OG/Twitter, JSON-LD) e robots/sitemap
+  - Aggiunte pagine legali e metadata nel footer
+  - Introdotto `src/config` per API URL e build metadata
+  - Spostati asset e route name PokéGen in config/routing del modulo
 
 # English:
 
 ## PokéGen
 
-Vue 3 + Vite application that explores Pokémon by generation via PokeAPI, with fallback to mock data for offline/CI environments. Implements Clean Architecture with a strict separation between layers, Dependency Injection, and the repository pattern.
+Vue 3 + Vite application that explores Pokémon by generation via PokeAPI, with fallback to mock data for offline/CI environments. Implements Clean Architecture with a strict separation between layers, Dependency Injection, and the repository pattern. Includes dynamic SEO, structured data, sitemap/robots, and legal pages.
 
 NB: the project is intentionally over-engineered, as it is used for educational purposes to learn clean architecture.
 
@@ -298,6 +314,10 @@ NB: the project is intentionally over-engineered, as it is used for educational 
 * Dependency Injection via `AppContainer` and feature-specific containers (PokéGen, Shared) for dependency management.
 * Official sprites downloaded as Blobs via a dedicated controller, with lazy loading via Intersection Observer, skeletons, and SVG fallback for missing artwork.
 * `useIntersectionObserver` composable to optimize image loading (lazy load).
+* Dynamic SEO with OG/Twitter meta, JSON-LD, and breadcrumbs per route.
+* `robots.txt` and `sitemap.xml` in `public/`.
+* Legal pages (`/privacy`, `/terms`) and footer disclaimer.
+* Build metadata (version and last updated) updated on every build.
 
 ## Tech stack
 
@@ -318,7 +338,7 @@ Contains framework-agnostic business rules:
 
   * `IUseCaseBase`, `IRepository`, `IDataSource`, `IHttpClient`, `ILogger`, `IMapper`
 * `domain/`: Domain entities (`Result<T, E>`)
-* `enums/`: Shared enums (`ApplicationErrorCode`)
+* `enums/`: Shared enums (`ApplicationErrorCode`, `EnvironmentEnum`)
 * `errors/`: Custom application errors (`NotFoundError`, `MappingError`, `UnauthorizedError`)
 * `types/`: Common types (`Base`, `NamedResource`, `Names`)
 * `utils/`: Pure utilities and helpers:
@@ -351,10 +371,16 @@ Concrete implementations of core interfaces:
 Application bootstrap and configuration:
 
 * `di/`: **Dependency Injection** centralized with `AppContainer` (root) and `PokegenContainer` (feature). Uses generic `FactoryHelper` to instantiate classes based on environment (prod/dev).
-* `routing/`: Vue Router configuration with `AppRouteName` enum (Home = '/')
-* `presentation/`: Global layouts (Hero, Navbar, Footer) and ViewModels
+* `routing/`: Vue Router configuration with `AppRouteName` enum (Home = '/') and `afterEach` hook to apply route SEO.
+* `presentation/`: Global layouts (Hero, Navbar, Footer)
 * `styles/`: Global CSS and Tailwind variables
-* `EnvironmentEnum`: Enum for environments (DEVELOPMENT, PRODUCTION, TESTING)
+
+### Config Layer (`src/config/`)
+
+Application configuration independent from core layers:
+
+* `appConfig.ts`: `BASE_API_URL`
+* `buildMeta.ts`: `APP_VERSION` and `LAST_UPDATED` (auto-updated by `scripts/updateBuildMetadata.js`)
 
 ### Modules Layer (`src/modules/pokegen/`)
 
@@ -382,8 +408,8 @@ PokéGen feature organized into sub-layers:
   * Mock versions for each datasource
 * `models/`: DTOs and aggregated types (`GenerationDTO`, `PokemonDTO`, `PokemonSpeciesDTO`, `PokemonAggregateData`)
 * `repositories/`: Repository implementations with datasource and mapper facades
-* `enums/`: `EndpointApi` for endpoint URLs
 * `types/`: Data-layer specific types
+*Note*: endpoint constants are centralized in `src/shared/data/enums/EndpointApi`.
 
 #### Presentation (`presentation/`)
 
@@ -408,9 +434,9 @@ Reusable components and logic (used across multiple features):
 * `data/`: `BlobDataSource` (API), `BlobMockDataSource` (mock), `BlobRepository`, `PokeApiResponseDataSource`, `PokeApiRepository`
 * `presentation/`:
 
-  * `components/`: Reusable Vue components (`404View`, `Loader`, `CustomSection`, `ScrollToTop`)
-  * `composables/`: Vue composable (`useIntersectionObserver` for optimized lazy loading)
-  * `controllers/`: `UseBlobController`, `UsePokeApiController` (PokeAPI index and search)
+  * `components/`: Reusable Vue components (`404View`, `Loader`, `CustomSection`, `ScrollToTop`, `AppMetaInfo`, `PrivacyView`, `TermsView`)
+  * `composables/`: Vue composables (`useIntersectionObserver`, `useSeo` for meta tags and JSON-LD)
+  * `controllers/`: `UseBlobController` (PokeAPI index and search live in PokéGen)
 * `factories/`: `SharedContainer` for dependency injection (Blob + PokeAPI + cache)
 
 ## Routes
@@ -418,6 +444,8 @@ Reusable components and logic (used across multiple features):
 * `/` – Home (generation list, redirect from /generation/1)
 * `/generation/:id` – Pokémon list of a specific generation
 * `/pokemon/:name` – Pokémon detail (UI under development, data already exposed by the controller)
+* `/privacy` – Privacy Policy
+* `/terms` – Terms of Service
 * `/:pathMatch(.*)*` – Custom 404 page
 
 ## Quick start
@@ -427,7 +455,7 @@ Reusable components and logic (used across multiple features):
 ```bash
 npm install
 npm run dev        # development (uses mock data)
-npm run build      # production build (uses PokeAPI)
+npm run build      # production build (uses PokeAPI) + updates build metadata
 npm run preview    # local build preview
 npm run deploy     # build and deploy to GitHub Pages
 ```
@@ -451,7 +479,8 @@ The `AppContainer` + `PokegenContainer` + `SharedContainer` initialize all appli
 5. **PokéGen Services**: `NavigationPokemonLoaderService`, `EvolutionSpriteEnricherService`
 6. **PokéGen Use Cases**: `GetGenerationUseCase`, `GetPokemonUseCase`, `GetPokemonDetailUseCase`, `GetSearchPokemonUseCase`
 7. **PokéGen Controllers**: `UseGenerationController`, `UsePokemonController`
-8. **Shared pipeline**: `BlobRepository` + `PokeApiRepository` → `GetBlobUseCase` + `GetPokeApiUseCase` → `UseBlobController` + `UsePokeApiController`
+8. **Shared pipeline**: `BlobRepository` → `GetBlobUseCase` → `UseBlobController`
+9. **PokéGen PokeAPI pipeline**: `PokeApiRepository` → `GetPokeApiUseCase` → `UsePokeApiController`
 
 ```typescript
 // Example usage in a Vue component
@@ -472,6 +501,12 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
   * Retry on transient errors (429, 500, 503, 504) and network errors
 * **Interceptor**: Request (cache read from IndexedDB) and Response (cache write to IndexedDB, retry logic)
 
+## SEO and Metadata
+* Dynamic meta tags per route (OG/Twitter) via `applyRouteSeo`.
+* JSON-LD with `createStructuredData` and `createPokemonStructuredData`.
+* `public/robots.txt` and `public/sitemap.xml` for indexing.
+* Build metadata (`APP_VERSION`, `LAST_UPDATED`) in `src/config/buildMeta.ts` updated by `scripts/updateBuildMetadata.js`.
+
 ## Full project structure
 
 ```
@@ -483,18 +518,18 @@ src/
         PokegenContainer.ts          # Pokegen DI container
     presentation/
       layout/                        # Hero, Navbar, Footer
-      viewmodels/                    # NavbarViewModel
     routing/
       AppRouteName.ts                # Route enum (Home = '/')
       routes.ts                      # Router configuration
+      index.js                       # Router + SEO afterEach
     styles/
-    const.ts                         # App constants
-    EnvironmentEnum.ts               # Environment enum
+  config/
+    appConfig.ts                     # BASE_API_URL
+    buildMeta.ts                     # APP_VERSION, LAST_UPDATED
   core/
     contracts/                       # Abstract interfaces
-    costants/                        # BASE_API_URL
     domain/                          # Result<T, E>
-    enums/                           # ApplicationErrorCode
+    enums/                           # ApplicationErrorCode, EnvironmentEnum
     errors/                          # Custom errors
     types/                           # Common types
     utils/                           # Pure utilities
@@ -528,8 +563,11 @@ src/
         usecases/                    # Use case interfaces
       presentation/
         components/                  # Card, BadgeType, Skeleton, EvolutionChain
+        composables/                 # usePokegenSeo
+        config/                      # PokegenAssets
         controllers/                 # Orchestration
         mappers/                     # Domain → ViewModel (+ utils/evolution/)
+        routing/                     # PokegenRouteName
         store/                       # Pinia stores
         viewmodels/                  # HomeViewModel, DetailViewModel
         views/                       # HomeView, DetailView
@@ -544,15 +582,17 @@ src/
       repositories/                  # IBlobRepository, IPokeApiRepository
       usecases/                      # IGetBlobUseCase, IGetPokeApiUseCase
     presentation/
-      components/                    # Loader, 404View, CustomSection, ScrollToTop
-      composables/                   # useIntersectionObserver for lazy loading
-      controllers/                   # UseBlobController, UsePokeApiController
+      components/                    # Loader, 404View, CustomSection, ScrollToTop, AppMetaInfo, PrivacyView, TermsView
+      composables/                   # useIntersectionObserver, useSeo
+      controllers/                   # UseBlobController
       viewmodels/                    # Shared ViewModels
     factories/                       # SharedContainer
 assets/
   mock_data/                         # Mock JSON data
 public/
   default_image.svg                  # Default Pokémon image
+  robots.txt                         # Robots
+  sitemap.xml                        # Sitemap
 ```
 
 ## Mock Data vs API
@@ -581,21 +621,12 @@ Vite build + automatic deploy to `gh-pages` branch with `404.html` for SPA routi
 ✅ Clean Architecture with modular DI
 ✅ SVG fallback images for missing artwork and sprites loaded via BlobController
 ✅ **Pokémon detail page** complete (stats, flavor text, size/capture rate, evolution chain)
+✅ SEO per route (meta, JSON-LD) + sitemap/robots
+✅ Legal pages (privacy/terms) + build metadata in footer
 
 ## Latest updates
-
-* **v1.4.0**: Cache refactor + shared PokeAPI search
-
-  * Persistent cache moved to `infrastructure/indexedDb` and `InMemoryCache` introduced
-  * Added `PokeApiRepository`, `GetPokeApiUseCase`, and `UsePokeApiController`
-  * Added Pokémon search with dedicated input (debounce) and indexed list
-* **v1.3.0**: Mapper and evolution utility refactor
-
-  * Extracted `Traverse` from `PokemonMapper` into separate file `mappers/utils/Traverse.ts`
-  * Extracted `BuildPokemonVM` and `BuildEvolutionVM` from `PokemonViewMapper` into `presentation/mappers/utils/evolution/`
-  * Created a dedicated `Footer.vue` component for the app footer
-  * Fixed home route from 'home' to '/' in `AppRouteName`
-  * Extracted `main.js` to mount Footer on dedicated `#footer` element
-  * Refactored `EvolutionChain.vue` to improve visual feedback ("no evolution" message)
-  * Refactored `PokemonViewMapper.mapEvolutionToVM()` to handle evolution fallback
-  * Improved maintainability, testability, and separation of mapper responsibilities
+* **v0.0.15**: SEO + routing and config refactor
+  * Added route-based SEO (OG/Twitter, JSON-LD) and robots/sitemap
+  * Added legal pages and footer metadata
+  * Introduced `src/config` for API URL and build metadata
+  * Moved PokéGen presentation assets and route names into module config/routing

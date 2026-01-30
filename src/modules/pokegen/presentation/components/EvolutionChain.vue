@@ -12,14 +12,16 @@ const arrayLength = pokemon.evolution.some(
 );
 </script>
 <template>
-    <div class="mt-3 bg-[var(--bg-custom)]/50 rounded-xl p-3">
-        <h2 class="font-bold text-xl p-1">Evolution Chain</h2>
+    <section class="mt-3 bg-[var(--bg-custom)]/50 rounded-xl p-3" aria-label="Evolution chain">
+        <header>
+            <h2 class="font-bold text-xl p-1">Evolution Chain</h2>
+        </header>
 
         <!-- container principale: colonne -->
-        <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-center items-center gap-6 w-full`">
+        <div role="list" :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} justify-center items-center gap-6 w-full`">
             <template v-for="(stage, i) in pokemon.evolution" :key="i">
                 <!-- Colonna dello stage -->
-                <div :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} items-center gap-4 justify-evenly w-full lg:w-auto`">
+                <article role="listitem" :class="`flex ${arrayLength ? 'flex-row' : 'flex-col lg:flex-row'} items-center gap-4 justify-evenly w-full lg:w-auto`">
 
                     <!-- Ciclo dei Pokémon base in questo stage -->
                     <template v-if="i === 0">
@@ -106,8 +108,8 @@ const arrayLength = pokemon.evolution.some(
                             </div>
                         </template>
                     </div>
-                </div>
+                </article>
             </template>
         </div>
-    </div>
+    </section>
 </template>

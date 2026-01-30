@@ -1,13 +1,13 @@
 import { IUseControllerBase } from "@/core/contracts/presentation/IUseControllerBase";
-import { EnvironmentEnum } from "../EnvironmentEnum";
+import { EnvironmentEnum } from "@/core/enums/EnvironmentEnum";
 import { AxiosClientFactory } from "@/infrastructure/http/client/axios/AxiosClientFactory";
-import { BASE_API_URL } from "@/core/costants/BaseApiUrl";
+import { BASE_API_URL } from "@/config/appConfig";
 import { HttpErrorMapper } from "@/infrastructure/http/mappers/HttpErrorMapper";
 import { RetryEnum } from "@/infrastructure/http/enums/RetryEnum";
 import { Logger } from "@/infrastructure/logger/Logger";
 import { PokegenContainer } from "./pokegen/PokegenContainer";
 import { SharedContainer } from "@/shared/factories/SharedContainer";
-import { IUsePokeApiController } from "@/shared/presentation/controllers/contracts/IUsePokeApiController";
+import { IUsePokeApiController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokeApiController";
 import { IUseGenerationController } from "@/modules/pokegen/presentation/controllers/contracts/IUseGenerationController";
 import { IUsePokemonController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokemonController";
 

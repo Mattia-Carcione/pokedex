@@ -9,7 +9,7 @@ import { DetailViewModel } from "../viewmodels/DetailViewModel";
 import { TypeRequestEnum } from "../enums/TypeRequestEnum";
 import { Pokemon } from "../../domain/entities/Pokemon";
 import { IUsePokemonController } from "./contracts/IUsePokemonController";
-import { PokeApiStore } from "@/shared/presentation/stores/types/SharedStoreTypes";
+import { PokeApiStore } from "@/modules/pokegen/presentation/store/types/StoreTypes";
 import { IGetSearchPokemonUseCase } from "../../domain/usecases/IGetSearchPokemonUseCase";
 
 /**

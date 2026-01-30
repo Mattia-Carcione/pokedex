@@ -34,7 +34,7 @@ useIntersectionObserver(
 
 <template>
     <div ref="element" :class="`${style} flex justify-center-safe items-center bg-[var(--bg-custom)]/50 rounded-full`"
-        aria-label="Sprite del Pokémon">
+        :aria-label="`Sprite del Pokémon ${pokemon.name}`" role="img">
         <Skeleton v-if="!loaded" :class="style" />
         <img v-if="img" :src="img" :alt="`Sprite ufficiale di ${pokemon.name}`" :class="`${style} z-10 object-cover transition-opacity duration-300`" :style="{ opacity: loaded ? 1 : 0 }" loading="lazy" @load="loaded = true" />
     </div>

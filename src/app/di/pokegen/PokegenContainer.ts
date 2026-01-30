@@ -1,4 +1,4 @@
-import { EnvironmentEnum } from "../../EnvironmentEnum";
+import { EnvironmentEnum } from "@/core/enums/EnvironmentEnum";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { PokemonViewMapper } from "@/modules/pokegen/presentation/mappers/PokemonViewMapper";
@@ -23,7 +23,7 @@ import { PokemonDataSource } from "@/modules/pokegen/data/datasources/PokemonDat
 import { PokemonMockDataSource } from "@/modules/pokegen/data/datasources/mock/PokemonMockDataSource";
 import { PokemonSpeciesDto } from "@/modules/pokegen/data/models/dtos/PokemonSpeciesDto";
 import { PokemonSpeciesDataSource } from "@/modules/pokegen/data/datasources/PokemonSpeciesDataSources";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/shared/data/models/dtos/PokeApiResponseDto";
 import { PokeApiResponseMockDataSource } from "@/shared/data/datasources/mock/PokeApiResponseMockDataSource";
 import { GenerationRepository } from "@/modules/pokegen/data/repositories/GenerationRepository";
 import { PokemonRepository } from "@/modules/pokegen/data/repositories/PokemonRepository";
@@ -42,9 +42,9 @@ import { EvolutionSpriteEnricherService } from "@/modules/pokegen/application/se
 import { PokeApiRepository } from "@/shared/data/repositories/PokeApiRepository";
 import { IGetPokeApiUseCase } from "@/shared/domain/usecases/IGetPokeApiUseCase";
 import { GetPokeApiUseCase } from "@/shared/application/usecases/GetPokeApiUseCase";
-import { UsePokeApiController } from "@/shared/presentation/controllers/UsePokeApiController";
-import { usePokeApiStore } from "@/shared/presentation/stores/UsePokeApiStore";
-import { IUsePokeApiController } from "@/shared/presentation/controllers/contracts/IUsePokeApiController";
+import { UsePokeApiController } from "@/modules/pokegen/presentation/controllers/UsePokeApiController";
+import { usePokeApiStore } from "@/modules/pokegen/presentation/store/UsePokeApiStore";
+import { IUsePokeApiController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokeApiController";
 import { PokeApiResponseDataSource } from "@/shared/data/datasources/PokeApiResponseDataSource";
 import { IUseGenerationController } from "@/modules/pokegen/presentation/controllers/contracts/IUseGenerationController";
 import { IUsePokemonController } from "@/modules/pokegen/presentation/controllers/contracts/IUsePokemonController";

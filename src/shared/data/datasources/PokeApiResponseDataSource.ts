@@ -1,10 +1,10 @@
-import { EndpointApi } from "@/modules/pokegen/data/enums/EndpointApi";
+import { EndpointApi } from "@/shared/data/enums/EndpointApi";
 import { HttpError } from "@/infrastructure/http/errors/HttpError";
 import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";
 import { IHttpClient } from "@/core/contracts/infrastructure/http/IHttpClient";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/shared/data/models/dtos/PokeApiResponseDto";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**

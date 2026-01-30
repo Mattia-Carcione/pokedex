@@ -1,7 +1,7 @@
 import PokeApiResponseMockData from "@/../assets/mock_data/resource-list.json";
 import { IDataSource } from "@/core/contracts/data/IDataSource";
 import { ExternalServiceUnavailableError } from "@/core/errors/ExternalServiceUnavailableError";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/shared/data/models/dtos/PokeApiResponseDto";
 
 /**
  * Mock Data source per ottenere la lista delle generazioni Pokémon da file JSON locali.

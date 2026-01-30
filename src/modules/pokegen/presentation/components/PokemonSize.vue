@@ -4,11 +4,12 @@ const { height, weight, captureRate } = defineProps(['height', 'weight', 'captur
 
 <template>
     <table id="pokemon-size" class="w-full rounded-xl my-5 bg-[var(--bg-custom)]/75 p-3" aria-label="Pokémon size information">
+        <caption class="sr-only">Pokémon size information</caption>
         <thead>
             <tr>
-                <th class="p-1">Height</th>
-                <th class="p-1">Weight</th>
-                <th class="p-1">Capture Rate</th>
+                <th class="p-1" scope="col">Height</th>
+                <th class="p-1" scope="col">Weight</th>
+                <th class="p-1" scope="col">Capture Rate</th>
             </tr>
         </thead>
         <tbody>

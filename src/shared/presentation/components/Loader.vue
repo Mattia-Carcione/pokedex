@@ -3,10 +3,10 @@
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center h-vh gap-6 mt-15">
+    <div class="flex flex-col items-center justify-center h-vh gap-6 mt-15" role="status" aria-live="polite">
         <!-- Testo Loading con puntini animati -->
-        <div class="text-center pokemon mb-5 flex items-center">
-            Loading<span class="ml-1 inline-block">
+        <div class="text-center pokemon mb-5 flex items-center" aria-label="Loading">
+            Loading<span class="ml-1 inline-block" aria-hidden="true">
                 <span class="dot-1">.</span>
                 <span class="dot-2">.</span>
                 <span class="dot-3">.</span>

@@ -6,4 +6,6 @@ export enum AppRouteName {
     NotFound = 'NotFound',
     Generation = 'generation',
     Pokemon = 'pokemon',
+    Privacy = 'privacy',
+    Terms = 'terms',
 }

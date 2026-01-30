@@ -1,8 +1,8 @@
 import { MappingError } from "@/core/errors/MappingError";
 import { Pokemon } from "../../domain/entities/Pokemon";
 import { IPokemonViewMapper } from "./contracts/IPokemonViewMapper";
-import { AppRouteName } from "@/app/routing/AppRouteName";
-import { DEFAUL_IMAGE, TYPE_COLORS, TYPE_ICONS } from "@/app/const";
+import { PokegenRouteName } from "@/modules/pokegen/presentation/routing/PokegenRouteName";
+import { DEFAULT_POKEMON_IMAGE, TYPE_COLORS, TYPE_ICONS } from "@/modules/pokegen/presentation/config/PokegenAssets";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { MathHelper } from "@/core/utils/math/MathHelper";
 import { PokemonVM } from "../viewmodels/types/PokemonVM";
@@ -38,7 +38,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
                     name: StringHelper.capitalize(type.name),
                 })),
                 name: StringHelper.capitalize(source.name),
-                href: { name: AppRouteName.Pokemon, params: { name: source.nameSpecies } },
+                href: { name: PokegenRouteName.Pokemon, params: { name: source.nameSpecies } },
             }
         } catch (error) {
             this.logger.error("[PokemonViewMapper] - Error during mapping of Pokémon: " + (error as Error).message);
@@ -65,7 +65,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
 
             const label = StringHelper.capitalize(generation);
             const generationId = MathHelper.convertToArabicNumber(roman);
-            pokemon.generation = { href: { name: AppRouteName.Generation, params: { id: generationId ?? 1 } }, name: `${label} ${roman?.toUpperCase()}` };
+            pokemon.generation = { href: { name: PokegenRouteName.Generation, params: { id: generationId ?? 1 } }, name: `${label} ${roman?.toUpperCase()}` };
             pokemon.genderRate = MathHelper.mapGenderRate(source.genderRate || -1);
             pokemon.captureRate = MathHelper.formatPercentageValue(source.captureRate || 0);
 
@@ -101,7 +101,7 @@ export class PokemonViewMapper implements IPokemonViewMapper {
             if (!stageMap[evo.from]) {
                 // nuovo stage
                 stageMap[evo.from] = {
-                    pokemons: buildPokemonVM(evo.from, evo.spriteFrom ?? DEFAUL_IMAGE),
+                    pokemons: buildPokemonVM(evo.from, evo.spriteFrom ?? DEFAULT_POKEMON_IMAGE),
                     evolutions: []
                 };
             }

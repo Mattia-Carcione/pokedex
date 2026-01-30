@@ -1,4 +1,4 @@
-import { EnvironmentEnum } from "@/app/EnvironmentEnum";
+import { EnvironmentEnum } from "@/core/enums/EnvironmentEnum";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { IUseControllerBase } from "@/core/contracts/presentation/IUseControllerBase";
 import { IHttpErrorMapper } from "@/core/contracts/infrastructure/http/mappers/IHttpErrorMapper";

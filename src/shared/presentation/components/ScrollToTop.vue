@@ -4,10 +4,10 @@
 </script>
 
 <template>
-    <div v-if="route.name != 'NotFound'" class="size-14 animate-bounce absolute fixed bottom-10 left-5 z-30">
+    <aside v-if="route.name != 'NotFound'" class="size-14 animate-bounce absolute fixed bottom-10 left-5 z-30" aria-label="Back to top">
         <RouterLink to="#home" aria-label="Vai all'inizio">
             <img class="origin-center rotate-180" src="/icons/arrowDown.svg" alt="Arrow up icon">
             <img src="/icons/poke-icon.svg" alt="poké ball icon">
         </RouterLink>
-    </div>
+    </aside>
 </template>

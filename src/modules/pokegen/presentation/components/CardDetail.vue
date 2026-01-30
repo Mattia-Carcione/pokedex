@@ -19,41 +19,42 @@ const [firstType, secondaryType = firstType] = colors;
 
 
 <template>
-    <div id="details" class="p-1 mt-3" aria-label="Pokémon details">
-        <div :id="`info-pokemon-${name}`" class="pokemon-card relative shadow-xl p-1 md:p-5 rounded-xl"
+    <section id="details" class="p-1 mt-3" aria-label="Pokémon details">
+        <article :id="`info-pokemon-${name}`" class="pokemon-card relative shadow-xl p-1 md:p-5 rounded-xl"
             :style="{ background: `linear-gradient(90deg, ${firstType} 50%, ${secondaryType} 50%)` }"
             aria-label="Pokémon info">
 
             <!-- Navigation -->
-            <div id="detail-nav" aria-label="pokemon navigation" class="flex justify-between py-2">
+            <nav id="detail-nav" aria-label="pokemon navigation" class="flex justify-between py-2">
                 <CardDetailNavigation :prev="prev" :next="next" />
-            </div>
+            </nav>
 
             <!-- Article -->
             <article id="pokemon-info" aria-label="Pokémon info"
                 class="rounded-xl border border-amber-50/50 mt-3 md:p-5">
                 <!-- Name and Types -->
-                <div id="name-and-types" class="flex justify-between py-2 px-1">
+                <header id="name-and-types" class="flex justify-between py-2 px-1">
                     <BadgeName :number="pokemon.pokedexNumber" :name="pokemon.name" />
 
                     <BagdeType :types="pokemon.types" />
-                </div>
+                </header>
 
                 <!-- Details -->
-                <div id="main-info" aria-label="main pokemon info"
+                <section id="main-info-grid" aria-label="main pokemon info"
                     class="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 mt-5">
-                    <div class="row-span-2 space-y-8 col-span-1">
+                    <aside class="row-span-2 space-y-8 col-span-1">
                         <!-- Sprite -->
-                        <div id="sprite" class="flex items-center justify-center">
+                        <figure id="sprite" class="flex items-center justify-center">
                             <Sprite :pokemon="pokemon" :className="style" />
-                        </div>
+                            <figcaption class="sr-only">{{ pokemon.name }} sprite</figcaption>
+                        </figure>
 
                         <!-- Base Info -->
                         <BaseInfo :pokemon />
-                    </div>
+                    </aside>
 
                     <!-- Detail -->
-                    <div id="main-info" class="md:p-5 col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
+                    <section id="main-info-content" class="md:p-5 col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4">
                         <!-- Flavor Text -->
                         <FlavorTextTable :flavorText="pokemon.flavorText" />
 
@@ -62,9 +63,9 @@ const [firstType, secondaryType = firstType] = colors;
 
                         <!-- Evolution Chain -->
                         <EvolutionChain :pokemon="pokemon" />
-                    </div>
-                </div>
+                    </section>
+                </section>
             </article>
-        </div>
-    </div>
+        </article>
+    </section>
 </template>

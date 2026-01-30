@@ -3,7 +3,7 @@ import { ICache } from "@/core/contracts/infrastructure/cache/ICache";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 import { NotImplementedError } from "@/core/errors/NotImplementedError";
 import { NamedResource } from "@/core/types/CommonTypes";
-import { PokeApiResponseDto } from "@/modules/pokegen/data/models/dtos/PokeApiResponseDto";
+import { PokeApiResponseDto } from "@/shared/data/models/dtos/PokeApiResponseDto";
 import { IPokeApiRepository } from "@/shared/domain/repositories/IPokeApiRepository";
 
 /**

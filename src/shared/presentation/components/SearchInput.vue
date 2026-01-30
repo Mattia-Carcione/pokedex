@@ -48,12 +48,23 @@ watch(
 );
 </script>
 <template>
-    <!-- Icona -->
-    <span class="mt-3 absolute inset-y-0 left-3 flex items-center text-[var(--color-secondary)]/75 pointer-events-none">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1112 4.5a7.5 7.5 0 014.65 12.15z" />
-      </svg>
-    </span>
-    <input v-model="query" type="text" placeholder="Search Pokémon..." class="mt-3 bg-[#FFF] [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)] p-2 pl-10 rounded-full focus:outline-[var(--color-secondary)]/75 w-full" />
+    <form class="relative" role="search" @submit.prevent>
+      <label for="pokemon-search" class="sr-only">Search Pokémon</label>
+      <!-- Icona -->
+      <span class="mt-3 absolute inset-y-0 left-3 flex items-center text-[var(--color-secondary)]/75 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1112 4.5a7.5 7.5 0 014.65 12.15z" />
+        </svg>
+      </span>
+      <input
+        id="pokemon-search"
+        v-model="query"
+        name="search"
+        type="search"
+        placeholder="Search Pokémon..."
+        autocomplete="off"
+        class="mt-3 bg-[#FFF] [box-shadow:0_0_15px_0_rgba(0,0,0,0.2)] p-2 pl-10 rounded-full focus:outline-[var(--color-secondary)]/75 w-full"
+      />
+    </form>
 </template>

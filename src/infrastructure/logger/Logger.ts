@@ -1,4 +1,4 @@
-import { EnvironmentEnum } from "@/app/EnvironmentEnum";
+import { EnvironmentEnum } from "@/core/enums/EnvironmentEnum";
 import { ILogger } from "@/core/contracts/infrastructure/logger/ILogger";
 
 /**
