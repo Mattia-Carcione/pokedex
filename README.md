@@ -7,7 +7,7 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 ## Caratteristiche
 - Navigazione per generazione (`/generation/:id`) con elenco ordinato di Pokémon.
 - Pagina dettaglio Pokémon (`/pokemon/:name`) completa con card dedicata, stats, flavor text, size/capture rate e catena evolutiva.
-- Ricerca Pokémon con input dedicato e debounce, basata su indice PokeAPI locale e fetch dei dettagli.
+- Ricerca Pokémon con input dedicato e debounce, basata su indice PokeAPI locale e fetch dei dettagli (con deduplica risultati).
 - Stato centralizzato con Pinia e controller/use-case che orchestrano repository e store.
 - Client HTTP Axios con retry configurabile, exponential backoff con jitter e cache IndexedDB.
 - Mock data locali in `assets/mock_data` utilizzati in modalità development (incl. `pokeapi-list.json`).
@@ -25,6 +25,7 @@ NB: il progetto è volutamente over ingegnerizzato, poiché usato a scopo didatt
 - **Storage**: IndexedDB per cache delle risposte HTTP (90 giorni TTL) + InMemoryCache in-app con TTL configurabile (via `InMemoryCache.set`)
 - **Styling**: Tailwind 4
 - **Testing**: Vitest + @vue/test-utils
+- **Linting**: ESLint + boundaries
 - **TypeScript**: Supporto completo con tsconfig
 
 ## Architettura (Clean Architecture)
@@ -132,6 +133,7 @@ npm run dev        # sviluppo (usa mock data)
 npm run build      # build produzione (usa PokeAPI) + aggiorna build metadata
 npm run preview    # anteprima build locale
 npm run deploy     # build e deploy su GitHub Pages
+npm run lint       # linting con ESLint
 ```
 
 ## Test
@@ -139,6 +141,11 @@ npm run deploy     # build e deploy su GitHub Pages
 npm test              # esegue test con vitest
 npm run test:ui       # interfaccia interattiva vitest
 npm run test:coverage # report coverage
+```
+
+## Lint
+```bash
+npm run lint
 ```
 
 ## Dependency Injection (AppContainer)
@@ -178,6 +185,7 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
 
 ## Struttura progetto completa
 ```
+eslint.config.js                  # ESLint + boundaries
 src/
   app/
     di/
@@ -307,7 +315,7 @@ NB: the project is intentionally over-engineered, as it is used for educational 
 
 * Generation-based navigation (`/generation/:id`) with an ordered list of Pokémon.
 * Pokémon detail page (`/pokemon/:name`) complete with a dedicated card, stats, flavor text, size/capture rate, and evolution chain.
-* Pokémon search with dedicated input and debounce, based on a local PokeAPI index and fetching of details.
+* Pokémon search with dedicated input and debounce, based on a local PokeAPI index and fetching of details (deduped results).
 * Centralized state with Pinia and controller/use-case layers that orchestrate repositories and store.
 * Axios HTTP client with configurable retry, exponential backoff with jitter, and IndexedDB cache.
 * Local mock data in `assets/mock_data` used in development mode (incl. `pokeapi-list.json`).
@@ -326,6 +334,7 @@ NB: the project is intentionally over-engineered, as it is used for educational 
 * **Storage**: IndexedDB for HTTP response cache (90 days TTL) + in-app InMemoryCache with configurable TTL (via `InMemoryCache.set`)
 * **Styling**: Tailwind 4
 * **Testing**: Vitest + @vue/test-utils
+* **Linting**: ESLint + boundaries
 * **TypeScript**: Full support with tsconfig
 
 ## Architecture (Clean Architecture)
@@ -458,6 +467,7 @@ npm run dev        # development (uses mock data)
 npm run build      # production build (uses PokeAPI) + updates build metadata
 npm run preview    # local build preview
 npm run deploy     # build and deploy to GitHub Pages
+npm run lint       # ESLint linting
 ```
 
 ## Tests
@@ -466,6 +476,11 @@ npm run deploy     # build and deploy to GitHub Pages
 npm test              # run tests with vitest
 npm run test:ui       # vitest interactive UI
 npm run test:coverage # coverage report
+```
+
+## Lint
+```bash
+npm run lint
 ```
 
 ## Dependency Injection (AppContainer)
@@ -510,6 +525,7 @@ await pkmController.loadData({ endpoint: 'pikachu', req: TypeRequestEnum.DETAIL 
 ## Full project structure
 
 ```
+eslint.config.js                  # ESLint + boundaries
 src/
   app/
     di/

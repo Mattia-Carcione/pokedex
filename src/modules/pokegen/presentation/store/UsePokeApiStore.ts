@@ -35,22 +35,29 @@ export const usePokeApiStore = defineStore("pokemonIndex", {
      */
     async search(prefix: string, useCase: IGetSearchPokemonUseCase): Promise<void> {
       if (!this.list) return;
+
       this.data = [];
       const data: Pokemon[] = [];
       const value = prefix.trim().toLowerCase();
+
       const pokemon = this.list.filter((p) => p.name.startsWith(value));
-      console.log(pokemon)
+
       const task = pokemon.map(async (p) => {
         const response = await useCase.execute(p.url);
         return response;
       });
 
       const result = (await Promise.all(task)).flat();
-      result.map((r) => {
-        if(r.success)
-          if(r.data)
+
+      const seen = new Set<string>();
+
+      result.forEach((r) => {
+        if (r.success) {
+          if (r.data && !seen.has(r.data.name)) {
+            seen.add(r.data.name);
             data.push(r.data);
-        else {
+          }
+        } else {
           this.error = r.error ?? new Error("Error unknown");
         }
       });
