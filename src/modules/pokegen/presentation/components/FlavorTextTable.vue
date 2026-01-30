@@ -16,7 +16,7 @@ const toggle = () => {
         <header class="flex items-center gap-2 p-3 select-none">
             <button
                 type="button"
-                class="flex items-center gap-2 w-full text-left"
+                class="flex items-center gap-2 w-full text-left cursor-pointer"
                 @click="toggle"
                 :aria-expanded="expanded"
                 aria-controls="flavor-text-content"

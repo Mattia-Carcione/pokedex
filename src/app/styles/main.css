@@ -23,7 +23,7 @@ body {
 }
 
 main,
-header {
+body.header {
     @apply w-full max-w-[1800px] mx-auto;
 }
 
